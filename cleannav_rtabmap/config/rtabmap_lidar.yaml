@@ -1,0 +1,28 @@
+# CleanNav RTAB-Map LiDAR 2D 建图参数
+#
+# 来源标注：
+#   [ROS1]   ROS1 参考工程 rtabmap_slam.launch
+#   [DEFAULT] RTAB-Map C++ 默认值
+#   [TBD]    待实机验证后确定
+#
+# 注意：
+#   - 当前文件未经过真实 RTAB-Map 运行验证
+#   - 不包含任何 RGB-D 参数
+#   - 不与 launch 层重复或冲突的项（database_path、map_topic、publish_tf、
+#     frame_id、odom_frame_id、map_frame_id 等由 launch 参数传递）
+
+rtabmap:
+  ros__parameters:
+
+    # --- 传感器订阅 ---
+    subscribe_scan: true                                    # [DEFAULT] 2D LiDAR 输入
+    subscribe_depth: false                                  # [ROS1] 无深度相机
+    subscribe_rgb: false                                    # [ROS1] RGB 可选，本次不使用
+    subscribe_scan_cloud: false                             # [DEFAULT]
+
+    # --- 队列与同步 ---
+    topic_queue_size: 20                                    # [ROS1] queue_size=20
+    sync_queue_size: 20                                     # [ROS1]
+
+    # --- 不涉及 /cmd_vel ---
+    use_action_for_goal: false                              # [DEFAULT] 不发布导航目标

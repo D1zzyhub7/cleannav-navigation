@@ -4,7 +4,7 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import EnvironmentVariable, LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration
 
 
 def generate_launch_description():
@@ -13,10 +13,8 @@ def generate_launch_description():
 
     map_yaml_file = LaunchConfiguration(
         'map',
-        default=PathJoinSubstitution([
-            EnvironmentVariable('HOME'),
-            'code/cleannav/maps/cleannav_first_map.yaml',
-        ]))
+        default=os.path.join(
+            cleannav_dir, 'maps', 'cleannav_first_map.yaml'))
 
     params_file = LaunchConfiguration(
         'params_file',

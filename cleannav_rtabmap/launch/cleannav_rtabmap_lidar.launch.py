@@ -29,7 +29,7 @@ def generate_launch_description():
 
     cleannav_rtabmap_dir = get_package_share_directory('cleannav_rtabmap')
     default_cfg = os.path.join(cleannav_rtabmap_dir, 'config', 'rtabmap_lidar.ini')
-    default_db = os.path.expanduser('~/code/cleannav/maps/rtabmap_lidar.db')
+    default_db = os.path.expanduser('~/.ros/rtabmap_lidar.db')
 
     # --- 顶层可覆盖参数 ---
     database_path = LaunchConfiguration('database_path')
@@ -47,7 +47,7 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('database_path',
             default_value=default_db,
-            description='RTAB-Map database path (default: ~/code/cleannav/maps/rtabmap_lidar.db)'),
+            description='RTAB-Map database path (default: ~/.ros/rtabmap_lidar.db)'),
 
         DeclareLaunchArgument('cfg', default_value=default_cfg,
             description='RTAB-Map INI config file (RTAB-Map native format, not ROS2 YAML)'),

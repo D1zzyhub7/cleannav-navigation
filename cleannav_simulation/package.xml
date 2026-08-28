@@ -11,6 +11,7 @@
 
   <exec_depend>ackermann_steering_controller</exec_depend>
   <exec_depend>controller_manager</exec_depend>
+  <exec_depend>gazebo_plugins</exec_depend>
   <exec_depend>gazebo_ros</exec_depend>
   <exec_depend>gazebo_ros2_control</exec_depend>
   <exec_depend>joint_state_broadcaster</exec_depend>

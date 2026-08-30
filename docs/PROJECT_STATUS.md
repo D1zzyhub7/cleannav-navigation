@@ -12,7 +12,17 @@
 - `cleannav_rtabmap`
 - `cleannav_safety_supervisor`
 
-## 2. 当前 Git 基线
+当前 `main` 稳定基线包含 5 个 package；Ackermann V1 特性分支新增 `cleannav_simulation` 后，特性代码树包含 6 个 package。
+
+## 2. Stable main baseline：`main`（稳定主线基线）
+
+`main` 是已验证的差速底盘导航稳定基线，当前基线 HEAD：
+
+`f38568842998a2c71c272e9b5d5a804f86d6fcf7`
+
+主线链路：
+
+`RTAB-Map / localization → CleanNav A* → /cleannav/global_path → Path Executor → Nav2 FollowPath → DWB → Safety Supervisor → /cmd_vel`
 
 历史提取基线：
 
@@ -22,35 +32,50 @@
 
 `54a3beb6d8ffd6bf6a476ea910d057aa9c8481ae`
 
-当前分支：
+## 3. Ackermann feature status：V1 特性状态
 
-`main`
+`feature/ackermann-hybrid-mppi-v1` 是未合并到 `main` 的 Ackermann V1 开发分支。已验证代码 HEAD：
 
-## 3. 当前导航链路
+`e1446e35b2dbb983272a0cd587024c88e1347268`
 
-地图 / RTAB-Map
-→ A* Global Planner
-→ Path Bridge
-→ Nav2 FollowPath
-→ DWB Controller
-→ Safety Supervisor
-→ 最终速度输出边界
+该特性包含以下 4 个增量提交：
 
-## 4. 当前 Controller
+- `af16d83`：simulation baseline
+- `9040eeb`：lidar + sensor TF
+- `902cbf3`：Smac Hybrid-A*
+- `e1446e3`：MPPI Ackermann
 
-当前 active controller：
+Ackermann 仿真链路：
 
-`dwb_core::DWBLocalPlanner`
+`/goal_pose → Hybrid Planner Bridge → ComputePathToPose → SmacPlannerHybrid → /cleannav/global_path → Path Executor / FollowPath → MPPI Ackermann → /cleannav/cmd_vel_candidate → Safety Supervisor → /cmd_vel → Ackermann controller`
 
-当前事实：
+已确认的运行时事实：
 
-`DWB = 当前事实`
+- `FollowPath`：`SUCCEEDED`。
+- MPPI 运行时运动模型：`Ackermann`。
+- MPPI `min_turning_r`：`1.12 m`。
+- Smac `minimum_turning_radius`：`1.12 m`。
+- Gazebo `/odom` 观察到位移：`0.141 m`。
+- 最终 `/cmd_vel` 发布者：Safety Supervisor。
+- N-A5C Safety closed-loop runtime：`PASS`。
 
-后续目标：
+`1.12 m` 是当前仿真几何推导的 `SIMULATION_PLACEHOLDER`，不是最终真实车辆参数；上述证据不代表真实硬件验证。不得将该特性描述为已合并主线。
 
-`TEB = 后续目标`
+## 4. 当前 Git 基线记录
 
-TEB 当前未激活，未来切换必须作为独立导航功能变更验证。
+历史提取基线：
+
+`00bd8455035cff4c515c727bcd4e3758fef20974`
+
+独立运行适配：
+
+`54a3beb6d8ffd6bf6a476ea910d057aa9c8481ae`
+
+治理分支：
+
+`chore/github-governance`
+
+主线稳定基线使用 DWB；Ackermann V1 使用 Smac Hybrid-A* 与 MPPI Ackermann。两者属于不同分支状态，不应混写为单一“当前 controller”事实。
 
 ## 5. 地图状态
 
@@ -136,6 +161,7 @@ Safety Supervisor：
 - G5.5 branch/tag/replace-ref 治理
 - G5.6 独立运行适配与验证
 - G5.7 治理文件生成
+- N-A5C Ackermann MPPI Safety closed-loop runtime 验证
 
 尚需完成：
 

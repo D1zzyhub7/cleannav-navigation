@@ -16,6 +16,19 @@ htmlcov/
 # Runtime state
 *.db
 *.db3
+*.sqlite
+*.sqlite3
+rosbag2_*/
+*.bag
+
+# Secrets and local credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
 
 # Editors
 .vscode/

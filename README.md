@@ -1,102 +1,87 @@
 # CleanNav Navigation
 
-`cleannav-navigation` 是 CleanNav 的独立导航组件仓库，负责建图包装、全局规划、路径执行、Nav2 配置以及最终速度安全门控。
+CleanNav Navigation 是 CleanNav 的独立 ROS 2 导航仓库，负责定位包装、全局规划、路径执行、Nav2 控制集成，以及最终速度安全门控。
 
-## 1. 当前状态
+## 仓库内容
 
-当前关键 Git 基线：
+仓库代码线合计包含 6 个 ROS 2 package：`main` 稳定基线包含 5 个，Ackermann V1 特性分支新增仿真包后包含 6 个：
 
-- 历史提取基线：`00bd8455035cff4c515c727bcd4e3758fef20974`
-- 独立运行适配：`54a3beb6d8ffd6bf6a476ea910d057aa9c8481ae`
-- 主分支：`main`
-
-当前 active Nav2 controller 为 `dwb_core::DWBLocalPlanner`。
-
-TEB 当前未激活，属于后续导航技术路线。
-
-## 2. 仓库内容
-
-包含五个 ROS 2 package：
-
-- `cleannav_global_planner`：A* 全局规划。
-- `cleannav_navigation`：Nav2 参数与 bringup。
-- `cleannav_path_executor`：Path Bridge，将 Path 提交给 Nav2 `FollowPath`。
-- `cleannav_rtabmap`：RTAB-Map LiDAR 2D 包装。
+- `cleannav_simulation`：Gazebo 仿真、底盘与控制器。
+- `cleannav_navigation`：Nav2 参数、bringup 与地图资源。
+- `cleannav_global_planner`：CleanNav A* 与 Ackermann Hybrid Planner Bridge。
+- `cleannav_path_executor`：将路径提交给 Nav2 `FollowPath`。
 - `cleannav_safety_supervisor`：候选速度安全门控与最终速度仲裁。
+- `cleannav_rtabmap`：RTAB-Map LiDAR 定位包装。
 
-Safety Supervisor 不替代局部规划器；Path Bridge 不直接发布最终 Twist。
+其中 `cleannav_simulation` 属于 `feature/ackermann-hybrid-mppi-v1` 的 Ackermann Gazebo 仿真代码；它不代表已经合并到 `main`。
 
-## 3. 当前导航链路
+## Stable main baseline：`main`（稳定主线）
 
-RTAB-Map / 地图与定位输入
-→ A* Global Planner
-→ Path Bridge
-→ Nav2 FollowPath
-→ DWB Controller
-→ Safety Supervisor
-→ 最终速度输出边界
+`main` 保持已验证的差速底盘导航基线，当前基线 HEAD 为
+`f38568842998a2c71c272e9b5d5a804f86d6fcf7`。
 
-## 4. 地图与运行时数据
+```text
+RTAB-Map / localization
+  → CleanNav A* global planner
+  → /cleannav/global_path
+  → Path Executor
+  → Nav2 FollowPath
+  → DWB
+  → Safety Supervisor
+  → /cmd_vel
+```
 
-默认静态地图：
+Safety Supervisor 是最终 `/cmd_vel` 的唯一发布者。Path Executor、DWB 和其他上游组件只能参与候选控制链路，不能绕过 Safety Supervisor 直接发布最终速度。
 
-- `cleannav_navigation/maps/cleannav_first_map.yaml`
-- `cleannav_navigation/maps/cleannav_first_map.pgm`
+## Ackermann feature status：V1 特性分支
 
-地图安装到 `cleannav_navigation` package share，不再依赖原 monorepo 的绝对路径。
+`feature/ackermann-hybrid-mppi-v1` 是 Ackermann V1 开发分支，不表示已合并到 `main`，其已验证代码 HEAD 为
+`e1446e35b2dbb983272a0cd587024c88e1347268`。该分支的闭环链路为：
 
-RTAB-Map 默认数据库：
+```text
+/goal_pose
+  → Hybrid Planner Bridge
+  → ComputePathToPose
+  → SmacPlannerHybrid
+  → /cleannav/global_path
+  → Path Executor / FollowPath
+  → MPPI Ackermann
+  → /cleannav/cmd_vel_candidate
+  → Safety Supervisor
+  → /cmd_vel
+  → Ackermann controller
+```
 
-`~/.ros/rtabmap_lidar.db`
+已验证的 Ackermann 仿真要点包括：`gazebo_ros2_control`、`ackermann_steering_controller`、`/odom`、`/scan`，以及 `odom → base_footprint → base_link → base_scan` TF 链。MPPI 运行时运动模型为 Ackermann；Smac 与 MPPI 的最小转弯半径均为 `1.12 m`。
 
-数据库属于运行时状态，不应提交到 Git。
+### N-A5C 运行证据
 
-## 5. 独立验证
+- Nav2 `FollowPath`：`SUCCEEDED`。
+- MPPI Ackermann：运行时运动模型确认。
+- Gazebo `/odom`：观察到位移 `0.141 m`。
+- 最终 `/cmd_vel`：由 Safety Supervisor 发布，控制器不是最终速度所有者。
+- `1.12 m` 是由当前仿真几何推导的 `SIMULATION_PLACEHOLDER`，不是最终真实车辆参数。
 
-当前 standalone validation：
+上述结果仅代表 Ackermann Gazebo 仿真闭环验证，不代表真实硬件验证。仓库当前不包含 Mission Manager，也不允许 Mission Manager 或 APP/语音等外部入口直接发布 `/cmd_vel` 或绕过导航链路。
 
-- ROS 2 Humble
-- 5 packages
-- build PASS
-- 25 tests
-- 0 errors
-- 0 failures
-- 0 skipped
+## Safety 边界
 
-同时已验证地图安装、package prefix、monorepo 路径消除，以及 repo-local `build/`、`install/`、`log/` 不产生污染。
+控制合同固定为：
 
-## 6. 仓库边界
+```text
+controller_server → /cleannav/cmd_vel_candidate → Safety Supervisor → /cmd_vel
+```
 
-本仓库不包含：
+Safety Supervisor 负责最终速度门控、限幅、急停与授权仲裁；它不是局部规划器。动态障碍响应由局部规划器与 costmap 负责。
 
-- `cleannav_interfaces`
-- `cleannav_mission_manager`
-- Perception
-- HMI
+## 地图与运行时数据
 
-跨组件 ROS 合同由独立 `cleannav-interfaces` 仓库维护。
+- 地图：`cleannav_navigation/maps/cleannav_first_map.yaml` 与对应 PGM。
+- RTAB-Map 默认数据库：`~/.ros/rtabmap_lidar.db`。
+- 运行时数据库、colcon 产物和日志不得提交到 Git。
 
-## 7. Git 历史
+## 仓库边界
 
-原 monorepo Navigation 源提交：
+本仓库不包含 `cleannav_interfaces`、Mission Manager、Perception 或 HMI。跨组件 ROS 接口由独立接口仓库维护。
 
-`0408167e69819422e90d74f236339a39cb5fe9fb`
-
-过滤后的独立历史基线：
-
-`00bd8455035cff4c515c727bcd4e3758fef20974`
-
-独立运行适配：
-
-`54a3beb6d8ffd6bf6a476ea910d057aa9c8481ae`
-
-详细迁移记录见 `docs/MONOREPO_MIGRATION.md`。
-
-## 8. 开发原则
-
-- 功能修改与仓库治理分开提交。
-- 当前 DWB 状态必须如实记录。
-- TEB 切换必须作为独立功能变更验证。
-- Safety Supervisor 保持最终安全门控职责。
-- 运行时数据库和 colcon 产物不得进入 Git。
-- 系统级版本最终由 `cleannav-system` 固定各组件精确 SHA。
+详细状态与验证记录见 [`docs/PROJECT_STATUS.md`](docs/PROJECT_STATUS.md)。

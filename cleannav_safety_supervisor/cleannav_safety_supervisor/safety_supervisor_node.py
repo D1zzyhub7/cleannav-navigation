@@ -13,6 +13,7 @@ import rclpy
 from rclpy.executors import ExternalShutdownException, SingleThreadedExecutor
 from rclpy.node import Node
 
+from cleannav_interfaces.msg import SafetyStatus
 from cleannav_interfaces.srv import SafetyLease
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool, String
@@ -23,6 +24,7 @@ SAFETY_ACQUIRE_LEASE_SERVICE = '/cleannav/safety/acquire_lease'
 SAFETY_RELEASE_LEASE_SERVICE = '/cleannav/safety/release_lease'
 SAFETY_RESET_ESTOP_SERVICE = '/cleannav/safety/reset_emergency_stop'
 SAFETY_ESTOP_TOPIC = '/cleannav/safety/emergency_stop'
+SAFETY_STATUS_TOPIC = '/cleannav/safety_status'
 
 
 class SafetySupervisorNode(Node):
@@ -63,6 +65,8 @@ class SafetySupervisorNode(Node):
         self._cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 1)
         self._status_pub = self.create_publisher(
             String, '/cleannav/safety_supervisor_status', 1)
+        self._structured_status_pub = self.create_publisher(
+            SafetyStatus, SAFETY_STATUS_TOPIC, 1)
 
         self._candidate_sub = self.create_subscription(
             Twist, '/cleannav/cmd_vel_candidate', self._candidate_cb, 1)
@@ -234,7 +238,10 @@ class SafetySupervisorNode(Node):
         # Priority 3: stale / no candidate → zero
         now = self.get_clock().now()
         age = (now - self._last_candidate_time).nanoseconds * 1e-9
-        stale = (self._candidate_count == 0) or (age > self._candidate_timeout_sec)
+        stale = (
+            self._candidate_count == 0
+            or age > self._candidate_timeout_sec
+        )
         if stale or self._last_candidate_twist is None:
             self._cmd_vel_pub.publish(Twist())
             return
@@ -262,7 +269,10 @@ class SafetySupervisorNode(Node):
             freshness = "candidate_fresh"
 
         remaining = 0.0
-        if self._autonomous_enabled and self._autonomous_start_time is not None:
+        if (
+            self._autonomous_enabled
+            and self._autonomous_start_time is not None
+        ):
             remaining = max(
                 0.0, self._autonomous_timeout_sec
                 - (time.monotonic() - self._autonomous_start_time))
@@ -288,6 +298,27 @@ class SafetySupervisorNode(Node):
             f"last_output_limited={self._last_output_limited}"
         )
         self._status_pub.publish(String(data=status))
+        self._structured_status_pub.publish(
+            self._structured_status_message())
+
+    def _structured_status_message(self):
+        """Build structured status directly from supervisor state."""
+        message = SafetyStatus()
+        message.header.stamp = self.get_clock().now().to_msg()
+        message.header.frame_id = ''
+        message.interface_version = '1.0'
+        message.emergency_stop_active = self._emergency_stop
+        message.autonomous_enabled = self._autonomous_enabled
+        message.lease_owner_execution_id = (
+            self._lease_owner_execution_id or ''
+        )
+        if self._emergency_stop:
+            message.message = 'emergency stop active'
+        elif self._autonomous_enabled:
+            message.message = 'autonomous enabled'
+        else:
+            message.message = 'autonomous disabled'
+        return message
 
     @staticmethod
     def _valid_execution_id(execution_id):

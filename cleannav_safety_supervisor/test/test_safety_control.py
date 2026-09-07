@@ -2,6 +2,7 @@
 
 import rclpy
 import pytest
+from cleannav_interfaces.msg import SafetyStatus
 from cleannav_interfaces.srv import SafetyLease
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool
@@ -13,6 +14,7 @@ from cleannav_safety_supervisor.safety_supervisor_node import (
     SAFETY_ESTOP_TOPIC,
     SAFETY_RELEASE_LEASE_SERVICE,
     SAFETY_RESET_ESTOP_SERVICE,
+    SAFETY_STATUS_TOPIC,
     SafetySupervisorNode,
 )
 
@@ -185,3 +187,38 @@ def test_control_endpoints_are_frozen():
         '/cleannav/safety/reset_emergency_stop'
     )
     assert SAFETY_ESTOP_TOPIC == '/cleannav/safety/emergency_stop'
+    assert SAFETY_STATUS_TOPIC == '/cleannav/safety_status'
+
+
+def test_structured_status_initial_state_and_legacy_publisher_preserved(node):
+    published = []
+    node._structured_status_pub.publish = published.append
+
+    node._status_timer_cb()
+
+    assert len(published) == 1
+    status = published[0]
+    assert isinstance(status, SafetyStatus)
+    assert status.header.frame_id == ''
+    assert status.interface_version == '1.0'
+    assert status.emergency_stop_active is False
+    assert status.autonomous_enabled is False
+    assert status.lease_owner_execution_id == ''
+
+
+def test_structured_status_reflects_lease_and_estop(node):
+    published = []
+    node._structured_status_pub.publish = published.append
+    node._acquire_lease_cb(
+        _lease_request('execution-a'),
+        _lease_response(),
+    )
+    node._status_timer_cb()
+    assert published[-1].autonomous_enabled is True
+    assert published[-1].lease_owner_execution_id == 'execution-a'
+
+    node._estop_cb(Bool(data=True))
+    node._status_timer_cb()
+    assert published[-1].emergency_stop_active is True
+    assert published[-1].autonomous_enabled is False
+    assert published[-1].lease_owner_execution_id == ''

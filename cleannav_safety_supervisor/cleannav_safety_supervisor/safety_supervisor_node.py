@@ -13,9 +13,16 @@ import rclpy
 from rclpy.executors import ExternalShutdownException, SingleThreadedExecutor
 from rclpy.node import Node
 
+from cleannav_interfaces.srv import SafetyLease
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool, String
-from std_srvs.srv import SetBool
+from std_srvs.srv import SetBool, Trigger
+
+
+SAFETY_ACQUIRE_LEASE_SERVICE = '/cleannav/safety/acquire_lease'
+SAFETY_RELEASE_LEASE_SERVICE = '/cleannav/safety/release_lease'
+SAFETY_RESET_ESTOP_SERVICE = '/cleannav/safety/reset_emergency_stop'
+SAFETY_ESTOP_TOPIC = '/cleannav/safety/emergency_stop'
 
 
 class SafetySupervisorNode(Node):
@@ -51,6 +58,7 @@ class SafetySupervisorNode(Node):
 
         self._autonomous_enabled = False
         self._autonomous_start_time = None
+        self._lease_owner_execution_id: str | None = None
 
         self._cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 1)
         self._status_pub = self.create_publisher(
@@ -59,11 +67,26 @@ class SafetySupervisorNode(Node):
         self._candidate_sub = self.create_subscription(
             Twist, '/cleannav/cmd_vel_candidate', self._candidate_cb, 1)
         self._estop_sub = self.create_subscription(
-            Bool, '/cleannav/safety/emergency_stop', self._estop_cb, 1)
+            Bool, SAFETY_ESTOP_TOPIC, self._estop_cb, 1)
 
         self._autonomous_srv = self.create_service(
             SetBool, '/cleannav/safety/set_autonomous_enabled',
             self._autonomous_srv_cb)
+        self._acquire_lease_srv = self.create_service(
+            SafetyLease,
+            SAFETY_ACQUIRE_LEASE_SERVICE,
+            self._acquire_lease_cb,
+        )
+        self._release_lease_srv = self.create_service(
+            SafetyLease,
+            SAFETY_RELEASE_LEASE_SERVICE,
+            self._release_lease_cb,
+        )
+        self._reset_estop_srv = self.create_service(
+            Trigger,
+            SAFETY_RESET_ESTOP_SERVICE,
+            self._reset_estop_cb,
+        )
 
         self._cmd_timer = self.create_timer(
             1.0 / publish_freq, self._cmd_timer_cb)
@@ -83,10 +106,73 @@ class SafetySupervisorNode(Node):
             self._nonzero_candidate_count += 1
 
     def _estop_cb(self, msg: Bool):
-        if self._autonomous_enabled and msg.data:
+        if msg.data:
+            self._emergency_stop = True
             self._autonomous_enabled = False
             self._autonomous_start_time = None
-        self._emergency_stop = msg.data
+            self._lease_owner_execution_id = None
+        elif self._emergency_stop:
+            self.get_logger().warning(
+                'false emergency_stop message ignored; use reset service')
+
+    def _acquire_lease_cb(self, request, response):
+        execution_id = request.execution_id
+        if not self._valid_execution_id(execution_id):
+            response.success = False
+            response.message = 'execution_id must be a non-empty string'
+            return response
+        if self._emergency_stop:
+            response.success = False
+            response.message = 'rejected by emergency_stop'
+            return response
+
+        if self._lease_owner_execution_id is None:
+            self._lease_owner_execution_id = execution_id
+            self._autonomous_enabled = True
+            self._autonomous_start_time = None
+            response.success = True
+            response.message = 'safety lease acquired'
+        elif self._lease_owner_execution_id == execution_id:
+            self._autonomous_enabled = True
+            self._autonomous_start_time = None
+            response.success = True
+            response.message = 'safety lease already owned'
+        else:
+            response.success = False
+            response.message = 'safety lease owned by another execution'
+        return response
+
+    def _release_lease_cb(self, request, response):
+        execution_id = request.execution_id
+        if not self._valid_execution_id(execution_id):
+            response.success = False
+            response.message = 'execution_id must be a non-empty string'
+            return response
+
+        if self._lease_owner_execution_id is None:
+            self._autonomous_enabled = False
+            self._autonomous_start_time = None
+            response.success = True
+            response.message = 'safety lease already released'
+        elif self._lease_owner_execution_id == execution_id:
+            self._autonomous_enabled = False
+            self._autonomous_start_time = None
+            self._lease_owner_execution_id = None
+            response.success = True
+            response.message = 'safety lease released'
+        else:
+            response.success = False
+            response.message = 'safety lease owned by another execution'
+        return response
+
+    def _reset_estop_cb(self, request, response):
+        self._emergency_stop = False
+        self._autonomous_enabled = False
+        self._autonomous_start_time = None
+        self._lease_owner_execution_id = None
+        response.success = True
+        response.message = 'emergency_stop reset; autonomous disabled'
+        return response
 
     def _autonomous_srv_cb(self, request, response):
         if request.data:
@@ -130,7 +216,11 @@ class SafetySupervisorNode(Node):
 
         # Priority 2: autonomous timeout (checked before stale, so timeout
         # works even without candidate)
-        if self._autonomous_enabled and self._autonomous_start_time is not None:
+        if (
+            self._autonomous_enabled
+            and self._lease_owner_execution_id is None
+            and self._autonomous_start_time is not None
+        ):
             elapsed = time.monotonic() - self._autonomous_start_time
             if elapsed >= self._autonomous_timeout_sec:
                 self._autonomous_enabled = False
@@ -193,10 +283,15 @@ class SafetySupervisorNode(Node):
             f"block_all={self._block_all} "
             f"emergency_stop={self._emergency_stop} "
             f"autonomous_enabled={self._autonomous_enabled} "
+            f"lease_owner={self._lease_owner_execution_id or 'none'} "
             f"autonomous_remaining_sec={remaining:.1f} "
             f"last_output_limited={self._last_output_limited}"
         )
         self._status_pub.publish(String(data=status))
+
+    @staticmethod
+    def _valid_execution_id(execution_id):
+        return isinstance(execution_id, str) and execution_id != ''
 
 
 def main(args=None):

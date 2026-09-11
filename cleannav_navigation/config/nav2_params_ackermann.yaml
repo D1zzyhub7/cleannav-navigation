@@ -218,6 +218,9 @@ global_costmap:
       global_frame: map
       robot_base_frame: base_link
       use_sim_time: True
+      rolling_window: true
+      width: 40.0
+      height: 10.0
       # SIMULATION_PLACEHOLDER derived from current simulation geometry.
       footprint: "[[-0.45, -0.29], [-0.45, 0.29], [0.45, 0.29], [0.45, -0.29]]"
       resolution: 0.05

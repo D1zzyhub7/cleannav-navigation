@@ -129,10 +129,10 @@ controller_server:
       vx_std: 0.02
       vy_std: 0.0
       wz_std: 0.04
-      vx_max: 0.05
+      vx_max: 0.50
       vx_min: 0.0
       vy_max: 0.0
-      wz_max: 0.044
+      wz_max: 0.44
       iteration_count: 1
       temperature: 0.3
       gamma: 0.015
@@ -259,6 +259,7 @@ global_costmap:
           obstacle_min_range: 0.0
       static_layer:
         plugin: "nav2_costmap_2d::StaticLayer"
+        map_topic: /rtabmap/map
         map_subscribe_transient_local: True
       inflation_layer:
         plugin: "nav2_costmap_2d::InflationLayer"

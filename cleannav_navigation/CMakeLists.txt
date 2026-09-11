@@ -14,6 +14,7 @@ install(DIRECTORY config launch maps
 
 install(PROGRAMS
   navigation_facade_node.py
+  demo_hil_navigation_client.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

@@ -42,6 +42,8 @@ def generate_launch_description():
     map_frame = LaunchConfiguration('map_frame')
     log_level = LaunchConfiguration('log_level')
     safety_block_all = LaunchConfiguration('safety_block_all')
+    safety_max_forward_linear_x = LaunchConfiguration(
+        'safety_max_forward_linear_x')
     safety_autonomous_timeout_sec = LaunchConfiguration(
         'safety_autonomous_timeout_sec')
 
@@ -84,6 +86,7 @@ def generate_launch_description():
         launch_arguments={
             'use_sim_time': use_sim_time,
             'block_all': safety_block_all,
+            'max_forward_linear_x': safety_max_forward_linear_x,
             'autonomous_timeout_sec': safety_autonomous_timeout_sec,
         }.items(),
     )
@@ -158,6 +161,11 @@ def generate_launch_description():
             'safety_block_all',
             default_value='true',
             description='Block candidate velocities by default',
+        ),
+        DeclareLaunchArgument(
+            'safety_max_forward_linear_x',
+            default_value='0.05',
+            description='Safety maximum forward velocity in m/s',
         ),
         DeclareLaunchArgument(
             'safety_autonomous_timeout_sec',

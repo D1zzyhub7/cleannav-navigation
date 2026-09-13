@@ -81,13 +81,31 @@ def test_static_obstacle_names_are_unique_and_have_scan_height():
 def test_dynamic_sdf_and_endpoints_are_valid():
     dynamic = _model(MODEL_ROOT / "cleannav_demo_dynamic_obstacle.sdf")
     link = dynamic.find("link")
+    assert dynamic.attrib["name"] == "cleannav_demo_dynamic_obstacle"
     assert dynamic.findtext("static") == "false"
+    assert dynamic.findtext("allow_auto_disable") == "false"
     assert link is not None
+    assert link.attrib["name"] == "link"
+    assert link.findtext("gravity") == "false"
+    assert link.findtext("kinematic") == "true"
     assert link.find("collision") is not None
-    assert link.find("visual") is not None
-    assert float(
-        link.findtext("visual/geometry/box/size").split()[2]
-    ) >= 0.40
+    collision = link.find("collision")
+    assert collision.attrib["name"] == "collision"
+    assert collision.findtext("geometry/box/size") == "0.65 0.65 0.80"
+
+    visuals = link.findall("visual")
+    assert len(visuals) >= 5
+    visual_geometry_types = {
+        next(iter(visual.find("geometry"))).tag
+        for visual in visuals
+    }
+    assert {"box", "cylinder", "sphere"} <= visual_geometry_types
+    assert not link.findall(".//mesh")
+    assert "model://" not in (
+        MODEL_ROOT.joinpath(
+            "cleannav_demo_dynamic_obstacle.sdf"
+        ).read_text(encoding="utf-8")
+    )
 
     controller = _load_controller()
     endpoint_a = controller.Endpoint(4.0, -6.25, 0.40, 0.0)

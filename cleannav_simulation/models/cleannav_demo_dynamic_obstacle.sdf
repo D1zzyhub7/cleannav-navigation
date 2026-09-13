@@ -24,15 +24,80 @@
           </box>
         </geometry>
       </collision>
-      <visual name="visual">
+      <visual name="visual_left_leg">
+        <pose>-0.10 0 -0.075 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.10</radius>
+            <length>0.65</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.08 0.08 0.08 1</ambient>
+          <diffuse>0.12 0.12 0.12 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_right_leg">
+        <pose>0.10 0 -0.075 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.10</radius>
+            <length>0.65</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.08 0.08 0.08 1</ambient>
+          <diffuse>0.12 0.12 0.12 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_torso">
+        <pose>0 0 0.55 0 0 0</pose>
         <geometry>
           <box>
-            <size>0.65 0.65 0.80</size>
+            <size>0.36 0.28 0.60</size>
           </box>
         </geometry>
         <material>
-          <ambient>0.80 0.08 0.65 1</ambient>
-          <diffuse>0.80 0.08 0.65 1</diffuse>
+          <ambient>0.95 0.45 0.03 1</ambient>
+          <diffuse>1.0 0.60 0.05 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_head">
+        <pose>0 0 1.03 0 0 0</pose>
+        <geometry>
+          <sphere>
+            <radius>0.18</radius>
+          </sphere>
+        </geometry>
+        <material>
+          <ambient>0.76 0.52 0.34 1</ambient>
+          <diffuse>0.92 0.68 0.48 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_left_arm">
+        <pose>-0.25 0 0.56 0 0.10 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.07</radius>
+            <length>0.52</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.08 0.08 0.08 1</ambient>
+          <diffuse>0.15 0.15 0.15 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_right_arm">
+        <pose>0.25 0 0.56 0 -0.10 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.07</radius>
+            <length>0.52</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.08 0.08 0.08 1</ambient>
+          <diffuse>0.15 0.15 0.15 1</diffuse>
         </material>
       </visual>
     </link>

@@ -251,7 +251,7 @@ class SafetySupervisorNode(Node):
             self._cmd_vel_pub.publish(Twist())
             return
 
-        # Priority 5: forward limited candidate
+        # Priority 5: independently forward/reverse limited candidate
         limited = self._limit_twist(self._last_candidate_twist)
         self._last_output_limited = (
             limited.linear.x != self._last_candidate_twist.linear.x

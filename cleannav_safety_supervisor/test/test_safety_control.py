@@ -5,6 +5,7 @@ import pytest
 from cleannav_interfaces.msg import SafetyStatus
 from cleannav_interfaces.srv import SafetyLease
 from geometry_msgs.msg import Twist
+from rclpy.duration import Duration
 from std_msgs.msg import Bool
 from std_srvs.srv import Trigger
 
@@ -39,6 +40,131 @@ def _lease_request(execution_id):
 
 def _lease_response():
     return SafetyLease.Response()
+
+
+def _run_candidate(node, linear_x, *, angular_z=0.0, autonomous=True):
+    published = []
+    node._cmd_vel_pub.publish = published.append
+    candidate = Twist()
+    candidate.linear.x = linear_x
+    candidate.angular.z = angular_z
+    node._candidate_cb(candidate)
+    node._autonomous_enabled = autonomous
+    if autonomous:
+        node._lease_owner_execution_id = 'execution-a'
+    node._cmd_timer_cb()
+    return published[-1]
+
+
+def test_forward_velocity_below_limit_passes(node):
+    output = _run_candidate(node, 0.04)
+
+    assert output.linear.x == pytest.approx(0.04)
+
+
+def test_forward_velocity_above_limit_is_clamped(node):
+    output = _run_candidate(node, 0.20)
+
+    assert output.linear.x == pytest.approx(0.05)
+
+
+def test_reverse_velocity_below_limit_passes(node):
+    node._max_reverse_linear_x = 0.10
+
+    output = _run_candidate(node, -0.06)
+
+    assert output.linear.x == pytest.approx(-0.06)
+
+
+def test_reverse_velocity_above_limit_is_clamped(node):
+    node._max_reverse_linear_x = 0.10
+
+    output = _run_candidate(node, -0.25)
+
+    assert output.linear.x == pytest.approx(-0.10)
+
+
+def test_zero_velocity_remains_zero(node):
+    node._max_reverse_linear_x = 0.10
+
+    output = _run_candidate(node, 0.0)
+
+    assert output.linear.x == 0.0
+
+
+def test_autonomous_disabled_blocks_reverse(node):
+    node._max_reverse_linear_x = 0.10
+
+    output = _run_candidate(node, -0.06, autonomous=False)
+
+    assert output.linear.x == 0.0
+
+
+def test_emergency_stop_blocks_reverse(node):
+    node._max_reverse_linear_x = 0.10
+    candidate = Twist()
+    candidate.linear.x = -0.06
+    node._candidate_cb(candidate)
+    node._autonomous_enabled = True
+    node._lease_owner_execution_id = 'execution-a'
+    node._estop_cb(Bool(data=True))
+    published = []
+    node._cmd_vel_pub.publish = published.append
+
+    node._cmd_timer_cb()
+
+    assert published[-1].linear.x == 0.0
+
+
+def test_stale_reverse_candidate_is_blocked(node):
+    node._max_reverse_linear_x = 0.10
+    candidate = Twist()
+    candidate.linear.x = -0.06
+    node._candidate_cb(candidate)
+    node._last_candidate_time = (
+        node.get_clock().now() - Duration(seconds=1.0)
+    )
+    node._autonomous_enabled = True
+    node._lease_owner_execution_id = 'execution-a'
+    published = []
+    node._cmd_vel_pub.publish = published.append
+
+    node._cmd_timer_cb()
+
+    assert published[-1].linear.x == 0.0
+
+
+def test_lease_release_blocks_previously_allowed_reverse(node):
+    node._max_reverse_linear_x = 0.10
+    node._acquire_lease_cb(_lease_request('execution-a'), _lease_response())
+    candidate = Twist()
+    candidate.linear.x = -0.06
+    node._candidate_cb(candidate)
+    published = []
+    node._cmd_vel_pub.publish = published.append
+    node._cmd_timer_cb()
+    assert published[-1].linear.x == pytest.approx(-0.06)
+
+    node._release_lease_cb(_lease_request('execution-a'), _lease_response())
+    node._cmd_timer_cb()
+
+    assert published[-1].linear.x == 0.0
+
+
+def test_forward_and_reverse_limits_are_independent(node):
+    node._max_forward_linear_x = 0.04
+    node._max_reverse_linear_x = 0.10
+
+    forward = node._limit_twist(Twist())
+    assert forward.linear.x == 0.0
+
+    forward_input = Twist()
+    forward_input.linear.x = 0.50
+    reverse_input = Twist()
+    reverse_input.linear.x = -0.50
+
+    assert node._limit_twist(forward_input).linear.x == pytest.approx(0.04)
+    assert node._limit_twist(reverse_input).linear.x == pytest.approx(-0.10)
 
 
 def test_default_owner_and_autonomous_state(node):

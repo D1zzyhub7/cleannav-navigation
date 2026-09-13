@@ -9,11 +9,17 @@ from launch_ros.actions import Node
 def generate_launch_description():
     planner_id = LaunchConfiguration('planner_id')
     map_frame = LaunchConfiguration('map_frame')
+    replan_period_sec = LaunchConfiguration('replan_period_sec')
     use_sim_time = LaunchConfiguration('use_sim_time')
 
     return LaunchDescription([
         DeclareLaunchArgument('planner_id', default_value='GridBased'),
         DeclareLaunchArgument('map_frame', default_value='map'),
+        DeclareLaunchArgument(
+            'replan_period_sec',
+            default_value='1.0',
+            description='Periodic ComputePathToPose interval; <= 0 disables it',
+        ),
         DeclareLaunchArgument('use_sim_time', default_value='true'),
         Node(
             package='cleannav_global_planner',
@@ -23,6 +29,7 @@ def generate_launch_description():
             parameters=[{
                 'planner_id': planner_id,
                 'map_frame': map_frame,
+                'replan_period_sec': replan_period_sec,
                 'use_sim_time': use_sim_time,
             }],
         ),

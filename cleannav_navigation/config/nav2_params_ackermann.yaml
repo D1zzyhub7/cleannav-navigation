@@ -130,7 +130,9 @@ controller_server:
       vy_std: 0.0
       wz_std: 0.04
       vx_max: 0.50
-      vx_min: 0.0
+      # P1-RV: controller may sample reverse, while Safety applies the final
+      # conservative output limit independently.
+      vx_min: -0.15
       vy_max: 0.0
       wz_max: 0.44
       iteration_count: 1
@@ -140,12 +142,23 @@ controller_server:
       transform_tolerance: 0.2
       regenerate_noises: false
       motion_model: "Ackermann"
+      # Follow each Reeds-Shepp segment up to its cusp before changing
+      # direction. These are the Nav2 1.1.20 parameter names and defaults.
+      enforce_path_inversion: true
+      inversion_xy_tolerance: 0.20
+      inversion_yaw_tolerance: 0.40
       # SIMULATION_PLACEHOLDER
       # derived from current simulation geometry;
       # replace after real chassis measurement.
       AckermannConstraints:
         min_turning_r: 1.12
       critics: ["ConstraintCritic", "CostCritic", "GoalCritic", "GoalAngleCritic", "PathAlignCritic", "PathFollowCritic", "PathAngleCritic", "PreferForwardCritic"]
+      PathAlignCritic:
+        use_path_orientations: true
+      PathAngleCritic:
+        # Humble 1.1.20 uses forward_preference, not the newer mode option.
+        # PreferForwardCritic remains enabled to bias normal motion forward.
+        forward_preference: false
 
 controller_server_rclcpp_node:
   ros__parameters:
@@ -298,7 +311,9 @@ planner_server:
       plugin: "nav2_smac_planner/SmacPlannerHybrid"
       tolerance: 0.5
       allow_unknown: true
-      motion_model_for_search: "DUBIN"
+      motion_model_for_search: "REEDS_SHEPP"
+      # Upstream 1.1.20 default: prefer forward while retaining reverse arcs.
+      reverse_penalty: 2.0
       angle_quantization_bins: 72
       # SIMULATION_PLACEHOLDER
       # derived from current Ackermann simulation geometry;

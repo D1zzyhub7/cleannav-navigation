@@ -40,10 +40,16 @@ def generate_launch_description():
     autostart = LaunchConfiguration('autostart')
     planner_id = LaunchConfiguration('planner_id')
     map_frame = LaunchConfiguration('map_frame')
+    replan_period_sec = LaunchConfiguration('replan_period_sec')
     log_level = LaunchConfiguration('log_level')
     safety_block_all = LaunchConfiguration('safety_block_all')
     safety_max_forward_linear_x = LaunchConfiguration(
         'safety_max_forward_linear_x')
+    safety_max_reverse_linear_x = LaunchConfiguration(
+        'safety_max_reverse_linear_x')
+    completion_window_xy_tolerance = LaunchConfiguration(
+        'completion_window_xy_tolerance')
+    robot_base_frame = LaunchConfiguration('robot_base_frame')
     safety_autonomous_timeout_sec = LaunchConfiguration(
         'safety_autonomous_timeout_sec')
 
@@ -62,6 +68,7 @@ def generate_launch_description():
         launch_arguments={
             'planner_id': planner_id,
             'map_frame': map_frame,
+            'replan_period_sec': replan_period_sec,
             'use_sim_time': use_sim_time,
         }.items(),
     )
@@ -74,6 +81,8 @@ def generate_launch_description():
         )),
         launch_arguments={
             'use_sim_time': use_sim_time,
+            'completion_window_xy_tolerance': completion_window_xy_tolerance,
+            'robot_base_frame': robot_base_frame,
         }.items(),
     )
 
@@ -87,6 +96,7 @@ def generate_launch_description():
             'use_sim_time': use_sim_time,
             'block_all': safety_block_all,
             'max_forward_linear_x': safety_max_forward_linear_x,
+            'max_reverse_linear_x': safety_max_reverse_linear_x,
             'autonomous_timeout_sec': safety_autonomous_timeout_sec,
         }.items(),
     )
@@ -153,6 +163,11 @@ def generate_launch_description():
             description='Frame used by the Hybrid Planner Bridge',
         ),
         DeclareLaunchArgument(
+            'replan_period_sec',
+            default_value='1.0',
+            description='Periodic global replan interval; <= 0 disables it',
+        ),
+        DeclareLaunchArgument(
             'log_level',
             default_value='info',
             description='ROS log level for direct Nav2 nodes',
@@ -166,6 +181,21 @@ def generate_launch_description():
             'safety_max_forward_linear_x',
             default_value='0.05',
             description='Safety maximum forward velocity in m/s',
+        ),
+        DeclareLaunchArgument(
+            'safety_max_reverse_linear_x',
+            default_value='0.10',
+            description='Safety maximum reverse velocity magnitude in m/s',
+        ),
+        DeclareLaunchArgument(
+            'completion_window_xy_tolerance',
+            default_value='0.25',
+            description='Path Executor completion window from goal checker xy tolerance',
+        ),
+        DeclareLaunchArgument(
+            'robot_base_frame',
+            default_value='base_link',
+            description='Robot base frame used by Path Executor TF lookup',
         ),
         DeclareLaunchArgument(
             'safety_autonomous_timeout_sec',

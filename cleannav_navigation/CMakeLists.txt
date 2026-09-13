@@ -24,6 +24,10 @@ if(BUILD_TESTING)
     navigation_facade_unit
     test/test_navigation_facade.py
   )
+  ament_add_pytest_test(
+    ackermann_reverse_config
+    test/test_ackermann_reverse_config.py
+  )
 endif()
 
 ament_package()

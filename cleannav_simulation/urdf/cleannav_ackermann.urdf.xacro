@@ -19,9 +19,9 @@
   <xacro:property name="wheel_mass" value="1.0"/>
   <xacro:property name="steering_limit" value="0.60"/>
   <!-- SIMULATION_PLACEHOLDER — replace after real chassis/sensor measurement. -->
-  <xacro:property name="base_scan_x" value="0.0"/>
+  <xacro:property name="base_scan_x" value="0.50"/>
   <xacro:property name="base_scan_y" value="0.0"/>
-  <xacro:property name="base_scan_z" value="0.42"/>
+  <xacro:property name="base_scan_z" value="0.28"/>
   <xacro:property name="lidar_radius" value="0.035"/>
   <xacro:property name="lidar_height" value="0.04"/>
 
@@ -228,10 +228,10 @@
       <ray>
         <scan>
           <horizontal>
-            <samples>360</samples>
+            <samples>181</samples>
             <resolution>1.0</resolution>
-            <min_angle>-${pi}</min_angle>
-            <max_angle>${pi}</max_angle>
+            <min_angle>-${pi / 2}</min_angle>
+            <max_angle>${pi / 2}</max_angle>
           </horizontal>
         </scan>
         <range>

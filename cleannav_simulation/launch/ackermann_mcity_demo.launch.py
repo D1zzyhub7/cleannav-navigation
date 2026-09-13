@@ -59,6 +59,7 @@ def generate_launch_description():
     world = LaunchConfiguration("world")
     model_path = LaunchConfiguration("model_path")
     gui = LaunchConfiguration("gui")
+    extra_gazebo_args = LaunchConfiguration("extra_gazebo_args")
 
     spawn_x = LaunchConfiguration("spawn_x")
     spawn_y = LaunchConfiguration("spawn_y")
@@ -115,6 +116,7 @@ def generate_launch_description():
         launch_arguments={
             "world": world,
             "gui": gui,
+            "extra_gazebo_args": extra_gazebo_args,
         }.items(),
     )
 
@@ -209,6 +211,14 @@ def generate_launch_description():
                 "gui",
                 default_value="true",
                 description="Start Gazebo GUI",
+            ),
+            DeclareLaunchArgument(
+                "extra_gazebo_args",
+                default_value="",
+                description=(
+                    "Additional gzserver arguments; demo-only scene overlays "
+                    "use this to load gazebo_ros_state"
+                ),
             ),
             DeclareLaunchArgument(
                 "spawn_x",

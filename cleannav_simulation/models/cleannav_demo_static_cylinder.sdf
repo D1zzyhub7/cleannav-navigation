@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="cleannav_demo_static_cylinder">
+    <static>true</static>
+    <link name="link">
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+            <radius>0.45</radius>
+            <length>0.80</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <cylinder>
+            <radius>0.45</radius>
+            <length>0.80</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.08 0.55 0.82 1</ambient>
+          <diffuse>0.08 0.55 0.82 1</diffuse>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

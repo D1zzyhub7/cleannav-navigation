@@ -43,6 +43,8 @@ def generate_launch_description():
     replan_period_sec = LaunchConfiguration('replan_period_sec')
     log_level = LaunchConfiguration('log_level')
     safety_block_all = LaunchConfiguration('safety_block_all')
+    safety_publish_frequency = LaunchConfiguration(
+        'safety_publish_frequency')
     safety_max_forward_linear_x = LaunchConfiguration(
         'safety_max_forward_linear_x')
     safety_max_reverse_linear_x = LaunchConfiguration(
@@ -94,6 +96,7 @@ def generate_launch_description():
         )),
         launch_arguments={
             'use_sim_time': use_sim_time,
+            'publish_frequency': safety_publish_frequency,
             'block_all': safety_block_all,
             'max_forward_linear_x': safety_max_forward_linear_x,
             'max_reverse_linear_x': safety_max_reverse_linear_x,
@@ -176,6 +179,11 @@ def generate_launch_description():
             'safety_block_all',
             default_value='true',
             description='Block candidate velocities by default',
+        ),
+        DeclareLaunchArgument(
+            'safety_publish_frequency',
+            default_value='20.0',
+            description='Safety output publish frequency in Hz',
         ),
         DeclareLaunchArgument(
             'safety_max_forward_linear_x',

@@ -64,6 +64,17 @@ Safety Supervisor 是最终 `/cmd_vel` 的唯一发布者。Path Executor、DWB 
 
 上述结果仅代表 Ackermann Gazebo 仿真闭环验证，不代表真实硬件验证。仓库当前不包含 Mission Manager，也不允许 Mission Manager 或 APP/语音等外部入口直接发布 `/cmd_vel` 或绕过导航链路。
 
+## M0 Competition PC showcase
+
+M0 录制与人工验收统一使用 `cleannav_simulation` 的 Scene v2 入口：
+
+```bash
+ros2 launch cleannav_simulation ackermann_mcity_showcase_v2.launch.py
+```
+
+该入口组合 mcity world、静态障碍、动态行人、自行车巡检和 leaf cleanup 场景；
+`ackermann_mcity_static_showcase.launch.py` 及其他 demo launch 仅作为静态或历史参考，不是 M0 的 canonical showcase。
+
 ## Safety 边界
 
 控制合同固定为：

@@ -43,10 +43,14 @@ def generate_launch_description():
     replan_period_sec = LaunchConfiguration('replan_period_sec')
     log_level = LaunchConfiguration('log_level')
     safety_block_all = LaunchConfiguration('safety_block_all')
+    safety_publish_frequency = LaunchConfiguration(
+        'safety_publish_frequency')
     safety_max_forward_linear_x = LaunchConfiguration(
         'safety_max_forward_linear_x')
     safety_max_reverse_linear_x = LaunchConfiguration(
         'safety_max_reverse_linear_x')
+    safety_max_angular_z = LaunchConfiguration(
+        'safety_max_angular_z')
     completion_window_xy_tolerance = LaunchConfiguration(
         'completion_window_xy_tolerance')
     robot_base_frame = LaunchConfiguration('robot_base_frame')
@@ -94,9 +98,11 @@ def generate_launch_description():
         )),
         launch_arguments={
             'use_sim_time': use_sim_time,
+            'publish_frequency': safety_publish_frequency,
             'block_all': safety_block_all,
             'max_forward_linear_x': safety_max_forward_linear_x,
             'max_reverse_linear_x': safety_max_reverse_linear_x,
+            'max_angular_z': safety_max_angular_z,
             'autonomous_timeout_sec': safety_autonomous_timeout_sec,
         }.items(),
     )
@@ -119,6 +125,14 @@ def generate_launch_description():
         output='screen',
         parameters=[configured_params],
         remappings=[('cmd_vel', '/cleannav/cmd_vel_candidate')],
+        arguments=node_log_args,
+    )
+
+    navigation_facade = Node(
+        package='cleannav_navigation',
+        executable='navigation_facade_node.py',
+        name='cleannav_navigation_facade',
+        output='screen',
         arguments=node_log_args,
     )
 
@@ -178,14 +192,24 @@ def generate_launch_description():
             description='Block candidate velocities by default',
         ),
         DeclareLaunchArgument(
+            'safety_publish_frequency',
+            default_value='20.0',
+            description='Safety output publish frequency in Hz',
+        ),
+        DeclareLaunchArgument(
             'safety_max_forward_linear_x',
-            default_value='0.05',
+            default_value='0.35',
             description='Safety maximum forward velocity in m/s',
         ),
         DeclareLaunchArgument(
             'safety_max_reverse_linear_x',
             default_value='0.10',
             description='Safety maximum reverse velocity magnitude in m/s',
+        ),
+        DeclareLaunchArgument(
+            'safety_max_angular_z',
+            default_value='0.60',
+            description='Safety maximum angular velocity in rad/s',
         ),
         DeclareLaunchArgument(
             'completion_window_xy_tolerance',
@@ -204,6 +228,7 @@ def generate_launch_description():
         ),
         planner_server,
         controller_server,
+        navigation_facade,
         lifecycle_manager,
         planner_bridge,
         path_executor,

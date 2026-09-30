@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import copy
+import asyncio
 import math
 import threading
 from dataclasses import dataclass
@@ -152,6 +153,8 @@ class NavigationFacadeRuntime:
         use_start: bool = DEFAULT_USE_START,
         controller_id: str = DEFAULT_CONTROLLER_ID,
         goal_checker_id: str = DEFAULT_GOAL_CHECKER_ID,
+        max_planning_retries: int = 0,
+        planning_retry_delay_sec: float = 0.5,
     ) -> None:
         self._planner_client = planner_client
         self._follow_client = follow_client
@@ -159,6 +162,11 @@ class NavigationFacadeRuntime:
         self._use_start = use_start
         self._controller_id = controller_id
         self._goal_checker_id = goal_checker_id
+        # A transient empty/failed plan is common while a costmap is being
+        # updated by a moving obstacle.  Keep the test runtime default at
+        # zero for backwards compatibility; the ROS node enables retries.
+        self._max_planning_retries = max(0, int(max_planning_retries))
+        self._planning_retry_delay_sec = max(0.0, float(planning_retry_delay_sec))
 
         self._lock = threading.Lock()
         self._busy = False
@@ -223,34 +231,43 @@ class NavigationFacadeRuntime:
             planner_goal.planner_id = self._planner_id
             planner_goal.use_start = self._use_start
 
-            if not self._planner_client.server_is_ready():
-                return self._finish(outer_goal_handle, 'abort')
+            path = None
+            attempts = self._max_planning_retries + 1
+            for attempt in range(attempts):
+                if self._is_cancel_requested(session):
+                    return self._finish(outer_goal_handle, 'cancel')
+                if not self._planner_client.server_is_ready():
+                    planner_outcome = _InnerOutcome.RESULT
+                    planner_wrapped = None
+                else:
+                    planner_handle = await self._send_goal(
+                        self._planner_client, planner_goal)
+                    if planner_handle is None or not getattr(
+                            planner_handle, 'accepted', False):
+                        planner_outcome = _InnerOutcome.RESULT
+                        planner_wrapped = None
+                    else:
+                        with self._lock:
+                            session.planner_goal_handle = planner_handle
+                        planner_outcome, planner_wrapped = await self._wait_inner_result(
+                            session, planner_handle)
+                        with self._lock:
+                            session.planner_goal_handle = None
 
-            planner_handle = await self._send_goal(
-                self._planner_client,
-                planner_goal,
-            )
-            if planner_handle is None or not getattr(planner_handle, 'accepted', False):
-                return self._finish(outer_goal_handle, 'abort')
+                if planner_outcome is _InnerOutcome.CANCELED:
+                    return self._finish(outer_goal_handle, 'cancel')
+                if planner_outcome is _InnerOutcome.CANCEL_FAILED:
+                    return self._finish(outer_goal_handle, 'abort')
+                if (planner_wrapped is not None
+                        and planner_wrapped.status == GoalStatus.STATUS_SUCCEEDED
+                        and _path_is_valid(planner_wrapped.result.path)):
+                    path = planner_wrapped.result.path
+                    break
 
-            with self._lock:
-                session.planner_goal_handle = planner_handle
+                if attempt + 1 < attempts:
+                    await asyncio.sleep(self._planning_retry_delay_sec)
 
-            planner_outcome, planner_wrapped = await self._wait_inner_result(
-                session,
-                planner_handle,
-            )
-            if planner_outcome is _InnerOutcome.CANCELED:
-                return self._finish(outer_goal_handle, 'cancel')
-            if planner_outcome is _InnerOutcome.CANCEL_FAILED:
-                return self._finish(outer_goal_handle, 'abort')
-            if planner_wrapped is None or (
-                planner_wrapped.status != GoalStatus.STATUS_SUCCEEDED
-            ):
-                return self._finish(outer_goal_handle, 'abort')
-
-            path = planner_wrapped.result.path
-            if not _path_is_valid(path):
+            if path is None:
                 return self._finish(outer_goal_handle, 'abort')
 
             # 取消发生在 planner 成功与 FollowPath submit 之间时，
@@ -454,6 +471,8 @@ class NavigationFacadeNode(Node):
         self.declare_parameter('use_start', DEFAULT_USE_START)
         self.declare_parameter('controller_id', DEFAULT_CONTROLLER_ID)
         self.declare_parameter('goal_checker_id', DEFAULT_GOAL_CHECKER_ID)
+        self.declare_parameter('max_planning_retries', 3)
+        self.declare_parameter('planning_retry_delay_sec', 1.0)
 
         self._planner_client = ActionClient(
             self,
@@ -472,6 +491,9 @@ class NavigationFacadeNode(Node):
             use_start=bool(self.get_parameter('use_start').value),
             controller_id=self.get_parameter('controller_id').value,
             goal_checker_id=self.get_parameter('goal_checker_id').value,
+            max_planning_retries=self.get_parameter('max_planning_retries').value,
+            planning_retry_delay_sec=self.get_parameter(
+                'planning_retry_delay_sec').value,
         )
         self._callback_group = ReentrantCallbackGroup()
         self._action_server = ActionServer(

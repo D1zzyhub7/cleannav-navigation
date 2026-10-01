@@ -336,12 +336,17 @@ def generate_launch_description():
             GroupAction(
                 condition=IfCondition(enable_dynamic),
                 actions=[
-                    # Start both actions together. The controller itself
-                    # waits for Gazebo and retries until the entity exists;
-                    # it must not depend on spawn_entity.py exiting cleanly.
+                    # Spawn first, then start the controller after a short
+                    # grace period. Starting both in the same TimerAction
+                    # caused repeated SetEntityState errors before Gazebo
+                    # had created the dynamic entity.
                     TimerAction(
                         period=SCENE_SPAWN_DELAY_SEC,
-                        actions=[dynamic_spawn, dynamic_controller],
+                        actions=[dynamic_spawn],
+                    ),
+                    TimerAction(
+                        period=SCENE_SPAWN_DELAY_SEC + 5.0,
+                        actions=[dynamic_controller],
                     ),
                 ],
             ),

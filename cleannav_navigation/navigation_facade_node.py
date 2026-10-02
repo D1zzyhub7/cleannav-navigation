@@ -21,6 +21,7 @@ from action_msgs.msg import GoalStatus
 from action_msgs.srv import CancelGoal
 from geometry_msgs.msg import PoseStamped
 from nav2_msgs.action import ComputePathToPose, FollowPath, NavigateToPose
+from nav2_msgs.srv import ClearEntireCostmap
 from nav_msgs.msg import Path
 from rclpy.action import ActionClient, ActionServer, CancelResponse, GoalResponse
 from rclpy.callback_groups import ReentrantCallbackGroup
@@ -157,6 +158,9 @@ class NavigationFacadeRuntime:
         planning_retry_delay_sec: float = 0.5,
         max_follow_retries: int = 5,
         follow_retry_delay_sec: float = 2.0,
+        clear_costmaps: Any | None = None,
+        logger: Any | None = None,
+        sleep_callback: Any | None = None,
     ) -> None:
         self._planner_client = planner_client
         self._follow_client = follow_client
@@ -174,6 +178,9 @@ class NavigationFacadeRuntime:
         # outer goal so the vehicle can resume after the obstacle moves.
         self._max_follow_retries = max(0, int(max_follow_retries))
         self._follow_retry_delay_sec = max(0.0, float(follow_retry_delay_sec))
+        self._clear_costmaps = clear_costmaps
+        self._logger = logger
+        self._sleep_callback = sleep_callback
 
         self._lock = threading.Lock()
         self._busy = False
@@ -272,7 +279,7 @@ class NavigationFacadeRuntime:
                     break
 
                 if attempt + 1 < attempts:
-                    await asyncio.sleep(self._planning_retry_delay_sec)
+                    await self._sleep(self._planning_retry_delay_sec)
 
             if path is None:
                 return self._finish(outer_goal_handle, 'abort')
@@ -284,9 +291,19 @@ class NavigationFacadeRuntime:
 
             for follow_attempt in range(self._max_follow_retries + 1):
                 if follow_attempt:
-                    await asyncio.sleep(self._follow_retry_delay_sec)
+                    self._log(
+                        'warn',
+                        f'FollowPath recovery attempt {follow_attempt}/'
+                        f'{self._max_follow_retries}',
+                    )
+                    await self._sleep(self._follow_retry_delay_sec)
                     if self._is_cancel_requested(session):
                         return self._finish(outer_goal_handle, 'cancel')
+                    if self._clear_costmaps is not None:
+                        try:
+                            await self._clear_costmaps()
+                        except Exception as exc:
+                            self._log('warn', f'Costmap recovery failed: {exc}')
                     # Replan against the current costmap before resubmitting
                     # the controller goal. This is the key dynamic-obstacle
                     # recovery path.
@@ -353,9 +370,12 @@ class NavigationFacadeRuntime:
                     follow_wrapped.status == GoalStatus.STATUS_SUCCEEDED
                 ):
                     return self._finish(outer_goal_handle, 'succeed')
+                status = getattr(follow_wrapped, 'status', 'unknown')
+                self._log('warn', f'FollowPath failed with status {status}')
 
             return self._finish(outer_goal_handle, 'abort')
-        except Exception:
+        except Exception as exc:
+            self._log('error', f'Navigation execution failed: {exc}')
             return self._finish(outer_goal_handle, 'abort')
         finally:
             with self._lock:
@@ -364,6 +384,21 @@ class NavigationFacadeRuntime:
                     self._session = None
                     self._busy = False
                     self._reserved = False
+
+    def _log(self, level: str, message: str) -> None:
+        logger = self._logger
+        if logger is None:
+            return
+        try:
+            getattr(logger, level)(message)
+        except Exception:
+            pass
+
+    async def _sleep(self, delay_sec: float) -> None:
+        if self._sleep_callback is not None:
+            await self._sleep_callback(delay_sec)
+            return
+        await asyncio.sleep(delay_sec)
 
     async def _send_goal(self, client: Any, goal: Any) -> Any:
         """Await one non-blocking ActionClient goal request."""
@@ -533,6 +568,14 @@ class NavigationFacadeNode(Node):
             FollowPath,
             FOLLOW_ACTION_NAME,
         )
+        self._local_costmap_clear = self.create_client(
+            ClearEntireCostmap,
+            '/local_costmap/clear_entirely_local_costmap',
+        )
+        self._global_costmap_clear = self.create_client(
+            ClearEntireCostmap,
+            '/global_costmap/clear_entirely_global_costmap',
+        )
         self._runtime = NavigationFacadeRuntime(
             self._planner_client,
             self._follow_client,
@@ -547,6 +590,9 @@ class NavigationFacadeNode(Node):
                 'max_follow_retries').value,
             follow_retry_delay_sec=self.get_parameter(
                 'follow_retry_delay_sec').value,
+            clear_costmaps=self._clear_costmaps,
+            logger=self.get_logger(),
+            sleep_callback=self._sleep,
         )
         self._callback_group = ReentrantCallbackGroup()
         self._action_server = ActionServer(
@@ -586,6 +632,36 @@ class NavigationFacadeNode(Node):
         """Destroy the action server before the ROS node."""
         self._action_server.destroy()
         super().destroy_node()
+
+    async def _clear_costmaps(self) -> None:
+        """Clear stale obstacle layers before retrying a failed controller."""
+        request = ClearEntireCostmap.Request()
+        for client in (self._local_costmap_clear, self._global_costmap_clear):
+            if not client.service_is_ready():
+                continue
+            future = client.call_async(request)
+            try:
+                # rclpy futures are awaitable by the executor coroutine but
+                # are not asyncio Futures; asyncio.wait_for() would fail with
+                # "no running event loop" inside the ROS executor.
+                await future
+            except Exception as exc:
+                self.get_logger().debug(f'Costmap clear request failed: {exc}')
+
+    async def _sleep(self, delay_sec: float) -> None:
+        """Sleep through an rclpy timer without an asyncio event loop."""
+        future = Future()
+        timer_holder: dict[str, Any] = {}
+
+        def _wake() -> None:
+            if not future.done():
+                future.set_result(None)
+            timer = timer_holder.get('timer')
+            if timer is not None:
+                self.destroy_timer(timer)
+
+        timer_holder['timer'] = self.create_timer(max(0.0, float(delay_sec)), _wake)
+        await future
 
 
 def main(args=None) -> None:

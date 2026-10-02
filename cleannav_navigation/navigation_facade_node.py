@@ -290,28 +290,33 @@ class NavigationFacadeRuntime:
                     # Replan against the current costmap before resubmitting
                     # the controller goal. This is the key dynamic-obstacle
                     # recovery path.
-                    if not self._planner_client.server_is_ready():
-                        continue
-                    planner_handle = await self._send_goal(
-                        self._planner_client, planner_goal)
-                    if planner_handle is None or not getattr(
-                            planner_handle, 'accepted', False):
-                        continue
-                    with self._lock:
-                        session.planner_goal_handle = planner_handle
-                    planner_outcome, planner_wrapped = await self._wait_inner_result(
-                        session, planner_handle)
-                    with self._lock:
-                        session.planner_goal_handle = None
-                    if planner_outcome is _InnerOutcome.CANCELED:
-                        return self._finish(outer_goal_handle, 'cancel')
-                    if planner_outcome is not _InnerOutcome.RESULT or (
-                        planner_wrapped is None
-                        or planner_wrapped.status != GoalStatus.STATUS_SUCCEEDED
-                        or not _path_is_valid(planner_wrapped.result.path)
-                    ):
-                        continue
-                    path = planner_wrapped.result.path
+                    replanned_path = None
+                    if self._planner_client.server_is_ready():
+                        planner_handle = await self._send_goal(
+                            self._planner_client, planner_goal)
+                        if planner_handle is not None and getattr(
+                                planner_handle, 'accepted', False):
+                            with self._lock:
+                                session.planner_goal_handle = planner_handle
+                            planner_outcome, planner_wrapped = await self._wait_inner_result(
+                                session, planner_handle)
+                            with self._lock:
+                                session.planner_goal_handle = None
+                            if planner_outcome is _InnerOutcome.CANCELED:
+                                return self._finish(outer_goal_handle, 'cancel')
+                            if (
+                                planner_outcome is _InnerOutcome.RESULT
+                                and planner_wrapped is not None
+                                and planner_wrapped.status == GoalStatus.STATUS_SUCCEEDED
+                                and _path_is_valid(planner_wrapped.result.path)
+                            ):
+                                replanned_path = planner_wrapped.result.path
+                    # A moving obstacle can temporarily make the planner
+                    # reject the request. Keep the last valid path and still
+                    # resubmit FollowPath so the local controller can retry
+                    # once the obstacle leaves the path.
+                    if replanned_path is not None:
+                        path = replanned_path
 
                 follow_goal = FollowPath.Goal()
                 follow_goal.path = _prepare_controller_path(path)

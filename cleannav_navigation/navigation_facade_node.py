@@ -155,6 +155,8 @@ class NavigationFacadeRuntime:
         goal_checker_id: str = DEFAULT_GOAL_CHECKER_ID,
         max_planning_retries: int = 0,
         planning_retry_delay_sec: float = 0.5,
+        max_follow_retries: int = 5,
+        follow_retry_delay_sec: float = 2.0,
     ) -> None:
         self._planner_client = planner_client
         self._follow_client = follow_client
@@ -167,6 +169,11 @@ class NavigationFacadeRuntime:
         # zero for backwards compatibility; the ROS node enables retries.
         self._max_planning_retries = max(0, int(max_planning_retries))
         self._planning_retry_delay_sec = max(0.0, float(planning_retry_delay_sec))
+        # A controller abort can be transient when a moving obstacle occupies
+        # the local costmap. Replan and resubmit FollowPath before failing the
+        # outer goal so the vehicle can resume after the obstacle moves.
+        self._max_follow_retries = max(0, int(max_follow_retries))
+        self._follow_retry_delay_sec = max(0.0, float(follow_retry_delay_sec))
 
         self._lock = threading.Lock()
         self._busy = False
@@ -275,38 +282,73 @@ class NavigationFacadeRuntime:
             if self._is_cancel_requested(session):
                 return self._finish(outer_goal_handle, 'cancel')
 
-            follow_goal = FollowPath.Goal()
-            follow_goal.path = _prepare_controller_path(path)
-            follow_goal.controller_id = self._controller_id
-            follow_goal.goal_checker_id = self._goal_checker_id
+            for follow_attempt in range(self._max_follow_retries + 1):
+                if follow_attempt:
+                    await asyncio.sleep(self._follow_retry_delay_sec)
+                    if self._is_cancel_requested(session):
+                        return self._finish(outer_goal_handle, 'cancel')
+                    # Replan against the current costmap before resubmitting
+                    # the controller goal. This is the key dynamic-obstacle
+                    # recovery path.
+                    if not self._planner_client.server_is_ready():
+                        continue
+                    planner_handle = await self._send_goal(
+                        self._planner_client, planner_goal)
+                    if planner_handle is None or not getattr(
+                            planner_handle, 'accepted', False):
+                        continue
+                    with self._lock:
+                        session.planner_goal_handle = planner_handle
+                    planner_outcome, planner_wrapped = await self._wait_inner_result(
+                        session, planner_handle)
+                    with self._lock:
+                        session.planner_goal_handle = None
+                    if planner_outcome is _InnerOutcome.CANCELED:
+                        return self._finish(outer_goal_handle, 'cancel')
+                    if planner_outcome is not _InnerOutcome.RESULT or (
+                        planner_wrapped is None
+                        or planner_wrapped.status != GoalStatus.STATUS_SUCCEEDED
+                        or not _path_is_valid(planner_wrapped.result.path)
+                    ):
+                        continue
+                    path = planner_wrapped.result.path
 
-            if not self._follow_client.server_is_ready():
-                return self._finish(outer_goal_handle, 'abort')
+                follow_goal = FollowPath.Goal()
+                follow_goal.path = _prepare_controller_path(path)
+                follow_goal.controller_id = self._controller_id
+                follow_goal.goal_checker_id = self._goal_checker_id
 
-            with self._lock:
-                session.stage = _Stage.FOLLOWING
-            follow_handle = await self._send_goal(
-                self._follow_client,
-                follow_goal,
-            )
-            if follow_handle is None or not getattr(follow_handle, 'accepted', False):
-                return self._finish(outer_goal_handle, 'abort')
+                if not self._follow_client.server_is_ready():
+                    continue
 
-            with self._lock:
-                session.follow_goal_handle = follow_handle
+                with self._lock:
+                    session.stage = _Stage.FOLLOWING
+                follow_handle = await self._send_goal(
+                    self._follow_client,
+                    follow_goal,
+                )
+                if follow_handle is None or not getattr(
+                        follow_handle, 'accepted', False):
+                    continue
 
-            follow_outcome, follow_wrapped = await self._wait_inner_result(
-                session,
-                follow_handle,
-            )
-            if follow_outcome is _InnerOutcome.CANCELED:
-                return self._finish(outer_goal_handle, 'cancel')
-            if follow_outcome is _InnerOutcome.CANCEL_FAILED:
-                return self._finish(outer_goal_handle, 'abort')
-            if follow_wrapped is not None and (
-                follow_wrapped.status == GoalStatus.STATUS_SUCCEEDED
-            ):
-                return self._finish(outer_goal_handle, 'succeed')
+                with self._lock:
+                    session.follow_goal_handle = follow_handle
+
+                follow_outcome, follow_wrapped = await self._wait_inner_result(
+                    session,
+                    follow_handle,
+                )
+                with self._lock:
+                    session.follow_goal_handle = None
+                if follow_outcome is _InnerOutcome.CANCELED:
+                    return self._finish(outer_goal_handle, 'cancel')
+                if follow_outcome is _InnerOutcome.CANCEL_FAILED:
+                    return self._finish(outer_goal_handle, 'abort')
+                if follow_wrapped is not None and (
+                    follow_wrapped.status == GoalStatus.STATUS_SUCCEEDED
+                ):
+                    return self._finish(outer_goal_handle, 'succeed')
+
             return self._finish(outer_goal_handle, 'abort')
         except Exception:
             return self._finish(outer_goal_handle, 'abort')
@@ -473,6 +515,8 @@ class NavigationFacadeNode(Node):
         self.declare_parameter('goal_checker_id', DEFAULT_GOAL_CHECKER_ID)
         self.declare_parameter('max_planning_retries', 3)
         self.declare_parameter('planning_retry_delay_sec', 1.0)
+        self.declare_parameter('max_follow_retries', 5)
+        self.declare_parameter('follow_retry_delay_sec', 2.0)
 
         self._planner_client = ActionClient(
             self,
@@ -494,6 +538,10 @@ class NavigationFacadeNode(Node):
             max_planning_retries=self.get_parameter('max_planning_retries').value,
             planning_retry_delay_sec=self.get_parameter(
                 'planning_retry_delay_sec').value,
+            max_follow_retries=self.get_parameter(
+                'max_follow_retries').value,
+            follow_retry_delay_sec=self.get_parameter(
+                'follow_retry_delay_sec').value,
         )
         self._callback_group = ReentrantCallbackGroup()
         self._action_server = ActionServer(

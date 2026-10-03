@@ -15,7 +15,10 @@ OUT="/mnt/c/Users/sangy/Documents/ChatGPT/智能清扫小车/batch-headless-crui
 mkdir -p "$OUT"
 BASE="/home/hyn/cleannav_ws/install/cleannav_navigation/share/cleannav_navigation/config/nav2_params_ackermann.yaml"
 printf 'scenario,seed,controller_frequency,vx_max,inflation_radius,movement_time_allowance,person_speed,person_range,status,error_lines\n' > "$OUT/summary.csv"
-DOMAIN_BASE=$((140 + ($(date +%s) % 80)))
+# Keep each batch away from domains used by earlier interrupted runs. The
+# shell PID changes on every invocation, reducing collisions with stale DDS
+# participants while staying within the ROS 2 domain range.
+DOMAIN_BASE=$((200 + ($$ % 30)))
 
 cleanup_group() {
   local pid="$1"

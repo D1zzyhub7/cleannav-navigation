@@ -84,6 +84,7 @@ run_case() {
   local param="/tmp/cleannav_${name}.yaml"
   cp "$BASE" "$param"
   sed -i "s#/rtabmap/map#/map#g; s/use_sim_time: False/use_sim_time: True/g; s#yaml_filename: \"map.yaml\"#yaml_filename: \"/home/hyn/cleannav_ws/install/cleannav_navigation/share/cleannav_navigation/maps/cleannav_first_map.yaml\"#; s/controller_frequency: [0-9.]*/controller_frequency: ${frequency}/; s/vx_max: [0-9.]*/vx_max: ${vx}/; s/inflation_radius: [0-9.]*/inflation_radius: ${inflation}/g; s/movement_time_allowance: [0-9.]*/movement_time_allowance: ${allowance}/" "$param"
+  sed -i '/    scan_topic: scan/a\    set_initial_pose: True\n    initial_pose:\n      x: -1.875\n      y: 0.415\n      yaw: 0.0' "$param"
 
   setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 launch cleannav_simulation ackermann_mcity_obstacles_demo.launch.py gui:=false world:=/usr/share/gazebo-11/worlds/empty.world model_path:=/usr/share/gazebo-11/models spawn_x:=-1.875 spawn_y:=0.415 enable_static_obstacles:=true static_block_x:=$block_x static_block_y:=$block_y static_cylinder_x:=$cylinder_x static_cylinder_y:=$cylinder_y enable_dynamic_obstacle:=true dynamic_obstacle_speed:=$person_speed dynamic_obstacle_a_x:=-1.675 dynamic_obstacle_a_y:=0.415 dynamic_obstacle_b_x:=-1.675 dynamic_obstacle_b_y:=$obstacle_b_y" > "$case_dir/sim.log" 2>&1 &
   local sim_pid=$!

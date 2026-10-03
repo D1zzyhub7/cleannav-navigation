@@ -66,6 +66,11 @@ run_case() {
   local case_dir="$OUT/$name"
   mkdir -p "$case_dir"
 
+  # Previous interrupted launches can leave the demo controller outside the
+  # parent launch process group. Remove those stale clients before starting
+  # the next isolated ROS domain.
+  pkill -TERM -f '/dynamic_obstacle_controller --ros-args' 2>/dev/null || true
+
   # Deterministic random static obstacles. The seed is recorded with every run.
   local block_x block_y cylinder_x cylinder_y obstacle_b_y
   block_x=$(awk -v s="$seed" 'BEGIN{srand(s); printf "%.2f", -0.8 + rand()*2.8}')
@@ -122,6 +127,7 @@ run_case() {
     if [ "$cruise_ok" -eq 1 ]; then status=SUCCEEDED; else status=CRUISE_FAIL; fi
   fi
   cleanup_group "$nav_pid"; cleanup_group "$loc_pid"; cleanup_group "$sim_pid"
+  pkill -TERM -f '/dynamic_obstacle_controller --ros-args' 2>/dev/null || true
   local errors
   errors=$(grep -h '\[ERROR\]' "$case_dir"/*.log 2>/dev/null | grep -v -E 'context is invalid|rcl_shutdown already called|process has died' | wc -l | tr -d ' ')
   printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" "$status" "$errors" >> "$OUT/summary.csv"

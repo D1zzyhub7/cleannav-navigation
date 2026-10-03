@@ -352,7 +352,9 @@ def generate_launch_description():
                         actions=[dynamic_spawn],
                     ),
                     TimerAction(
-                        period=SCENE_SPAWN_DELAY_SEC + 9.0,
+                        # Give Gazebo time to advertise /set_entity_state
+                        # after the dynamic model has been spawned.
+                        period=SCENE_SPAWN_DELAY_SEC + 20.0,
                         actions=[dynamic_controller],
                     ),
                 ],

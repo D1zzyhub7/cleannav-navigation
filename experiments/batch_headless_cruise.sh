@@ -47,7 +47,12 @@ wait_action() {
 wait_for_transform() {
   local domain="$1"
   for _ in $(seq 1 120); do
-    if ROS_DOMAIN_ID="$domain" timeout 4s ros2 run tf2_ros tf2_echo map base_link 2>/dev/null | grep -q 'Translation'; then
+    # tf2_echo normally exits with timeout status 124 after printing a valid
+    # transform. Capture first so pipefail does not turn that into a false
+    # readiness failure.
+    local tf_output
+    tf_output=$(ROS_DOMAIN_ID="$domain" timeout 4s ros2 run tf2_ros tf2_echo map base_link 2>/dev/null || true)
+    if printf '%s\n' "$tf_output" | grep -q 'Translation'; then
       return 0
     fi
     sleep 1

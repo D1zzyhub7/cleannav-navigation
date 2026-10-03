@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -euo pipefail
 
 # Headless stress batch for recovery, dynamic avoidance and cruise mode.
 # The launch uses the repository's local obstacle SDFs and an empty Gazebo
@@ -7,6 +6,10 @@ set -euo pipefail
 
 source /opt/ros/humble/setup.bash
 source /home/hyn/cleannav_ws/install/setup.bash
+
+# ROS setup scripts reference optional environment variables. Enable strict
+# mode only after both setup files have been sourced.
+set -euo pipefail
 
 OUT="/mnt/c/Users/sangy/Documents/ChatGPT/智能清扫小车/batch-headless-cruise-$(date +%Y%m%d-%H%M%S)"
 mkdir -p "$OUT"

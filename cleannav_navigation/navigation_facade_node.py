@@ -553,8 +553,11 @@ class NavigationFacadeNode(Node):
         self.declare_parameter('use_start', DEFAULT_USE_START)
         self.declare_parameter('controller_id', DEFAULT_CONTROLLER_ID)
         self.declare_parameter('goal_checker_id', DEFAULT_GOAL_CHECKER_ID)
-        self.declare_parameter('max_planning_retries', 3)
-        self.declare_parameter('planning_retry_delay_sec', 1.0)
+        # A moving obstacle can occupy the only mapped corridor for several
+        # seconds.  Keep retrying the planner long enough for it to clear,
+        # instead of aborting the outer NavigateToPose goal immediately.
+        self.declare_parameter('max_planning_retries', 12)
+        self.declare_parameter('planning_retry_delay_sec', 1.5)
         self.declare_parameter('max_follow_retries', 5)
         self.declare_parameter('follow_retry_delay_sec', 2.0)
 

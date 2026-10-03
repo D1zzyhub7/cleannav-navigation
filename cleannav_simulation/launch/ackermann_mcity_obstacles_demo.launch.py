@@ -200,9 +200,7 @@ def generate_launch_description():
         parameters=[
             {
                 "obstacle_name": DYNAMIC_OBSTACLE_NAME,
-                # gazebo_ros_state exposes the service under the Gazebo node
-                # namespace when loaded into the world plugin.
-                "service_name": "/gazebo/set_entity_state",
+                "service_name": "/set_entity_state",
                 "a_x": ParameterValue(dynamic_a_x, value_type=float),
                 "a_y": ParameterValue(dynamic_a_y, value_type=float),
                 "a_z": ParameterValue(dynamic_a_z, value_type=float),

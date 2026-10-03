@@ -44,6 +44,17 @@ wait_action() {
   return 1
 }
 
+wait_for_transform() {
+  local domain="$1"
+  for _ in $(seq 1 120); do
+    if ROS_DOMAIN_ID="$domain" timeout 4s ros2 run tf2_ros tf2_echo map base_link 2>/dev/null | grep -q 'Translation'; then
+      return 0
+    fi
+    sleep 1
+  done
+  return 1
+}
+
 run_case() {
   local name="$1" seed="$2" frequency="$3" vx="$4" inflation="$5" allowance="$6" person_speed="$7" person_range="$8"
   local domain=$((DOMAIN_BASE + seed % 20))
@@ -70,6 +81,12 @@ run_case() {
   local loc_pid=$!
   wait_lifecycle "$domain" /amcl || echo 'amcl not active' > "$case_dir/readiness.log"
   ROS_DOMAIN_ID=$domain python3 "$PWD/experiments/set_initial_pose_experiment.py" > "$case_dir/initialpose.log" 2>&1 || true
+  if ! wait_for_transform "$domain"; then
+    echo 'map->base_link transform did not become available' > "$case_dir/readiness.log"
+    cleanup_group "$loc_pid"; cleanup_group "$sim_pid"
+    printf '%s,%s,%s,%s,%s,%s,%s,%s,STARTUP_FAIL,0\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" >> "$OUT/summary.csv"
+    return 0
+  fi
   setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 launch cleannav_navigation cleannav_ackermann_navigation.launch.py params_file:=$param use_sim_time:=true autostart:=true replan_period_sec:=1.0 safety_block_all:=true" > "$case_dir/navigation.log" 2>&1 &
   local nav_pid=$!
   local status=STARTUP_FAIL cruise_ok=1

@@ -79,12 +79,15 @@ run_case() {
     ROS_DOMAIN_ID=$domain timeout 300s ros2 topic echo /odom > "$case_dir/odom.log" 2>&1 & local odom_pid=$!
     ROS_DOMAIN_ID=$domain timeout 10s ros2 service call /cleannav/safety/acquire_lease cleannav_interfaces/srv/SafetyLease "{execution_id: cruise_$name}" > "$case_dir/lease.log" 2>&1 || true
     : > "$case_dir/goal.log"
-    # Cruise mode: four sequential NavigateToPose legs in a repeatable loop.
-    for waypoint in '-1.20,0.415' '-0.20,1.20' '1.20,0.415' '-0.20,-0.35'; do
+    # Cruise mode: four reachable sequential legs in the mapped corridor.
+    for waypoint in '-1.475,0.415' '-1.15,0.415' '-1.15,0.75' '-1.475,0.75'; do
       wx="${waypoint%,*}"; wy="${waypoint#*,}"
-      if ! ROS_DOMAIN_ID=$domain timeout -k 5s --signal=INT 90s ros2 action send_goal /cleannav/navigate_to_pose nav2_msgs/action/NavigateToPose "{pose: {header: {frame_id: map}, pose: {position: {x: $wx, y: $wy, z: 0.0}, orientation: {w: 1.0}}}}" --feedback >> "$case_dir/goal.log" 2>&1; then
+      ROS_DOMAIN_ID=$domain timeout -k 5s --signal=INT 90s ros2 action send_goal /cleannav/navigate_to_pose nav2_msgs/action/NavigateToPose "{pose: {header: {frame_id: map}, pose: {position: {x: $wx, y: $wy, z: 0.0}, orientation: {w: 1.0}}}}" --feedback >> "$case_dir/goal.log" 2>&1
+      goal_rc=$?
+      goal_status=$(grep 'Goal finished with status:' "$case_dir/goal.log" | tail -1 | awk '{print $5}')
+      if [ "$goal_rc" -ne 0 ] || [ "$goal_status" != "SUCCEEDED" ]; then
         cruise_ok=0
-        echo "WAYPOINT_FAILED,$wx,$wy" >> "$case_dir/goal.log"
+        echo "WAYPOINT_FAILED,$wx,$wy,status=${goal_status:-NO_RESULT},rc=$goal_rc" >> "$case_dir/goal.log"
         break
       fi
     done

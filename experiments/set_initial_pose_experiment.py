@@ -23,5 +23,6 @@ for _ in range(50):
     publisher.publish(message)
     rclpy.spin_once(node, timeout_sec=0.2)
 
+print('initial pose published')
 node.destroy_node()
 rclpy.shutdown()

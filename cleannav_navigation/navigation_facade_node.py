@@ -279,6 +279,14 @@ class NavigationFacadeRuntime:
                     break
 
                 if attempt + 1 < attempts:
+                    # A moving obstacle may have left stale lethal cells in
+                    # the global costmap. Clear both layers before asking the
+                    # planner again so an empty path does not stay latched.
+                    if self._clear_costmaps is not None:
+                        try:
+                            await self._clear_costmaps()
+                        except Exception as exc:
+                            self._log('warn', f'Planning costmap recovery failed: {exc}')
                     await self._sleep(self._planning_retry_delay_sec)
 
             if path is None:

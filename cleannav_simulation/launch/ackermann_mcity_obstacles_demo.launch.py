@@ -327,10 +327,17 @@ def generate_launch_description():
             GroupAction(
                 condition=IfCondition(enable_static),
                 actions=[
+                    # Gazebo's /spawn_entity service is sensitive to
+                    # concurrent requests. Spawn the two static obstacles
+                    # sequentially so one request cannot starve the other.
                     TimerAction(
                         period=SCENE_SPAWN_DELAY_SEC,
-                        actions=[static_block, static_cylinder],
-                    )
+                        actions=[static_block],
+                    ),
+                    TimerAction(
+                        period=SCENE_SPAWN_DELAY_SEC + 4.0,
+                        actions=[static_cylinder],
+                    ),
                 ],
             ),
             GroupAction(
@@ -345,7 +352,7 @@ def generate_launch_description():
                         actions=[dynamic_spawn],
                     ),
                     TimerAction(
-                        period=SCENE_SPAWN_DELAY_SEC + 5.0,
+                        period=SCENE_SPAWN_DELAY_SEC + 9.0,
                         actions=[dynamic_controller],
                     ),
                 ],

@@ -29,7 +29,7 @@ cleanup_group() {
 wait_lifecycle() {
   local domain="$1" node="$2"
   for _ in $(seq 1 100); do
-    if ROS_DOMAIN_ID="$domain" timeout 5s ros2 lifecycle get "$node" 2>/dev/null | grep -q '^active'; then return 0; fi
+    if ROS_DOMAIN_ID="$domain" timeout 2s ros2 lifecycle get "$node" 2>/dev/null | grep -q '^active'; then return 0; fi
     sleep 1
   done
   return 1

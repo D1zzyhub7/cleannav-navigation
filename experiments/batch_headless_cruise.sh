@@ -41,7 +41,16 @@ wait_lifecycle() {
 wait_action() {
   local domain="$1"
   for _ in $(seq 1 100); do
-    if ROS_DOMAIN_ID="$domain" ros2 action info /cleannav/navigate_to_pose 2>/dev/null | grep -q 'Action servers: [1-9]'; then return 0; fi
+    if ROS_DOMAIN_ID="$domain" ros2 action info /cleannav/navigate_to_pose 2>/dev/null | grep -q 'Action servers: 1'; then return 0; fi
+    sleep 1
+  done
+  return 1
+}
+
+wait_single_action() {
+  local domain="$1" action="$2"
+  for _ in $(seq 1 100); do
+    if ROS_DOMAIN_ID="$domain" ros2 action info "$action" 2>/dev/null | grep -q 'Action servers: 1'; then return 0; fi
     sleep 1
   done
   return 1
@@ -109,7 +118,10 @@ run_case() {
   setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 launch cleannav_navigation cleannav_ackermann_navigation.launch.py params_file:=$param use_sim_time:=true autostart:=true replan_period_sec:=1.0 safety_block_all:=true" > "$case_dir/navigation.log" 2>&1 &
   local nav_pid=$!
   local status=STARTUP_FAIL cruise_ok=1
-  if wait_lifecycle "$domain" /planner_server && wait_lifecycle "$domain" /controller_server && wait_action "$domain"; then
+  if wait_lifecycle "$domain" /planner_server && wait_lifecycle "$domain" /controller_server \
+      && wait_action "$domain" \
+      && wait_single_action "$domain" /compute_path_to_pose \
+      && wait_single_action "$domain" /follow_path; then
     sleep 75
     ROS_DOMAIN_ID=$domain timeout 300s ros2 topic echo /cmd_vel > "$case_dir/cmd_vel.log" 2>&1 & local cmd_pid=$!
     ROS_DOMAIN_ID=$domain timeout 300s ros2 topic echo /odom > "$case_dir/odom.log" 2>&1 & local odom_pid=$!

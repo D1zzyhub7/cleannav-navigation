@@ -9,7 +9,7 @@ source /home/hyn/cleannav_ws/install/setup.bash
 
 # ROS setup scripts reference optional environment variables. Enable strict
 # mode only after both setup files have been sourced.
-set -euo pipefail
+set -uo pipefail
 
 OUT="/mnt/c/Users/sangy/Documents/ChatGPT/智能清扫小车/batch-headless-cruise-$(date +%Y%m%d-%H%M%S)"
 mkdir -p "$OUT"
@@ -69,7 +69,7 @@ run_case() {
   setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 launch nav2_bringup localization_launch.py map:=/home/hyn/cleannav_ws/install/cleannav_navigation/share/cleannav_navigation/maps/cleannav_first_map.yaml params_file:=$param use_sim_time:=True autostart:=True" > "$case_dir/localization.log" 2>&1 &
   local loc_pid=$!
   wait_lifecycle "$domain" /amcl || echo 'amcl not active' > "$case_dir/readiness.log"
-  ROS_DOMAIN_ID=$domain python3 /home/hyn/set_initial_pose_experiment.py > "$case_dir/initialpose.log" 2>&1 || true
+  ROS_DOMAIN_ID=$domain python3 "$PWD/experiments/set_initial_pose_experiment.py" > "$case_dir/initialpose.log" 2>&1 || true
   setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 launch cleannav_navigation cleannav_ackermann_navigation.launch.py params_file:=$param use_sim_time:=true autostart:=true replan_period_sec:=1.0 safety_block_all:=true" > "$case_dir/navigation.log" 2>&1 &
   local nav_pid=$!
   local status=STARTUP_FAIL cruise_ok=1
@@ -97,7 +97,7 @@ run_case() {
   printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" "$status" "$errors" >> "$OUT/summary.csv"
 }
 
-run_case fast_person_01 101 20.0 0.50 0.65 60.0 0.60 2.5
-run_case fast_person_02 202 20.0 0.50 0.65 90.0 0.90 3.5
-run_case fast_person_03 303 25.0 0.55 0.60 120.0 1.20 4.5
+run_case fast_person_01 101 20.0 0.50 0.65 60.0 0.60 2.5 || true
+run_case fast_person_02 202 20.0 0.50 0.65 90.0 0.90 3.5 || true
+run_case fast_person_03 303 25.0 0.55 0.60 120.0 1.20 4.5 || true
 echo "$OUT"

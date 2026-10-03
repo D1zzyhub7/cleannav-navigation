@@ -16,9 +16,13 @@ message.pose.covariance[0] = 0.25
 message.pose.covariance[7] = 0.25
 message.pose.covariance[35] = 0.0685
 
-# AMCL can be active before its subscription has finished discovery.  Keep
-# publishing long enough to guarantee that the initial pose is received.
-for _ in range(50):
+# AMCL can be active before its subscription has finished discovery. Wait for
+# the DDS subscription, then keep publishing long enough to guarantee receipt.
+for _ in range(100):
+    if publisher.get_subscription_count() > 0:
+        break
+    rclpy.spin_once(node, timeout_sec=0.2)
+for _ in range(100):
     message.header.stamp = node.get_clock().now().to_msg()
     publisher.publish(message)
     rclpy.spin_once(node, timeout_sec=0.2)

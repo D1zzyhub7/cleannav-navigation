@@ -84,7 +84,12 @@ run_case() {
   local sim_pid=$!
   setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 launch nav2_bringup localization_launch.py map:=/home/hyn/cleannav_ws/install/cleannav_navigation/share/cleannav_navigation/maps/cleannav_first_map.yaml params_file:=$param use_sim_time:=True autostart:=True" > "$case_dir/localization.log" 2>&1 &
   local loc_pid=$!
-  wait_lifecycle "$domain" /amcl || echo 'amcl not active' > "$case_dir/readiness.log"
+  if ! wait_lifecycle "$domain" /amcl; then
+    echo 'amcl not active' > "$case_dir/readiness.log"
+    cleanup_group "$loc_pid"; cleanup_group "$sim_pid"
+    printf '%s,%s,%s,%s,%s,%s,%s,%s,STARTUP_FAIL,0\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" >> "$OUT/summary.csv"
+    return 0
+  fi
   ROS_DOMAIN_ID=$domain python3 "$PWD/experiments/set_initial_pose_experiment.py" > "$case_dir/initialpose.log" 2>&1 || true
   if ! wait_for_transform "$domain"; then
     echo 'map->base_link transform did not become available' > "$case_dir/readiness.log"

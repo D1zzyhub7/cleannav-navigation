@@ -88,3 +88,13 @@ Safety 测试配置：safety_block_all:=false（仅用于允许候选速度进�
 结论：更近目标仍未完成，当前问题不能归因于目标距离；需要继续检查定位/控制反馈或测试场景。
 
 备注：本轮曾发现 cleannav_interfaces 未在工作区，已补齐并重新构建。此依赖问题已修复，但导航目标仍未完成。
+
+## 测试诊断补充
+
+本轮自动化复测未形成有效的 5 Hz/10 Hz 对比，原因如下：
+
+1. Safety Supervisor 日志出现 utonomous timeout — back to block_all，导致速度授权不能覆盖完整导航任务。
+2. 固定目标 (2.0, 0.0) 的 SmacPlannerHybrid 日志出现 ailed to create plan, exceeded maximum iterations，目标未生成有效路径。
+3. 因此本轮目标中止不能归因于 local_costmap update_frequency，5 Hz 与 10 Hz 的导航性能结论暂不成立。
+
+下一轮开始前必须先解决 Safety Lease 生命周期和可达目标选择，再进行参数对比。

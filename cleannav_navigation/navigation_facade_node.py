@@ -11,6 +11,7 @@ from __future__ import annotations
 import copy
 import math
 import threading
+import uuid
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
@@ -21,6 +22,7 @@ from action_msgs.srv import CancelGoal
 from geometry_msgs.msg import PoseStamped
 from nav2_msgs.action import ComputePathToPose, FollowPath, NavigateToPose
 from nav_msgs.msg import Path
+from cleannav_interfaces.srv import SafetyLease
 from rclpy.action import ActionClient, ActionServer, CancelResponse, GoalResponse
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.node import Node
@@ -465,6 +467,12 @@ class NavigationFacadeNode(Node):
             FollowPath,
             FOLLOW_ACTION_NAME,
         )
+        self._lease_acquire_client = self.create_client(
+            SafetyLease, '/cleannav/safety/acquire_lease'
+        )
+        self._lease_release_client = self.create_client(
+            SafetyLease, '/cleannav/safety/release_lease'
+        )
         self._runtime = NavigationFacadeRuntime(
             self._planner_client,
             self._follow_client,
@@ -504,8 +512,31 @@ class NavigationFacadeNode(Node):
         self,
         goal_handle: Any,
     ) -> NavigateToPose.Result:
-        """Delegate execution to the dependency-injected runtime."""
-        return await self._runtime.execute(goal_handle)
+        """Acquire a Safety Lease for the complete outer-goal lifetime."""
+        execution_id = f'nav-facade-{uuid.uuid4()}'
+        if not await self._call_lease(
+            self._lease_acquire_client, execution_id
+        ):
+            goal_handle.abort()
+            return NavigateToPose.Result()
+        try:
+            return await self._runtime.execute(goal_handle)
+        finally:
+            await self._call_lease(
+                self._lease_release_client, execution_id
+            )
+
+    async def _call_lease(self, client: Any, execution_id: str) -> bool:
+        """Call one SafetyLease service and require explicit success."""
+        try:
+            if not client.wait_for_service(timeout_sec=5.0):
+                return False
+            request = SafetyLease.Request()
+            request.execution_id = execution_id
+            response = await client.call_async(request)
+            return bool(response.success)
+        except Exception:
+            return False
 
     def destroy_node(self) -> None:
         """Destroy the action server before the ROS node."""

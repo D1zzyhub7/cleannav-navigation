@@ -32,6 +32,7 @@
   <exec_depend>nav2_bt_navigator</exec_depend>
   <exec_depend>nav2_lifecycle_manager</exec_depend>
   <exec_depend>cleannav_global_planner</exec_depend>
+  <exec_depend>cleannav_interfaces</exec_depend>
   <exec_depend>cleannav_path_executor</exec_depend>
   <exec_depend>cleannav_safety_supervisor</exec_depend>
 

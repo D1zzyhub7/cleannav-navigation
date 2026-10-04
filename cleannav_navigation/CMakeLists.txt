@@ -7,6 +7,7 @@ find_package(geometry_msgs REQUIRED)
 find_package(nav2_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(rclpy REQUIRED)
+find_package(cleannav_interfaces REQUIRED)
 
 install(DIRECTORY config launch maps
   DESTINATION share/${PROJECT_NAME}

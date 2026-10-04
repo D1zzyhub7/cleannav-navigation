@@ -98,3 +98,22 @@ Safety 测试配置：safety_block_all:=false（仅用于允许候选速度进�
 3. 因此本轮目标中止不能归因于 local_costmap update_frequency，5 Hz 与 10 Hz 的导航性能结论暂不成立。
 
 下一轮开始前必须先解决 Safety Lease 生命周期和可达目标选择，再进行参数对比。
+
+## EXP001 Lease 修复与可达目标复测（追加记录）
+
+本轮只修改 Safety Lease 生命周期。Navigation Facade 在每个外层导航目标开始前调用 acquire_lease，使用唯一 execution_id；目标结束、取消或异常时调用 release_lease。补充 cleannav_interfaces 运行时依赖。局部代价地图参数未与该修复混改。
+
+### 修复验证
+构建：导航包编译通过。
+10 Hz 可达目标：map 坐标 x=0.50，y=0.00，目标返回 SUCCEEDED；未观察到 autonomous timeout；急停次数 0。
+5 Hz 同一目标：第一次返回 ABORTED，日志为 Start pose is out of costmap；等待地图稳定后重试仍未形成有效路径。该结果标记为无效对照。
+另选当前局部代价地图内目标 x=-0.20，y=0.15 复测，仍返回 ABORTED，说明本轮 5 Hz 失败来自地图、定位或规划可达性，不能归因于 update_frequency。
+
+### 频率和指标记录
+10 Hz 配置：update_frequency=10.0；局部代价地图短窗口实测约 1.27 Hz，窗口内存在 1.60 s 间隔。
+5 Hz 配置：update_frequency=5.0；稳定窗口实测约 1.66 Hz，间隔约 0.60 s。
+10 Hz 成功率 1/1；耗时未纳入正式统计；重规划次数未可靠采集；急停次数 0。
+5 Hz 有效成功率 0/0，两次均因可达性或起点代价地图问题判为无效，不纳入性能统计；重规划次数和急停次数未可靠采集。
+
+### 结论与后续
+Safety Lease 超时根因已修复并由成功目标验证。由于 5 Hz 与 10 Hz 尚未在同一稳定起点、同一可达目标下都完成，EXP001 频率性能结论仍不能下定论；下一步应先固定 RTAB-Map 初始定位和局部代价地图覆盖范围，再重新执行配对测试。此前所有日志内容保留，本节为追加记录。

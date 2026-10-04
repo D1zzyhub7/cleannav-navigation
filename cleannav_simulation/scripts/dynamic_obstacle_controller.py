@@ -137,6 +137,7 @@ class DynamicObstacleController(Node):
         self.declare_parameter("b_yaw", 0.0)
         self.declare_parameter("speed", 0.25)
         self.declare_parameter("update_rate", 10.0)
+        self.declare_parameter("initial_hold_sec", 0.0)
 
         self._obstacle_name = str(
             self.get_parameter("obstacle_name").value
@@ -158,6 +159,12 @@ class DynamicObstacleController(Node):
         self._update_rate = float(
             self.get_parameter("update_rate").value
         )
+        self._initial_hold_sec = float(
+            self.get_parameter("initial_hold_sec").value
+        )
+        _finite(self._initial_hold_sec, "initial_hold_sec")
+        if self._initial_hold_sec < 0.0:
+            raise ValueError("initial_hold_sec must not be negative")
         self._segment_length = validate_controller_config(
             self._endpoint_a,
             self._endpoint_b,
@@ -170,6 +177,7 @@ class DynamicObstacleController(Node):
         self._pending_call = None
         self._pending_call_started = None
         self._last_tick = time.monotonic()
+        self._service_ready_at = None
         self._last_warning_time = -math.inf
         self._callback_group = ReentrantCallbackGroup()
         self._client = self.create_client(
@@ -188,7 +196,8 @@ class DynamicObstacleController(Node):
             f"name={self._obstacle_name} "
             f"A=({self._endpoint_a.x:.2f},{self._endpoint_a.y:.2f}) "
             f"B=({self._endpoint_b.x:.2f},{self._endpoint_b.y:.2f}) "
-            f"speed={self._speed:.2f}m/s rate={self._update_rate:.1f}Hz"
+            f"speed={self._speed:.2f}m/s rate={self._update_rate:.1f}Hz "
+            f"initial_hold={self._initial_hold_sec:.2f}s"
         )
 
     def _on_timer(self) -> None:
@@ -216,6 +225,13 @@ class DynamicObstacleController(Node):
             self._warn_throttled(
                 "SetEntityState service unavailable; waiting safely"
             )
+            return
+
+        if self._service_ready_at is None:
+            self._service_ready_at = now
+        if now - self._service_ready_at < self._initial_hold_sec:
+            self._last_tick = now
+            self._send_pose(self._endpoint_a)
             return
 
         elapsed_sec = min(max(now - self._last_tick, 0.0), 0.5)

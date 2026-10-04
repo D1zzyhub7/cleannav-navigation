@@ -16,7 +16,7 @@ mkdir -p "$OUT"
 BASE="/home/hyn/cleannav_ws/install/cleannav_navigation/share/cleannav_navigation/config/nav2_params_ackermann.yaml"
 EMPTY_MAP_YAML="/tmp/cleannav_headless_empty_map.yaml"
 python3 "$PWD/experiments/create_headless_empty_map.py" "$EMPTY_MAP_YAML"
-printf 'scenario,seed,controller_frequency,vx_max,inflation_radius,movement_time_allowance,person_speed,person_range,status,error_lines\n' > "$OUT/summary.csv"
+printf 'scenario,seed,controller_frequency,vx_max,inflation_radius,movement_time_allowance,person_speed,person_range,obstacle_scan_range,raytrace_scan_range,status,error_lines\n' > "$OUT/summary.csv"
 # Keep each batch away from domains used by earlier interrupted runs. The
 # shell PID changes on every invocation, reducing collisions with stale DDS
 # participants while staying within the ROS 2 domain range.
@@ -130,7 +130,7 @@ wait_for_transform() {
 }
 
 run_case() {
-  local name="$1" seed="$2" frequency="$3" vx="$4" inflation="$5" allowance="$6" person_speed="$7" person_range="$8"
+  local name="$1" seed="$2" frequency="$3" vx="$4" inflation="$5" allowance="$6" person_speed="$7" person_range="$8" obstacle_scan_range="$9" raytrace_scan_range="${10}"
   local domain=$((DOMAIN_BASE + seed % 20))
   ACTIVE_DOMAIN="$domain"
   local case_dir="$OUT/$name"
@@ -147,12 +147,13 @@ run_case() {
   cylinder_x=$(awk -v s="$seed" 'BEGIN{srand(s+31); printf "%.2f", 0.2 + rand()*2.8}')
   cylinder_y=$(awk -v s="$seed" 'BEGIN{srand(s+47); printf "%.2f", -2.5 + rand()}')
   obstacle_b_y=$(awk -v r="$person_range" 'BEGIN{printf "%.2f", -4.00 + r}')
-  printf 'seed=%s block=(%s,%s) cylinder=(%s,%s) dynamic_speed=%s range=%s\n' \
-    "$seed" "$block_x" "$block_y" "$cylinder_x" "$cylinder_y" "$person_speed" "$person_range" > "$case_dir/scenario.log"
+  printf 'seed=%s block=(%s,%s) cylinder=(%s,%s) dynamic_speed=%s range=%s obstacle_scan=%s raytrace_scan=%s\n' \
+    "$seed" "$block_x" "$block_y" "$cylinder_x" "$cylinder_y" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" > "$case_dir/scenario.log"
 
   local param="/tmp/cleannav_${name}.yaml"
   cp "$BASE" "$param"
   sed -i "s#/rtabmap/map#/map#g; s/use_sim_time: False/use_sim_time: True/g; s#yaml_filename: \"map.yaml\"#yaml_filename: \"${EMPTY_MAP_YAML}\"#; s/controller_frequency: [0-9.]*/controller_frequency: ${frequency}/; s/vx_max: [0-9.]*/vx_max: ${vx}/; s/inflation_radius: [0-9.]*/inflation_radius: ${inflation}/g; s/movement_time_allowance: [0-9.]*/movement_time_allowance: ${allowance}/" "$param"
+  sed -i "s/raytrace_max_range: [0-9.]*/raytrace_max_range: ${raytrace_scan_range}/g; s/obstacle_max_range: [0-9.]*/obstacle_max_range: ${obstacle_scan_range}/g" "$param"
   # This experiment verifies the requested stop-then-resume behavior. Keep
   # MPPI forward-only so a temporary pedestrian blockage cannot become an
   # indefinite reverse escape trajectory. Smac retains Reeds-Shepp because
@@ -173,7 +174,7 @@ run_case() {
     echo 'amcl not active' > "$case_dir/readiness.log"
     cleanup_group "$loc_pid"; cleanup_group "$sim_pid"
     cleanup_domain "$domain"
-    printf '%s,%s,%s,%s,%s,%s,%s,%s,STARTUP_FAIL,0\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" >> "$OUT/summary.csv"
+    printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,STARTUP_FAIL,0\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" >> "$OUT/summary.csv"
     ACTIVE_DOMAIN=""
     return 0
   fi
@@ -182,7 +183,7 @@ run_case() {
     echo 'map->base_link transform did not become available' > "$case_dir/readiness.log"
     cleanup_group "$loc_pid"; cleanup_group "$sim_pid"
     cleanup_domain "$domain"
-    printf '%s,%s,%s,%s,%s,%s,%s,%s,STARTUP_FAIL,0\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" >> "$OUT/summary.csv"
+    printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,STARTUP_FAIL,0\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" >> "$OUT/summary.csv"
     ACTIVE_DOMAIN=""
     return 0
   fi
@@ -239,8 +240,10 @@ run_case() {
       wx="${waypoint%,*}"; wy="${waypoint#*,}"
       ROS_DOMAIN_ID=$domain timeout -k 5s --signal=INT 90s ros2 action send_goal /cleannav/navigate_to_pose nav2_msgs/action/NavigateToPose "{pose: {header: {frame_id: map}, pose: {position: {x: $wx, y: $wy, z: 0.0}, orientation: {w: 1.0}}}}" --feedback >> "$case_dir/goal.log" 2>&1 &
       local goal_pid=$! motion_started=0
-      # Trigger the crossing only after this run has produced a real forward
-      # command. This removes startup-time and pedestrian-speed phase races.
+      # Start the pedestrian after the controller has issued a real motion
+      # command. Its short initial hold gives the safety chain a deterministic
+      # detection interval without occupying the route long enough to turn the
+      # short goal into an excessive detour.
       for _ in $(seq 1 300); do
         if awk -F, '$2 == "cmd" && ($3 > 0.03 || $3 < -0.03) {found=1} END {exit !found}' "$case_dir/motion.csv" 2>/dev/null; then
           motion_started=1
@@ -249,9 +252,8 @@ run_case() {
         sleep 0.1
       done
       if [ "$motion_started" -eq 1 ]; then
-        sleep 0.5
         restart_obstacle_b_y=$(awk -v r="$person_range" 'BEGIN{printf "%.2f", 0.415 + r}')
-        setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 run cleannav_simulation dynamic_obstacle_controller --ros-args -p obstacle_name:=cleannav_demo_dynamic_obstacle -p a_x:=-0.90 -p a_y:=0.415 -p b_x:=-0.90 -p b_y:=$restart_obstacle_b_y -p speed:=$person_speed -p update_rate:=20.0" > "$case_dir/controlled_obstacle.log" 2>&1 &
+        setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 run cleannav_simulation dynamic_obstacle_controller --ros-args -p obstacle_name:=cleannav_demo_dynamic_obstacle -p a_x:=-1.25 -p a_y:=0.415 -p b_x:=-1.25 -p b_y:=$restart_obstacle_b_y -p speed:=$person_speed -p update_rate:=20.0 -p initial_hold_sec:=1.0" > "$case_dir/controlled_obstacle.log" 2>&1 &
         obstacle_pid=$!
       fi
       wait "$goal_pid"
@@ -296,16 +298,25 @@ run_case() {
   ACTIVE_DOMAIN=""
   local errors
   errors=$(grep -h '\[ERROR\]' "$case_dir"/*.log 2>/dev/null | grep -v -E 'context is invalid|rcl_shutdown already called|process has died' | wc -l | tr -d ' ')
-  printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" "$status" "$errors" >> "$OUT/summary.csv"
+  printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" "$status" "$errors" >> "$OUT/summary.csv"
 }
 
 if [ -z "${CLEANNAV_CASE_FILTER:-}" ] || [ "$CLEANNAV_CASE_FILTER" = fast_person_01 ]; then
-  run_case fast_person_01 101 20.0 0.50 0.65 60.0 0.60 7.0 || true
+  run_case fast_person_01 101 20.0 0.50 0.65 60.0 0.60 7.0 2.5 3.0 || true
 fi
 if [ -z "${CLEANNAV_CASE_FILTER:-}" ] || [ "$CLEANNAV_CASE_FILTER" = fast_person_02 ]; then
-  run_case fast_person_02 202 20.0 0.50 0.65 90.0 0.90 9.0 || true
+  run_case fast_person_02 202 20.0 0.50 0.65 90.0 0.90 9.0 2.5 3.0 || true
 fi
 if [ -z "${CLEANNAV_CASE_FILTER:-}" ] || [ "$CLEANNAV_CASE_FILTER" = fast_person_03 ]; then
-  run_case fast_person_03 303 25.0 0.55 0.60 120.0 1.20 11.0 || true
+  run_case fast_person_03 303 25.0 0.55 0.60 120.0 1.20 11.0 2.5 3.0 || true
+fi
+if [ -z "${CLEANNAV_CASE_FILTER:-}" ] || [ "$CLEANNAV_CASE_FILTER" = extended ] || [ "$CLEANNAV_CASE_FILTER" = fast_person_04 ]; then
+  run_case fast_person_04 404 20.0 0.55 0.60 120.0 1.50 13.0 3.5 4.0 || true
+fi
+if [ -z "${CLEANNAV_CASE_FILTER:-}" ] || [ "$CLEANNAV_CASE_FILTER" = extended ] || [ "$CLEANNAV_CASE_FILTER" = fast_person_05 ]; then
+  run_case fast_person_05 505 20.0 0.55 0.60 120.0 1.80 15.0 4.0 4.5 || true
+fi
+if [ -z "${CLEANNAV_CASE_FILTER:-}" ] || [ "$CLEANNAV_CASE_FILTER" = extended ] || [ "$CLEANNAV_CASE_FILTER" = fast_person_06 ]; then
+  run_case fast_person_06 606 20.0 0.55 0.60 120.0 2.10 17.0 4.5 5.0 || true
 fi
 echo "$OUT"

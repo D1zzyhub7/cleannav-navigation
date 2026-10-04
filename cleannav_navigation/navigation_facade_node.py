@@ -12,6 +12,7 @@ import copy
 import asyncio
 import math
 import threading
+import time
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any
@@ -158,6 +159,7 @@ class NavigationFacadeRuntime:
         planning_retry_delay_sec: float = 0.5,
         max_follow_retries: int = 5,
         follow_retry_delay_sec: float = 2.0,
+        dynamic_obstacle_wait_sec: float = 0.0,
         clear_costmaps: Any | None = None,
         logger: Any | None = None,
         sleep_callback: Any | None = None,
@@ -178,6 +180,8 @@ class NavigationFacadeRuntime:
         # outer goal so the vehicle can resume after the obstacle moves.
         self._max_follow_retries = max(0, int(max_follow_retries))
         self._follow_retry_delay_sec = max(0.0, float(follow_retry_delay_sec))
+        self._dynamic_obstacle_wait_sec = max(
+            0.0, float(dynamic_obstacle_wait_sec))
         self._clear_costmaps = clear_costmaps
         self._logger = logger
         self._sleep_callback = sleep_callback
@@ -297,6 +301,7 @@ class NavigationFacadeRuntime:
             if self._is_cancel_requested(session):
                 return self._finish(outer_goal_handle, 'cancel')
 
+            first_follow_failure_time = None
             for follow_attempt in range(self._max_follow_retries + 1):
                 if follow_attempt:
                     self._log(
@@ -307,41 +312,70 @@ class NavigationFacadeRuntime:
                     await self._sleep(self._follow_retry_delay_sec)
                     if self._is_cancel_requested(session):
                         return self._finish(outer_goal_handle, 'cancel')
-                    if self._clear_costmaps is not None:
-                        try:
-                            await self._clear_costmaps()
-                        except Exception as exc:
-                            self._log('warn', f'Costmap recovery failed: {exc}')
+                    obstacle_wait_elapsed = (
+                        time.monotonic() - first_follow_failure_time
+                        if first_follow_failure_time is not None else 0.0
+                    )
+                    if obstacle_wait_elapsed < self._dynamic_obstacle_wait_sec:
+                        # A moving obstacle should clear without changing the
+                        # Ackermann path. Replanning immediately tends to
+                        # create a large detour that the vehicle cannot unwind
+                        # near a short goal. The failed controller is no longer
+                        # publishing velocity, so retrying the same path keeps
+                        # the vehicle stopped until MPPI finds it collision-free.
+                        self._log(
+                            'warn',
+                            'Dynamic obstacle wait '
+                            f'{obstacle_wait_elapsed:.1f}/'
+                            f'{self._dynamic_obstacle_wait_sec:.1f}s; '
+                            'holding and retrying current path',
+                        )
+                        replanned_path = path
+                    else:
+                        if self._clear_costmaps is not None:
+                            try:
+                                await self._clear_costmaps()
+                            except Exception as exc:
+                                self._log('warn', f'Costmap recovery failed: {exc}')
+                        replanned_path = None
                     # Replan against the current costmap before resubmitting
-                    # the controller goal. This is the key dynamic-obstacle
-                    # recovery path.
-                    replanned_path = None
-                    if self._planner_client.server_is_ready():
-                        planner_handle = await self._send_goal(
-                            self._planner_client, planner_goal)
-                        if planner_handle is not None and getattr(
-                                planner_handle, 'accepted', False):
-                            with self._lock:
-                                session.planner_goal_handle = planner_handle
-                            planner_outcome, planner_wrapped = await self._wait_inner_result(
-                                session, planner_handle)
-                            with self._lock:
-                                session.planner_goal_handle = None
-                            if planner_outcome is _InnerOutcome.CANCELED:
-                                return self._finish(outer_goal_handle, 'cancel')
-                            if (
-                                planner_outcome is _InnerOutcome.RESULT
-                                and planner_wrapped is not None
-                                and planner_wrapped.status == GoalStatus.STATUS_SUCCEEDED
-                                and _path_is_valid(planner_wrapped.result.path)
-                            ):
-                                replanned_path = planner_wrapped.result.path
-                    # A moving obstacle can temporarily make the planner
-                    # reject the request. Keep the last valid path and still
-                    # resubmit FollowPath so the local controller can retry
-                    # once the obstacle leaves the path.
-                    if replanned_path is not None:
-                        path = replanned_path
+                    # the controller goal only after the dynamic wait window.
+                    if obstacle_wait_elapsed >= self._dynamic_obstacle_wait_sec:
+                        with self._lock:
+                            session.stage = _Stage.PLANNING
+                        if self._planner_client.server_is_ready():
+                            planner_handle = await self._send_goal(
+                                self._planner_client, planner_goal)
+                            if planner_handle is not None and getattr(
+                                    planner_handle, 'accepted', False):
+                                with self._lock:
+                                    session.planner_goal_handle = planner_handle
+                                planner_outcome, planner_wrapped = await self._wait_inner_result(
+                                    session, planner_handle)
+                                with self._lock:
+                                    session.planner_goal_handle = None
+                                if planner_outcome is _InnerOutcome.CANCELED:
+                                    return self._finish(outer_goal_handle, 'cancel')
+                                if (
+                                    planner_outcome is _InnerOutcome.RESULT
+                                    and planner_wrapped is not None
+                                    and planner_wrapped.status == GoalStatus.STATUS_SUCCEEDED
+                                    and _path_is_valid(planner_wrapped.result.path)
+                                ):
+                                    replanned_path = planner_wrapped.result.path
+                    # When the robot is inside a moving obstacle's inflated
+                    # cost region, replanning commonly returns an empty path
+                    # or "starting point in lethal space".  Resubmitting the
+                    # old path here makes the controller drive into the same
+                    # blockage. Keep the controller stopped and retry until a
+                    # fresh path proves the corridor is clear again.
+                    if replanned_path is None:
+                        self._log(
+                            'warn',
+                            'Recovery replan unavailable; holding position',
+                        )
+                        continue
+                    path = replanned_path
 
                 follow_goal = FollowPath.Goal()
                 follow_goal.path = _prepare_controller_path(path)
@@ -380,6 +414,8 @@ class NavigationFacadeRuntime:
                     return self._finish(outer_goal_handle, 'succeed')
                 status = getattr(follow_wrapped, 'status', 'unknown')
                 self._log('warn', f'FollowPath failed with status {status}')
+                if first_follow_failure_time is None:
+                    first_follow_failure_time = time.monotonic()
 
             return self._finish(outer_goal_handle, 'abort')
         except Exception as exc:
@@ -566,8 +602,9 @@ class NavigationFacadeNode(Node):
         # instead of aborting the outer NavigateToPose goal immediately.
         self.declare_parameter('max_planning_retries', 40)
         self.declare_parameter('planning_retry_delay_sec', 1.5)
-        self.declare_parameter('max_follow_retries', 5)
-        self.declare_parameter('follow_retry_delay_sec', 2.0)
+        self.declare_parameter('max_follow_retries', 20)
+        self.declare_parameter('follow_retry_delay_sec', 1.0)
+        self.declare_parameter('dynamic_obstacle_wait_sec', 10.0)
 
         self._planner_client = ActionClient(
             self,
@@ -601,6 +638,8 @@ class NavigationFacadeNode(Node):
                 'max_follow_retries').value,
             follow_retry_delay_sec=self.get_parameter(
                 'follow_retry_delay_sec').value,
+            dynamic_obstacle_wait_sec=self.get_parameter(
+                'dynamic_obstacle_wait_sec').value,
             clear_costmaps=self._clear_costmaps,
             logger=self.get_logger(),
             sleep_callback=self._sleep,

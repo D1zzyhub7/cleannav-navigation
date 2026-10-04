@@ -10,11 +10,14 @@ from dataclasses import dataclass
 from gazebo_msgs.srv import SetEntityState
 from geometry_msgs.msg import Pose, Twist
 import rclpy
+from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.executors import ExternalShutdownException
+from rclpy.executors import MultiThreadedExecutor
 from rclpy.node import Node
 
 
 WARNING_THROTTLE_SEC = 1.5
+SERVICE_CALL_TIMEOUT_SEC = 1.0
 
 
 @dataclass(frozen=True)
@@ -165,12 +168,19 @@ class DynamicObstacleController(Node):
         self._distance = 0.0
         self._direction = 1
         self._pending_call = None
+        self._pending_call_started = None
         self._last_tick = time.monotonic()
         self._last_warning_time = -math.inf
-        self._client = self.create_client(SetEntityState, service_name)
+        self._callback_group = ReentrantCallbackGroup()
+        self._client = self.create_client(
+            SetEntityState,
+            service_name,
+            callback_group=self._callback_group,
+        )
         self._timer = self.create_timer(
             1.0 / self._update_rate,
             self._on_timer,
+            callback_group=self._callback_group,
         )
 
         self.get_logger().info(
@@ -184,6 +194,21 @@ class DynamicObstacleController(Node):
     def _on_timer(self) -> None:
         now = time.monotonic()
         if self._pending_call is not None:
+            if (
+                self._pending_call_started is not None
+                and now - self._pending_call_started
+                > SERVICE_CALL_TIMEOUT_SEC
+            ):
+                stale_call = self._pending_call
+                self._pending_call = None
+                self._pending_call_started = None
+                try:
+                    stale_call.cancel()
+                except Exception:
+                    pass
+                self._warn_throttled(
+                    "SetEntityState call timed out; retrying"
+                )
             self._last_tick = now
             return
         if not self._client.service_is_ready():
@@ -218,9 +243,11 @@ class DynamicObstacleController(Node):
         request.state.reference_frame = "world"
         try:
             self._pending_call = self._client.call_async(request)
+            self._pending_call_started = time.monotonic()
             self._pending_call.add_done_callback(self._on_service_result)
         except Exception as exc:
             self._pending_call = None
+            self._pending_call_started = None
             self._warn_throttled(f"SetEntityState request failed: {exc}")
 
     @staticmethod
@@ -234,7 +261,12 @@ class DynamicObstacleController(Node):
         return pose
 
     def _on_service_result(self, future) -> None:
+        # A timed-out request may complete after a newer call was submitted.
+        # Never let that stale callback clear the active request state.
+        if future is not self._pending_call:
+            return
         self._pending_call = None
+        self._pending_call_started = None
         try:
             response = future.result()
             success = bool(response.success)
@@ -260,12 +292,21 @@ def main(args=None) -> None:
     """Run the demo-only controller until ROS shutdown."""
     rclpy.init(args=args)
     node = None
+    executor = None
     try:
         node = DynamicObstacleController()
-        rclpy.spin(node)
+        executor = MultiThreadedExecutor(num_threads=2)
+        executor.add_node(node)
+        executor.spin()
     except (KeyboardInterrupt, ExternalShutdownException):
         pass
     finally:
+        if executor is not None and node is not None:
+            try:
+                executor.remove_node(node)
+            except Exception:
+                pass
+            executor.shutdown()
         if node is not None:
             node.destroy_node()
         if rclpy.ok():

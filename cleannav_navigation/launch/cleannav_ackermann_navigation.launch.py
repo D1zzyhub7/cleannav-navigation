@@ -1,0 +1,236 @@
+"""启动 CleanNav Ackermann V1 的 Nav2 控制闭环。
+
+This launch DOES NOT start:
+  - Gazebo / simulation
+  - robot_state_publisher
+  - ros2_control
+  - Ackermann chassis controller
+  - RTAB-Map
+  - AMCL
+  - map_server
+  - Nav2 localization
+  - velocity_smoother
+  - Mission Manager
+  - HMI
+  - perception
+
+外部必须提供 map、TF、odom、scan，或等价的 Navigation 所需环境。
+本 launch 不使用标准 Nav2 bringup，也不声明 full CleanNav system runtime integration。
+"""
+
+import os
+
+from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import LaunchConfiguration
+from launch_ros.actions import Node
+from nav2_common.launch import RewrittenYaml
+
+
+def generate_launch_description():
+    navigation_share = get_package_share_directory('cleannav_navigation')
+    global_planner_share = get_package_share_directory('cleannav_global_planner')
+    path_executor_share = get_package_share_directory('cleannav_path_executor')
+    safety_share = get_package_share_directory('cleannav_safety_supervisor')
+
+    params_file = LaunchConfiguration('params_file')
+    use_sim_time = LaunchConfiguration('use_sim_time')
+    autostart = LaunchConfiguration('autostart')
+    planner_id = LaunchConfiguration('planner_id')
+    map_frame = LaunchConfiguration('map_frame')
+    replan_period_sec = LaunchConfiguration('replan_period_sec')
+    log_level = LaunchConfiguration('log_level')
+    safety_block_all = LaunchConfiguration('safety_block_all')
+    safety_publish_frequency = LaunchConfiguration(
+        'safety_publish_frequency')
+    safety_max_forward_linear_x = LaunchConfiguration(
+        'safety_max_forward_linear_x')
+    safety_max_reverse_linear_x = LaunchConfiguration(
+        'safety_max_reverse_linear_x')
+    safety_max_angular_z = LaunchConfiguration(
+        'safety_max_angular_z')
+    completion_window_xy_tolerance = LaunchConfiguration(
+        'completion_window_xy_tolerance')
+    robot_base_frame = LaunchConfiguration('robot_base_frame')
+    safety_autonomous_timeout_sec = LaunchConfiguration(
+        'safety_autonomous_timeout_sec')
+
+    configured_params = RewrittenYaml(
+        source_file=params_file,
+        param_rewrites={'use_sim_time': use_sim_time},
+        convert_types=True,
+    )
+
+    planner_bridge = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(
+            global_planner_share,
+            'launch',
+            'cleannav_hybrid_planner_bridge.launch.py',
+        )),
+        launch_arguments={
+            'planner_id': planner_id,
+            'map_frame': map_frame,
+            'replan_period_sec': replan_period_sec,
+            'use_sim_time': use_sim_time,
+        }.items(),
+    )
+
+    path_executor = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(
+            path_executor_share,
+            'launch',
+            'cleannav_path_executor.launch.py',
+        )),
+        launch_arguments={
+            'use_sim_time': use_sim_time,
+            'completion_window_xy_tolerance': completion_window_xy_tolerance,
+            'robot_base_frame': robot_base_frame,
+        }.items(),
+    )
+
+    safety_supervisor = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(
+            safety_share,
+            'launch',
+            'safety_supervisor.launch.py',
+        )),
+        launch_arguments={
+            'use_sim_time': use_sim_time,
+            'publish_frequency': safety_publish_frequency,
+            'block_all': safety_block_all,
+            'max_forward_linear_x': safety_max_forward_linear_x,
+            'max_reverse_linear_x': safety_max_reverse_linear_x,
+            'max_angular_z': safety_max_angular_z,
+            'autonomous_timeout_sec': safety_autonomous_timeout_sec,
+        }.items(),
+    )
+
+    node_log_args = ['--ros-args', '--log-level', log_level]
+
+    planner_server = Node(
+        package='nav2_planner',
+        executable='planner_server',
+        name='planner_server',
+        output='screen',
+        parameters=[configured_params],
+        arguments=node_log_args,
+    )
+
+    controller_server = Node(
+        package='nav2_controller',
+        executable='controller_server',
+        name='controller_server',
+        output='screen',
+        parameters=[configured_params],
+        remappings=[('cmd_vel', '/cleannav/cmd_vel_candidate')],
+        arguments=node_log_args,
+    )
+
+    navigation_facade = Node(
+        package='cleannav_navigation',
+        executable='navigation_facade_node.py',
+        name='cleannav_navigation_facade',
+        output='screen',
+        arguments=node_log_args,
+    )
+
+    lifecycle_manager = Node(
+        package='nav2_lifecycle_manager',
+        executable='lifecycle_manager',
+        name='lifecycle_manager_navigation',
+        output='screen',
+        parameters=[{
+            'use_sim_time': use_sim_time,
+            'autostart': autostart,
+            'node_names': ['planner_server', 'controller_server'],
+        }],
+        arguments=node_log_args,
+    )
+
+    return LaunchDescription([
+        DeclareLaunchArgument(
+            'params_file',
+            default_value=os.path.join(
+                navigation_share, 'config', 'nav2_params_ackermann.yaml'),
+            description='Full path to the Ackermann Nav2 parameter file',
+        ),
+        DeclareLaunchArgument(
+            'use_sim_time',
+            default_value='false',
+            description='Use Gazebo clock when explicitly enabled',
+        ),
+        DeclareLaunchArgument(
+            'autostart',
+            default_value='true',
+            description='Automatically configure and activate managed nodes',
+        ),
+        DeclareLaunchArgument(
+            'planner_id',
+            default_value='GridBased',
+            description='Nav2 planner plugin id',
+        ),
+        DeclareLaunchArgument(
+            'map_frame',
+            default_value='map',
+            description='Frame used by the Hybrid Planner Bridge',
+        ),
+        DeclareLaunchArgument(
+            'replan_period_sec',
+            default_value='1.0',
+            description='Periodic global replan interval; <= 0 disables it',
+        ),
+        DeclareLaunchArgument(
+            'log_level',
+            default_value='info',
+            description='ROS log level for direct Nav2 nodes',
+        ),
+        DeclareLaunchArgument(
+            'safety_block_all',
+            default_value='true',
+            description='Block candidate velocities by default',
+        ),
+        DeclareLaunchArgument(
+            'safety_publish_frequency',
+            default_value='20.0',
+            description='Safety output publish frequency in Hz',
+        ),
+        DeclareLaunchArgument(
+            'safety_max_forward_linear_x',
+            default_value='0.35',
+            description='Safety maximum forward velocity in m/s',
+        ),
+        DeclareLaunchArgument(
+            'safety_max_reverse_linear_x',
+            default_value='0.10',
+            description='Safety maximum reverse velocity magnitude in m/s',
+        ),
+        DeclareLaunchArgument(
+            'safety_max_angular_z',
+            default_value='0.60',
+            description='Safety maximum angular velocity in rad/s',
+        ),
+        DeclareLaunchArgument(
+            'completion_window_xy_tolerance',
+            default_value='0.25',
+            description='Path Executor completion window from goal checker xy tolerance',
+        ),
+        DeclareLaunchArgument(
+            'robot_base_frame',
+            default_value='base_link',
+            description='Robot base frame used by Path Executor TF lookup',
+        ),
+        DeclareLaunchArgument(
+            'safety_autonomous_timeout_sec',
+            default_value='5.0',
+            description='Safety autonomous authorization timeout',
+        ),
+        planner_server,
+        controller_server,
+        navigation_facade,
+        lifecycle_manager,
+        planner_bridge,
+        path_executor,
+        safety_supervisor,
+    ])

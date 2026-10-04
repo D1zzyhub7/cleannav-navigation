@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="cleannav_demo_bicycle">
+    <static>false</static>
+    <allow_auto_disable>false</allow_auto_disable>
+    <link name="link">
+      <gravity>false</gravity>
+      <kinematic>true</kinematic>
+      <inertial>
+        <mass>5.0</mass>
+        <inertia>
+          <ixx>0.20</ixx>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+          <iyy>0.20</iyy>
+          <iyz>0.0</iyz>
+          <izz>0.20</izz>
+        </inertia>
+      </inertial>
+
+      <visual name="visual_rear_wheel">
+        <pose>-0.55 0 0.34 1.57079632679 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.32</radius>
+            <length>0.06</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.03 0.03 0.03 1</ambient>
+          <diffuse>0.08 0.08 0.08 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_front_wheel">
+        <pose>0.55 0 0.34 1.57079632679 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.32</radius>
+            <length>0.06</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.03 0.03 0.03 1</ambient>
+          <diffuse>0.08 0.08 0.08 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_frame_lower">
+        <pose>0 0 0.63 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>1.10 0.07 0.07</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.03 0.18 0.40 1</ambient>
+          <diffuse>0.05 0.38 0.80 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_frame_top">
+        <pose>-0.10 0 0.88 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.75 0.07 0.07</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.03 0.18 0.40 1</ambient>
+          <diffuse>0.05 0.38 0.80 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_frame_seat_tube">
+        <pose>-0.20 0 0.76 0 0.45 0</pose>
+        <geometry>
+          <box>
+            <size>0.07 0.07 0.58</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.03 0.18 0.40 1</ambient>
+          <diffuse>0.05 0.38 0.80 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_handlebar">
+        <pose>0.48 0 1.00 1.57079632679 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.035</radius>
+            <length>0.38</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.04 0.04 0.04 1</ambient>
+          <diffuse>0.12 0.12 0.12 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_seat">
+        <pose>-0.23 0 1.02 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.25 0.13 0.06</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.04 0.04 0.04 1</ambient>
+          <diffuse>0.12 0.12 0.12 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_rider_torso">
+        <pose>-0.08 0 1.17 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.34 0.28 0.50</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.12 0.12 0.16 1</ambient>
+          <diffuse>0.18 0.22 0.42 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_rider_head">
+        <pose>-0.08 0 1.57 0 0 0</pose>
+        <geometry>
+          <sphere>
+            <radius>0.16</radius>
+          </sphere>
+        </geometry>
+        <material>
+          <ambient>0.76 0.52 0.34 1</ambient>
+          <diffuse>0.92 0.68 0.48 1</diffuse>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

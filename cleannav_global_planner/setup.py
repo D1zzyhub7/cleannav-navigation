@@ -26,6 +26,8 @@ setup(
         'console_scripts': [
             'global_planner_node = '
             'cleannav_global_planner.global_planner_node:main',
+            'hybrid_planner_bridge_node = '
+            'cleannav_global_planner.hybrid_planner_bridge_node:main',
         ],
     },
 )

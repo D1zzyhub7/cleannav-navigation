@@ -1,0 +1,511 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="cleannav_ackermann">
+  <xacro:arg name="controllers_file" default="config/ackermann_controllers.yaml"/>
+  <xacro:arg name="cmd_vel_topic" default="/cmd_vel"/>
+
+  <!-- SIMULATION_PLACEHOLDER — replace after real chassis measurement. -->
+  <!-- 控制器 YAML 中的五项几何参数必须与本区同名属性保持一致。 -->
+  <xacro:property name="wheelbase" value="0.60"/>
+  <xacro:property name="front_wheel_track" value="0.48"/>
+  <xacro:property name="rear_wheel_track" value="0.48"/>
+  <xacro:property name="front_wheel_radius" value="0.10"/>
+  <xacro:property name="rear_wheel_radius" value="0.10"/>
+  <xacro:property name="wheel_width" value="0.06"/>
+  <xacro:property name="chassis_length" value="0.85"/>
+  <xacro:property name="chassis_width" value="0.42"/>
+  <xacro:property name="chassis_height" value="0.18"/>
+  <xacro:property name="chassis_z" value="0.22"/>
+  <xacro:property name="chassis_mass" value="20.0"/>
+  <xacro:property name="wheel_mass" value="1.0"/>
+  <xacro:property name="steering_limit" value="0.60"/>
+  <!-- SIMULATION_PLACEHOLDER — replace after real chassis/sensor measurement. -->
+  <xacro:property name="base_scan_x" value="0.50"/>
+  <xacro:property name="base_scan_y" value="0.0"/>
+  <xacro:property name="base_scan_z" value="0.28"/>
+  <xacro:property name="lidar_radius" value="0.035"/>
+  <xacro:property name="lidar_height" value="0.04"/>
+
+  <link name="base_footprint"/>
+
+  <link name="base_link">
+    <!-- All colors are inline so each visual keeps its own Gazebo color. -->
+    <visual name="cleaner_lower_chassis">
+      <origin xyz="0.02 0 ${chassis_z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.80 0.42 0.16"/>
+      </geometry>
+      <material name="cleaner_lower_chassis_material">
+        <color rgba="0.16 0.18 0.19 1.0"/>
+      </material>
+    </visual>
+    <!-- Demo-only industrial body envelope; visuals have no collision. -->
+    <visual name="cleaner_main_body_shell">
+      <origin xyz="-0.02 0.00 0.36" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.76 0.52 0.24"/>
+      </geometry>
+      <material name="cleaner_main_body_material">
+        <color rgba="0.16 0.18 0.19 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_upper_equipment_compartment">
+      <origin xyz="-0.10 0.00 0.51" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.48 0.40 0.18"/>
+      </geometry>
+      <material name="cleaner_equipment_material">
+        <color rgba="0.25 0.27 0.28 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_rear_service_cap">
+      <origin xyz="-0.35 0.00 0.45" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.10 0.44 0.22"/>
+      </geometry>
+      <material name="cleaner_rear_service_cap_material">
+        <color rgba="0.10 0.11 0.12 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_front_fascia">
+      <origin xyz="0.39 0.00 0.36" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.08 0.50 0.22"/>
+      </geometry>
+      <material name="cleaner_front_fascia_material">
+        <color rgba="0.07 0.08 0.09 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_side_panel_left">
+      <origin xyz="-0.03 0.266 0.37" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.42 0.012 0.15"/>
+      </geometry>
+      <material name="cleaner_side_panel_left_material">
+        <color rgba="0.08 0.25 0.48 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_side_panel_right">
+      <origin xyz="-0.03 -0.266 0.37" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.42 0.012 0.15"/>
+      </geometry>
+      <material name="cleaner_side_panel_right_material">
+        <color rgba="0.08 0.25 0.48 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_front_safety_strip">
+      <origin xyz="0.435 0.00 0.39" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.02 0.44 0.04"/>
+      </geometry>
+      <material name="cleaner_front_safety_strip_material">
+        <color rgba="0.95 0.65 0.05 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_safety_rail_left">
+      <origin xyz="-0.10 0.22 0.625" rpy="0 ${pi / 2} 0"/>
+      <geometry>
+        <cylinder radius="0.012" length="0.32"/>
+      </geometry>
+      <material name="cleaner_safety_rail_left_material">
+        <color rgba="0.95 0.65 0.05 1.0"/>
+      </material>
+    </visual>
+    <!-- Housing follows the immutable base_scan pose at (0.50, 0, 0.28). -->
+    <visual name="cleaner_lidar_pedestal">
+      <origin xyz="0.50 0.00 0.24" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.040" length="0.040"/>
+      </geometry>
+      <material name="cleaner_lidar_pedestal_material">
+        <color rgba="0.12 0.13 0.14 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_lidar_top_cap">
+      <origin xyz="0.50 0.00 0.31" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.040" length="0.020"/>
+      </geometry>
+      <material name="cleaner_lidar_top_cap_material">
+        <color rgba="0.07 0.08 0.09 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_front_brush_left">
+      <origin xyz="0.37 0.16 0.105" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.065" length="0.025"/>
+      </geometry>
+      <material name="cleaner_front_brush_left_material">
+        <color rgba="0.07 0.08 0.09 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_front_brush_right">
+      <origin xyz="0.37 -0.16 0.105" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.065" length="0.025"/>
+      </geometry>
+      <material name="cleaner_front_brush_right_material">
+        <color rgba="0.07 0.08 0.09 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_front_bristles_left">
+      <origin xyz="0.37 0.16 0.085" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.075" length="0.030"/>
+      </geometry>
+      <material name="cleaner_front_bristles_left_material">
+        <color rgba="0.72 0.47 0.10 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_front_bristles_right">
+      <origin xyz="0.37 -0.16 0.085" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.075" length="0.030"/>
+      </geometry>
+      <material name="cleaner_front_bristles_right_material">
+        <color rgba="0.72 0.47 0.10 1.0"/>
+      </material>
+    </visual>
+    <!-- Folded visual-only industrial gripper arm on the right side. -->
+    <visual name="cleaner_arm_base_pedestal">
+      <origin xyz="-0.20 -0.225 0.50" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.045" length="0.060"/>
+      </geometry>
+      <material name="cleaner_arm_base_material">
+        <color rgba="0.07 0.08 0.09 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_arm_shoulder_joint">
+      <origin xyz="-0.20 -0.235 0.54" rpy="${pi / 2} 0 0"/>
+      <geometry>
+        <cylinder radius="0.035" length="0.055"/>
+      </geometry>
+      <material name="cleaner_arm_shoulder_material">
+        <color rgba="0.95 0.65 0.05 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_arm_upper_arm">
+      <origin xyz="-0.14 -0.235 0.565" rpy="0 -0.65 0"/>
+      <geometry>
+        <box size="0.16 0.045 0.050"/>
+      </geometry>
+      <material name="cleaner_arm_upper_material">
+        <color rgba="0.16 0.18 0.19 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_arm_elbow_joint">
+      <origin xyz="-0.075 -0.235 0.615" rpy="${pi / 2} 0 0"/>
+      <geometry>
+        <cylinder radius="0.033" length="0.055"/>
+      </geometry>
+      <material name="cleaner_arm_elbow_material">
+        <color rgba="0.95 0.65 0.05 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_arm_forearm">
+      <origin xyz="-0.135 -0.235 0.64" rpy="0 0.45 0"/>
+      <geometry>
+        <box size="0.14 0.040 0.045"/>
+      </geometry>
+      <material name="cleaner_arm_forearm_material">
+        <color rgba="0.25 0.27 0.28 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_arm_wrist">
+      <origin xyz="-0.20 -0.235 0.67" rpy="${pi / 2} 0 0"/>
+      <geometry>
+        <cylinder radius="0.025" length="0.050"/>
+      </geometry>
+      <material name="cleaner_arm_wrist_material">
+        <color rgba="0.95 0.65 0.05 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_arm_gripper_palm">
+      <origin xyz="-0.225 -0.235 0.655" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.055 0.050 0.035"/>
+      </geometry>
+      <material name="cleaner_arm_gripper_palm_material">
+        <color rgba="0.07 0.08 0.09 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_arm_gripper_finger_left">
+      <origin xyz="-0.270 -0.252 0.635" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.070 0.012 0.018"/>
+      </geometry>
+      <material name="cleaner_arm_gripper_finger_left_material">
+        <color rgba="0.95 0.65 0.05 1.0"/>
+      </material>
+    </visual>
+    <visual name="cleaner_arm_gripper_finger_right">
+      <origin xyz="-0.270 -0.218 0.635" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.070 0.012 0.018"/>
+      </geometry>
+      <material name="cleaner_arm_gripper_finger_right_material">
+        <color rgba="0.95 0.65 0.05 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 ${chassis_z}" rpy="0 0 0"/>
+      <geometry>
+        <box size="${chassis_length} ${chassis_width} ${chassis_height}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <origin xyz="0 0 ${chassis_z}" rpy="0 0 0"/>
+      <mass value="${chassis_mass}"/>
+      <inertia ixx="0.348" ixy="0" ixz="0" iyy="1.258" iyz="0" izz="1.498"/>
+    </inertial>
+  </link>
+
+  <joint name="base_footprint_to_base_link" type="fixed">
+    <parent link="base_footprint"/>
+    <child link="base_link"/>
+  </joint>
+
+  <!-- SIMULATION_PLACEHOLDER — replace after real chassis/sensor measurement. -->
+  <!-- 该位姿仅用于 V1 仿真，不代表真实 LiDAR 安装位置。 -->
+  <link name="base_scan">
+    <visual name="cleannav_lidar_sensor">
+      <geometry>
+        <cylinder radius="${lidar_radius}" length="${lidar_height}"/>
+      </geometry>
+      <material name="cleannav_lidar_sensor_material">
+        <color rgba="0.03 0.035 0.04 1.0"/>
+      </material>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="${lidar_radius}" length="${lidar_height}"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.10"/>
+      <inertia ixx="0.00004" ixy="0" ixz="0" iyy="0.00004" iyz="0" izz="0.00006"/>
+    </inertial>
+  </link>
+
+  <joint name="base_link_to_base_scan" type="fixed">
+    <origin xyz="${base_scan_x} ${base_scan_y} ${base_scan_z}" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="base_scan"/>
+  </joint>
+
+  <xacro:macro name="wheel_link" params="name radius">
+    <link name="${name}">
+      <visual name="${name}_tire">
+        <origin xyz="0 0 0" rpy="${pi / 2} 0 0"/>
+        <geometry>
+          <cylinder radius="${radius}" length="${wheel_width}"/>
+        </geometry>
+        <material name="${name}_tire_material">
+          <color rgba="0.035 0.040 0.045 1.0"/>
+        </material>
+      </visual>
+      <visual name="${name}_hub">
+        <origin xyz="0 0 0" rpy="${pi / 2} 0 0"/>
+        <geometry>
+          <cylinder radius="0.055" length="0.066"/>
+        </geometry>
+        <material name="${name}_hub_material">
+          <color rgba="0.32 0.34 0.35 1.0"/>
+        </material>
+      </visual>
+      <collision>
+        <origin xyz="0 0 0" rpy="${pi / 2} 0 0"/>
+        <geometry>
+          <cylinder radius="${radius}" length="${wheel_width}"/>
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="${wheel_mass}"/>
+        <inertia ixx="0.0028" ixy="0" ixz="0" iyy="0.005" iyz="0" izz="0.0028"/>
+      </inertial>
+    </link>
+  </xacro:macro>
+
+  <xacro:wheel_link name="front_left_wheel_link" radius="${front_wheel_radius}"/>
+  <xacro:wheel_link name="front_right_wheel_link" radius="${front_wheel_radius}"/>
+  <xacro:wheel_link name="rear_left_wheel_link" radius="${rear_wheel_radius}"/>
+  <xacro:wheel_link name="rear_right_wheel_link" radius="${rear_wheel_radius}"/>
+
+  <!-- SIMULATION_PLACEHOLDER — replace after real chassis measurement. -->
+  <!-- 转向节仅承载前轮转向与被动滚动两级关节，不代表实车结构尺寸。 -->
+  <xacro:macro name="steering_knuckle_link" params="name">
+    <link name="${name}">
+      <inertial>
+        <mass value="0.05"/>
+        <inertia ixx="0.00001" ixy="0" ixz="0" iyy="0.00001" iyz="0" izz="0.00001"/>
+      </inertial>
+    </link>
+  </xacro:macro>
+
+  <xacro:steering_knuckle_link name="front_left_steering_link"/>
+  <xacro:steering_knuckle_link name="front_right_steering_link"/>
+
+  <joint name="front_left_steering_joint" type="revolute">
+    <origin xyz="${wheelbase / 2} ${front_wheel_track / 2} ${front_wheel_radius}" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="front_left_steering_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-${steering_limit}" upper="${steering_limit}" effort="50.0" velocity="1.5"/>
+    <dynamics damping="0.4" friction="0.1"/>
+  </joint>
+
+  <joint name="front_left_wheel_joint" type="continuous">
+    <parent link="front_left_steering_link"/>
+    <child link="front_left_wheel_link"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="50.0" velocity="12.0"/>
+    <dynamics damping="0.01" friction="0.0"/>
+  </joint>
+
+  <joint name="front_right_steering_joint" type="revolute">
+    <origin xyz="${wheelbase / 2} -${front_wheel_track / 2} ${front_wheel_radius}" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="front_right_steering_link"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-${steering_limit}" upper="${steering_limit}" effort="50.0" velocity="1.5"/>
+    <dynamics damping="0.4" friction="0.1"/>
+  </joint>
+
+  <joint name="front_right_wheel_joint" type="continuous">
+    <parent link="front_right_steering_link"/>
+    <child link="front_right_wheel_link"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="50.0" velocity="12.0"/>
+    <dynamics damping="0.01" friction="0.0"/>
+  </joint>
+
+  <joint name="rear_left_wheel_joint" type="continuous">
+    <origin xyz="-${wheelbase / 2} ${rear_wheel_track / 2} ${rear_wheel_radius}" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="rear_left_wheel_link"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="50.0" velocity="12.0"/>
+    <dynamics damping="0.1" friction="0.0"/>
+  </joint>
+
+  <joint name="rear_right_wheel_joint" type="continuous">
+    <origin xyz="-${wheelbase / 2} -${rear_wheel_track / 2} ${rear_wheel_radius}" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="rear_right_wheel_link"/>
+    <axis xyz="0 1 0"/>
+    <limit effort="50.0" velocity="12.0"/>
+    <dynamics damping="0.1" friction="0.0"/>
+  </joint>
+
+  <ros2_control name="GazeboSystem" type="system">
+    <hardware>
+      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+    </hardware>
+    <joint name="front_left_steering_joint">
+      <command_interface name="position">
+        <param name="min">-${steering_limit}</param>
+        <param name="max">${steering_limit}</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="front_right_steering_joint">
+      <command_interface name="position">
+        <param name="min">-${steering_limit}</param>
+        <param name="max">${steering_limit}</param>
+      </command_interface>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="front_left_wheel_joint">
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="front_right_wheel_joint">
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="rear_left_wheel_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+    <joint name="rear_right_wheel_joint">
+      <command_interface name="velocity"/>
+      <state_interface name="position"/>
+      <state_interface name="velocity"/>
+    </joint>
+  </ros2_control>
+
+  <!-- Gazebo Classic needs link-scoped material scripts for stable colors. -->
+  <gazebo reference="base_link">
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+  <!-- Gazebo Classic fixed-joint lumping renders base_link as base_footprint. -->
+  <gazebo reference="base_footprint">
+    <material>Gazebo/DarkGrey</material>
+  </gazebo>
+  <gazebo reference="base_scan">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <gazebo reference="front_left_wheel_link">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <gazebo reference="front_right_wheel_link">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <gazebo reference="rear_left_wheel_link">
+    <material>Gazebo/Black</material>
+  </gazebo>
+  <gazebo reference="rear_right_wheel_link">
+    <material>Gazebo/Black</material>
+  </gazebo>
+
+  <!-- SIMULATION_PLACEHOLDER：V1 低负载 LiDAR，不代表最终实车传感器规格。 -->
+  <gazebo reference="base_scan">
+    <sensor name="cleannav_lidar" type="ray">
+      <always_on>true</always_on>
+      <visualize>false</visualize>
+      <update_rate>8</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>181</samples>
+            <resolution>1.0</resolution>
+            <min_angle>-${pi / 2}</min_angle>
+            <max_angle>${pi / 2}</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.12</min>
+          <max>10.0</max>
+          <resolution>0.01</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <mean>0.0</mean>
+          <stddev>0.005</stddev>
+        </noise>
+      </ray>
+      <plugin name="cleannav_laser_scan" filename="libgazebo_ros_ray_sensor.so">
+        <ros>
+          <remapping>~/out:=scan</remapping>
+        </ros>
+        <output_type>sensor_msgs/LaserScan</output_type>
+        <frame_name>base_scan</frame_name>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+  <gazebo>
+    <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+      <parameters>$(arg controllers_file)</parameters>
+      <ros>
+        <remapping>ackermann_controller/reference_unstamped:=$(arg cmd_vel_topic)</remapping>
+        <remapping>ackermann_controller/odometry:=odom</remapping>
+        <remapping>ackermann_controller/tf_odometry:=tf</remapping>
+      </ros>
+    </plugin>
+  </gazebo>
+</robot>

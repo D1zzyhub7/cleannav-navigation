@@ -22,8 +22,10 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, RegisterEventHandler, EmitEvent
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.event_handlers import OnProcessExit
+from launch.events import Shutdown
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 from nav2_common.launch import RewrittenYaml
@@ -149,6 +151,20 @@ def generate_launch_description():
         arguments=node_log_args,
     )
 
+    readiness = Node(
+        package='cleannav_navigation',
+        executable='navigation_readiness_node.py',
+        output='screen',
+        parameters=[{'use_sim_time': use_sim_time,
+                     'timeout_sec': LaunchConfiguration('readiness_timeout_sec'),
+                     'map_frame': map_frame, 'base_frame': robot_base_frame}],
+    )
+
+    def readiness_finished(event, context):
+        if event.returncode == 0:
+            return [lifecycle_manager]
+        return [EmitEvent(event=Shutdown(reason='Navigation readiness failed; see readiness log'))]
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'params_file',
@@ -226,10 +242,13 @@ def generate_launch_description():
             default_value='5.0',
             description='Safety autonomous authorization timeout',
         ),
+        DeclareLaunchArgument('readiness_timeout_sec', default_value='180.0',
+                              description='Wall-clock timeout for navigation input readiness'),
         planner_server,
         controller_server,
         navigation_facade,
-        TimerAction(period=75.0, actions=[lifecycle_manager]),
+        RegisterEventHandler(OnProcessExit(target_action=readiness, on_exit=readiness_finished)),
+        readiness,
         planner_bridge,
         path_executor,
         safety_supervisor,

@@ -22,7 +22,7 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -229,7 +229,7 @@ def generate_launch_description():
         planner_server,
         controller_server,
         navigation_facade,
-        lifecycle_manager,
+        TimerAction(period=75.0, actions=[lifecycle_manager]),
         planner_bridge,
         path_executor,
         safety_supervisor,

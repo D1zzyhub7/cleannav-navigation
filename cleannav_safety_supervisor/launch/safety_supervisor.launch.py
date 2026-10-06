@@ -23,6 +23,14 @@ def generate_launch_description():
         'max_angular_z', default='0.3')
     auto_timeout = LaunchConfiguration(
         'autonomous_timeout_sec', default='5.0')
+    front_stop_enabled = LaunchConfiguration(
+        'front_stop_enabled', default='false')
+    front_stop_distance = LaunchConfiguration(
+        'front_stop_distance_m', default='0.45')
+    front_release_distance = LaunchConfiguration(
+        'front_release_distance_m', default='0.65')
+    front_scan_timeout = LaunchConfiguration(
+        'front_scan_timeout_sec', default='0.5')
 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -52,6 +60,10 @@ def generate_launch_description():
         DeclareLaunchArgument(
             'autonomous_timeout_sec', default_value='5.0',
             description='Autonomous mode timeout in seconds'),
+        DeclareLaunchArgument('front_stop_enabled', default_value='false'),
+        DeclareLaunchArgument('front_stop_distance_m', default_value='0.45'),
+        DeclareLaunchArgument('front_release_distance_m', default_value='0.65'),
+        DeclareLaunchArgument('front_scan_timeout_sec', default_value='0.5'),
 
         Node(
             package='cleannav_safety_supervisor',
@@ -68,6 +80,10 @@ def generate_launch_description():
                 'max_reverse_linear_x': max_reverse,
                 'max_angular_z': max_angular,
                 'autonomous_timeout_sec': auto_timeout,
+                'front_stop_enabled': front_stop_enabled,
+                'front_stop_distance_m': front_stop_distance,
+                'front_release_distance_m': front_release_distance,
+                'front_scan_timeout_sec': front_scan_timeout,
             }],
         ),
     ])

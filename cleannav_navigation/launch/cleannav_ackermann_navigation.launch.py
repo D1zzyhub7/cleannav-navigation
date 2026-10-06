@@ -56,6 +56,8 @@ def generate_launch_description():
     robot_base_frame = LaunchConfiguration('robot_base_frame')
     safety_autonomous_timeout_sec = LaunchConfiguration(
         'safety_autonomous_timeout_sec')
+    safety_front_stop_enabled = LaunchConfiguration(
+        'safety_front_stop_enabled')
 
     configured_params = RewrittenYaml(
         source_file=params_file,
@@ -104,6 +106,7 @@ def generate_launch_description():
             'max_reverse_linear_x': safety_max_reverse_linear_x,
             'max_angular_z': safety_max_angular_z,
             'autonomous_timeout_sec': safety_autonomous_timeout_sec,
+            'front_stop_enabled': safety_front_stop_enabled,
         }.items(),
     )
 
@@ -225,6 +228,10 @@ def generate_launch_description():
             'safety_autonomous_timeout_sec',
             default_value='5.0',
             description='Safety autonomous authorization timeout',
+        ),
+        DeclareLaunchArgument(
+            'safety_front_stop_enabled', default_value='false',
+            description='Enable independent front laser stop and auto release',
         ),
         planner_server,
         controller_server,

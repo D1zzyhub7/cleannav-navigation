@@ -41,3 +41,22 @@ costmap layer retained those cells; that requires layer-specific tracing.
 Do not rank navigation parameter sets using these runs as successful dynamic
 avoidance. First make the close-obstacle stop deterministic and establish
 costmap clearing after the pedestrian departs, then repeat the batch.
+
+## Fixed-scenario resolution
+
+The fixed baseline now disables random static obstacles, keeps dynamic scan
+returns in the local costmap, uses an independent front-laser stop gate, and
+moves the pedestrian across the route only once. The global plan is a 2.40 m
+straight path with start, middle and end yaw all equal to zero.
+
+The original MPPI experiment used `vx_std=0.02` with
+`regenerate_noises=false`. It repeatedly selected a biased steering command
+and drove away from the straight path. The fixed experiment uses
+`vx_std=0.15`, `batch_size=2000`, regenerated noise, and disables path pose
+orientation scoring. Run `batch-headless-cruise-20261006-224631` then stopped
+at 3.13 s, resumed at 7.64 s and completed the goal. Run
+`batch-headless-cruise-20261006-225942` also completed. Run
+`batch-headless-cruise-20261006-230300` reached the goal according to the
+controller and final world pose, but FastDDS lost the outer action response;
+the batch script now restricts DDS to local UDP and independently recovers
+this result only when the controller log and Gazebo pose agree.

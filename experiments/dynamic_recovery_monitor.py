@@ -10,7 +10,7 @@ import time
 
 from geometry_msgs.msg import Twist
 from gazebo_msgs.msg import ModelStates
-from nav_msgs.msg import OccupancyGrid, Odometry
+from nav_msgs.msg import OccupancyGrid, Odometry, Path
 import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
@@ -27,6 +27,9 @@ CHAIN_COLUMNS = [
     'costmap_nearest_lethal_m',
     'costmap_front_lethal_m', 'costmap_front_x_m', 'costmap_front_y_m',
     'costmap_lethal_count', 'costmap_unknown_count', 'odom_age_sec',
+    'path_pose_count', 'path_length_m', 'path_start_x_m', 'path_start_y_m',
+    'path_end_x_m', 'path_end_y_m', 'path_start_yaw_rad',
+    'path_mid_yaw_rad', 'path_end_yaw_rad',
     'status',
 ]
 
@@ -71,6 +74,11 @@ class MotionMonitor(Node):
             self.create_subscription(
                 String, '/cleannav/safety_supervisor_status',
                 self._on_safety_status, 10)
+            self.create_subscription(
+                Path, '/plan', lambda msg: self._on_path(msg, 'plan'), 5)
+            self.create_subscription(
+                Path, '/transformed_global_plan',
+                lambda msg: self._on_path(msg, 'transformed_global_plan'), 5)
 
     def _times(self) -> tuple[str, int, int, int]:
         monotonic_ns = time.monotonic_ns()
@@ -105,6 +113,25 @@ class MotionMonitor(Node):
     def _on_candidate(self, msg: Twist) -> None:
         self._record('cmd_vel_candidate', self._times(),
                      linear_x=msg.linear.x, angular_z=msg.angular.z)
+
+    def _on_path(self, msg: Path, event: str) -> None:
+        points = [pose.pose.position for pose in msg.poses]
+        length = sum(math.hypot(b.x - a.x, b.y - a.y)
+                     for a, b in zip(points, points[1:]))
+        self._record(event, self._times(), source_stamp_ns=_stamp_ns(msg.header),
+                     frame_id=msg.header.frame_id, path_pose_count=len(points),
+                     path_length_m=length,
+                     path_start_x_m=points[0].x if points else None,
+                     path_start_y_m=points[0].y if points else None,
+                     path_end_x_m=points[-1].x if points else None,
+                     path_end_y_m=points[-1].y if points else None,
+                     path_start_yaw_rad=(
+                         _yaw(msg.poses[0].pose.orientation) if points else None),
+                     path_mid_yaw_rad=(
+                         _yaw(msg.poses[len(points) // 2].pose.orientation)
+                         if points else None),
+                     path_end_yaw_rad=(
+                         _yaw(msg.poses[-1].pose.orientation) if points else None))
 
     def _on_odom(self, msg: Odometry) -> None:
         times = self._times()

@@ -6,6 +6,7 @@ cleannav_safety_supervisor — Safety Supervisor Node.
 不转发 candidate，不调用 FollowPath，不规划路径。
 """
 
+import math
 import signal
 import time
 
@@ -16,6 +17,7 @@ from rclpy.node import Node
 from cleannav_interfaces.msg import SafetyStatus
 from cleannav_interfaces.srv import SafetyLease
 from geometry_msgs.msg import Twist
+from sensor_msgs.msg import LaserScan
 from std_msgs.msg import Bool, String
 from std_srvs.srv import SetBool, Trigger
 
@@ -50,6 +52,18 @@ class SafetySupervisorNode(Node):
             'max_angular_z', 0.3).value
         self._autonomous_timeout_sec = self.declare_parameter(
             'autonomous_timeout_sec', 5.0).value
+        self._front_stop_enabled = self.declare_parameter(
+            'front_stop_enabled', False).value
+        self._front_stop_distance_m = self.declare_parameter(
+            'front_stop_distance_m', 0.45).value
+        self._front_release_distance_m = self.declare_parameter(
+            'front_release_distance_m', 0.65).value
+        self._front_scan_timeout_sec = self.declare_parameter(
+            'front_scan_timeout_sec', 0.5).value
+        self._front_blocked = False
+        self._front_clear_scans = 0
+        self._front_min_m = None
+        self._last_front_scan_time = None
 
         self._emergency_stop = False
         self._last_candidate_time = self.get_clock().now()
@@ -72,6 +86,9 @@ class SafetySupervisorNode(Node):
             Twist, '/cleannav/cmd_vel_candidate', self._candidate_cb, 1)
         self._estop_sub = self.create_subscription(
             Bool, SAFETY_ESTOP_TOPIC, self._estop_cb, 1)
+        if self._front_stop_enabled:
+            self._scan_sub = self.create_subscription(
+                LaserScan, '/scan', self._scan_cb, 10)
 
         self._autonomous_srv = self.create_service(
             SetBool, '/cleannav/safety/set_autonomous_enabled',
@@ -108,6 +125,27 @@ class SafetySupervisorNode(Node):
                 or msg.angular.x != 0.0 or msg.angular.y != 0.0 \
                 or msg.angular.z != 0.0:
             self._nonzero_candidate_count += 1
+
+    def _scan_cb(self, msg: LaserScan):
+        self._last_front_scan_time = self.get_clock().now()
+        nearest = min((distance for index, distance in enumerate(msg.ranges)
+                       if abs(msg.angle_min + index * msg.angle_increment)
+                       <= math.pi / 6
+                       and math.isfinite(distance)
+                       and msg.range_min <= distance <= msg.range_max),
+                      default=None)
+        self._front_min_m = nearest
+        if nearest is not None and nearest <= self._front_stop_distance_m:
+            self._front_blocked = True
+            self._front_clear_scans = 0
+        elif self._front_blocked and (
+                nearest is None or nearest >= self._front_release_distance_m):
+            self._front_clear_scans += 1
+            if self._front_clear_scans >= 2:
+                self._front_blocked = False
+                self._front_clear_scans = 0
+        else:
+            self._front_clear_scans = 0
 
     def _estop_cb(self, msg: Bool):
         if msg.data:
@@ -251,6 +289,17 @@ class SafetySupervisorNode(Node):
             self._cmd_vel_pub.publish(Twist())
             return
 
+        # A close or stale front scan overrides a forward controller command.
+        # This gate is independent of MPPI and releases automatically after
+        # two clear scans, without latching an emergency stop.
+        if self._front_stop_enabled:
+            scan_age = (
+                (now - self._last_front_scan_time).nanoseconds * 1e-9
+                if self._last_front_scan_time is not None else float('inf'))
+            if self._front_blocked or scan_age > self._front_scan_timeout_sec:
+                self._cmd_vel_pub.publish(Twist())
+                return
+
         # Priority 5: independently forward/reverse limited candidate
         limited = self._limit_twist(self._last_candidate_twist)
         self._last_output_limited = (
@@ -296,6 +345,8 @@ class SafetySupervisorNode(Node):
             f"lease_owner={self._lease_owner_execution_id or 'none'} "
             f"autonomous_remaining_sec={remaining:.1f} "
             f"last_output_limited={self._last_output_limited}"
+            f" front_blocked={self._front_blocked}"
+            f" front_min_m={self._front_min_m if self._front_min_m is not None else 'none'}"
         )
         self._status_pub.publish(String(data=status))
         self._structured_status_pub.publish(

@@ -194,6 +194,7 @@ local_costmap:
         observation_sources: scan
         scan:
           topic: /scan
+          inf_is_valid: True
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -210,6 +211,7 @@ local_costmap:
         observation_sources: scan
         scan:
           topic: /scan
+          inf_is_valid: True
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -250,6 +252,7 @@ global_costmap:
         observation_sources: scan
         scan:
           topic: /scan
+          inf_is_valid: True
           max_obstacle_height: 2.0
           clearing: True
           marking: True
@@ -270,6 +273,7 @@ global_costmap:
         observation_sources: scan
         scan:
           topic: /scan
+          inf_is_valid: True
           max_obstacle_height: 2.0
           clearing: True
           marking: True

@@ -7,6 +7,12 @@
 source /opt/ros/humble/setup.bash
 source /home/hyn/cleannav_ws/install/setup.bash
 
+# Every node in this experiment runs inside one WSL instance. Restrict DDS to
+# localhost and UDP to avoid FastDDS shared-memory port locks corrupting action
+# replies during repeated launches.
+export ROS_LOCALHOST_ONLY=1
+export FASTDDS_BUILTIN_TRANSPORTS=UDPv4
+
 # ROS setup scripts reference optional environment variables. Enable strict
 # mode only after both setup files have been sourced.
 set -uo pipefail
@@ -20,7 +26,7 @@ printf 'scenario,seed,controller_frequency,vx_max,inflation_radius,movement_time
 # Keep each batch away from domains used by earlier interrupted runs. The
 # shell PID changes on every invocation, reducing collisions with stale DDS
 # participants while staying within the ROS 2 domain range.
-DOMAIN_BASE=$((200 + ($$ % 30)))
+DOMAIN_BASE=$((40 + ($$ % 40)))
 ACTIVE_DOMAIN=""
 
 cleanup_group() {
@@ -146,32 +152,43 @@ run_case() {
   cleanup_domain "$domain"
 
   # Deterministic random static obstacles. The seed is recorded with every run.
-  local block_x block_y cylinder_x cylinder_y obstacle_b_y
+  local block_x block_y cylinder_x cylinder_y obstacle_b_y static_enabled
+  static_enabled="${CLEANNAV_RANDOM_STATIC:-false}"
   block_x=$(awk -v s="$seed" 'BEGIN{srand(s); printf "%.2f", -0.8 + rand()*2.8}')
   block_y=$(awk -v s="$seed" 'BEGIN{srand(s+17); printf "%.2f", 1.5 + rand()}')
   cylinder_x=$(awk -v s="$seed" 'BEGIN{srand(s+31); printf "%.2f", 0.2 + rand()*2.8}')
   cylinder_y=$(awk -v s="$seed" 'BEGIN{srand(s+47); printf "%.2f", -2.5 + rand()}')
   obstacle_b_y=$(awk -v r="$person_range" 'BEGIN{printf "%.2f", -4.00 + r}')
-  printf 'seed=%s block=(%s,%s) cylinder=(%s,%s) dynamic_speed=%s range=%s obstacle_scan=%s raytrace_scan=%s pedestrian_x=%s goal_x=%s initial_hold_sec=%s initial_front_clearance=0.70m initial_lidar_clearance=0.65m\n' \
-    "$seed" "$block_x" "$block_y" "$cylinder_x" "$cylinder_y" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" "$pedestrian_x" "$goal_x" "$pedestrian_hold_sec" > "$case_dir/scenario.log"
+  printf 'seed=%s static_enabled=%s block=(%s,%s) cylinder=(%s,%s) dynamic_speed=%s range=%s obstacle_scan=%s raytrace_scan=%s pedestrian_x=%s goal_x=%s initial_hold_sec=%s initial_front_clearance=0.70m initial_lidar_clearance=0.65m\n' \
+    "$seed" "$static_enabled" "$block_x" "$block_y" "$cylinder_x" "$cylinder_y" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" "$pedestrian_x" "$goal_x" "$pedestrian_hold_sec" > "$case_dir/scenario.log"
 
   local param="/tmp/cleannav_${name}.yaml"
   cp "$BASE" "$param"
   sed -i "s#/rtabmap/map#/map#g; s/use_sim_time: False/use_sim_time: True/g; s#yaml_filename: \"map.yaml\"#yaml_filename: \"${EMPTY_MAP_YAML}\"#; s/controller_frequency: [0-9.]*/controller_frequency: ${frequency}/; s/vx_max: [0-9.]*/vx_max: ${vx}/; s/inflation_radius: [0-9.]*/inflation_radius: ${inflation}/g; s/movement_time_allowance: [0-9.]*/movement_time_allowance: ${allowance}/" "$param"
   sed -i "s/raytrace_max_range: [0-9.]*/raytrace_max_range: ${raytrace_scan_range}/g; s/obstacle_max_range: [0-9.]*/obstacle_max_range: ${obstacle_scan_range}/g" "$param"
+  # A planar LaserScan needs one 2D obstacle layer. Keep the voxel plugin
+  # definition available in the base config, but exclude it from this fixed
+  # experiment so we can isolate stale marks from duplicate scan layers.
+  sed -i 's/plugins: \["obstacle_layer", "voxel_layer", "inflation_layer"\]/plugins: ["obstacle_layer", "inflation_layer"]/' "$param"
+  if [ "$static_enabled" = false ]; then
+    # The fixed baseline uses a known empty map. Dynamic returns belong in
+    # the local costmap; feeding them to the global planner produced a 5.55 m
+    # loop for a 2.45 m straight goal before the pedestrian even appeared.
+    sed -i 's/plugins: \["static_layer", "obstacle_layer", "voxel_layer", "inflation_layer"\]/plugins: ["static_layer", "inflation_layer"]/' "$param"
+  fi
   # This experiment verifies the requested stop-then-resume behavior. Keep
   # MPPI forward-only so a temporary pedestrian blockage cannot become an
   # indefinite reverse escape trajectory. Smac retains Reeds-Shepp because
   # the mapped short corridor cannot produce a valid Dubin path.
   sed -i 's/vx_min: -0.15/vx_min: 0.0/' "$param"
-  sed -i 's/failure_tolerance: 5.0/failure_tolerance: 15.0/; s/wz_max: 0.60/wz_max: 0.05/; s/cost_weight: 14.0/cost_weight: 40.0/' "$param"
+  sed -i 's/failure_tolerance: 5.0/failure_tolerance: 15.0/; s/batch_size: 750/batch_size: 2000/; s/vx_std: 0.02/vx_std: 0.15/; s/regenerate_noises: false/regenerate_noises: true/; s/use_path_orientations: true/use_path_orientations: false/' "$param"
   sed -i '/    scan_topic: scan/a\    set_initial_pose: True\n    initial_pose:\n      x: -1.875\n      y: 0.415\n      yaw: 0.0' "$param"
   # The headless world has no static landmarks. Keep AMCL as the map->odom
   # provider but prevent dynamic, unmapped test obstacles from dragging the
   # localization estimate away from the deterministic initial pose.
   sed -i 's/update_min_a: 0.2/update_min_a: 1000.0/; s/update_min_d: 0.25/update_min_d: 1000.0/' "$param"
 
-  setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 launch cleannav_simulation ackermann_mcity_obstacles_demo.launch.py gui:=false world:=/usr/share/gazebo-11/worlds/empty.world model_path:=/usr/share/gazebo-11/models spawn_x:=-1.875 spawn_y:=0.415 enable_static_obstacles:=true static_block_x:=$block_x static_block_y:=$block_y static_cylinder_x:=$cylinder_x static_cylinder_y:=$cylinder_y enable_dynamic_obstacle:=true dynamic_obstacle_speed:=$person_speed dynamic_obstacle_a_x:=$pedestrian_x dynamic_obstacle_a_y:=-4.00 dynamic_obstacle_b_x:=$pedestrian_x dynamic_obstacle_b_y:=$obstacle_b_y" > "$case_dir/sim.log" 2>&1 &
+  setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 launch cleannav_simulation ackermann_mcity_obstacles_demo.launch.py gui:=false world:=/usr/share/gazebo-11/worlds/empty.world model_path:=/usr/share/gazebo-11/models spawn_x:=-1.875 spawn_y:=0.415 enable_static_obstacles:=$static_enabled static_block_x:=$block_x static_block_y:=$block_y static_cylinder_x:=$cylinder_x static_cylinder_y:=$cylinder_y enable_dynamic_obstacle:=true dynamic_obstacle_speed:=$person_speed dynamic_obstacle_a_x:=$pedestrian_x dynamic_obstacle_a_y:=-4.00 dynamic_obstacle_b_x:=$pedestrian_x dynamic_obstacle_b_y:=$obstacle_b_y" > "$case_dir/sim.log" 2>&1 &
   local sim_pid=$!
   setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 launch nav2_bringup localization_launch.py map:=$EMPTY_MAP_YAML params_file:=$param use_sim_time:=True autostart:=True" > "$case_dir/localization.log" 2>&1 &
   local loc_pid=$!
@@ -192,7 +209,7 @@ run_case() {
     ACTIVE_DOMAIN=""
     return 0
   fi
-  setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 launch cleannav_navigation cleannav_ackermann_navigation.launch.py params_file:=$param use_sim_time:=true autostart:=true replan_period_sec:=1.0 safety_block_all:=true" > "$case_dir/navigation.log" 2>&1 &
+  setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 launch cleannav_navigation cleannav_ackermann_navigation.launch.py params_file:=$param use_sim_time:=true autostart:=true replan_period_sec:=1.0 safety_block_all:=true safety_front_stop_enabled:=true" > "$case_dir/navigation.log" 2>&1 &
   local nav_pid=$!
   local status=STARTUP_FAIL cruise_ok=1
   local readiness_error=""
@@ -259,12 +276,26 @@ run_case() {
       done
       if [ "$motion_started" -eq 1 ]; then
         restart_obstacle_b_y=$(awk -v r="$person_range" 'BEGIN{printf "%.2f", 0.415 + r}')
-        setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 run cleannav_simulation dynamic_obstacle_controller --ros-args -p obstacle_name:=cleannav_demo_dynamic_obstacle -p a_x:=$pedestrian_x -p a_y:=0.415 -p b_x:=$pedestrian_x -p b_y:=$restart_obstacle_b_y -p speed:=$person_speed -p update_rate:=20.0 -p initial_hold_sec:=$pedestrian_hold_sec" > "$case_dir/controlled_obstacle.log" 2>&1 &
+        setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 run cleannav_simulation dynamic_obstacle_controller --ros-args -p obstacle_name:=cleannav_demo_dynamic_obstacle -p a_x:=$pedestrian_x -p a_y:=0.415 -p b_x:=$pedestrian_x -p b_y:=$restart_obstacle_b_y -p speed:=$person_speed -p update_rate:=20.0 -p initial_hold_sec:=$pedestrian_hold_sec -p ping_pong:=false" > "$case_dir/controlled_obstacle.log" 2>&1 &
         obstacle_pid=$!
       fi
       wait "$goal_pid"
       goal_rc=$?
       goal_status=$(grep 'Goal finished with status:' "$case_dir/goal.log" | tail -1 | awk '{print $5}')
+      # FastDDS can lose the outer action response even though the controller
+      # reached and stopped at the goal. Recover only when both the controller
+      # log and the final Gazebo world pose independently confirm arrival.
+      if [ -z "$goal_status" ] \
+          && grep -q 'Reached the goal!' "$case_dir/navigation.log" \
+          && awk -F, -v gx="$wx" -v gy="$wy" '
+               $6 == "robot_world" {x=$10; y=$11; found=1}
+               END {if (!found) exit 1; dx=x-gx; dy=y-gy;
+                    exit !((dx*dx + dy*dy) <= 0.1225)}' \
+             "$case_dir/chain.csv"; then
+        goal_status=SUCCEEDED
+        goal_rc=0
+        echo "RESULT_RECOVERED_FROM_CONTROLLER_AND_WORLD_POSE" >> "$case_dir/goal.log"
+      fi
       if [ "$motion_started" -ne 1 ] || [ "$goal_rc" -ne 0 ] || [ "$goal_status" != "SUCCEEDED" ]; then
         cruise_ok=0
         echo "WAYPOINT_FAILED,$wx,$wy,status=${goal_status:-NO_RESULT},rc=$goal_rc,motion_started=$motion_started" >> "$case_dir/goal.log"

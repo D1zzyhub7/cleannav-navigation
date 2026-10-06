@@ -138,6 +138,7 @@ class DynamicObstacleController(Node):
         self.declare_parameter("speed", 0.25)
         self.declare_parameter("update_rate", 10.0)
         self.declare_parameter("initial_hold_sec", 0.0)
+        self.declare_parameter("ping_pong", True)
 
         self._obstacle_name = str(
             self.get_parameter("obstacle_name").value
@@ -162,6 +163,7 @@ class DynamicObstacleController(Node):
         self._initial_hold_sec = float(
             self.get_parameter("initial_hold_sec").value
         )
+        self._ping_pong = bool(self.get_parameter("ping_pong").value)
         _finite(self._initial_hold_sec, "initial_hold_sec")
         if self._initial_hold_sec < 0.0:
             raise ValueError("initial_hold_sec must not be negative")
@@ -197,7 +199,8 @@ class DynamicObstacleController(Node):
             f"A=({self._endpoint_a.x:.2f},{self._endpoint_a.y:.2f}) "
             f"B=({self._endpoint_b.x:.2f},{self._endpoint_b.y:.2f}) "
             f"speed={self._speed:.2f}m/s rate={self._update_rate:.1f}Hz "
-            f"initial_hold={self._initial_hold_sec:.2f}s"
+            f"initial_hold={self._initial_hold_sec:.2f}s "
+            f"ping_pong={self._ping_pong}"
         )
 
     def _on_timer(self) -> None:
@@ -236,13 +239,19 @@ class DynamicObstacleController(Node):
 
         elapsed_sec = min(max(now - self._last_tick, 0.0), 0.5)
         self._last_tick = now
-        self._distance, self._direction = advance_ping_pong(
-            self._distance,
-            self._direction,
-            self._speed,
-            elapsed_sec,
-            self._segment_length,
-        )
+        if self._ping_pong:
+            self._distance, self._direction = advance_ping_pong(
+                self._distance,
+                self._direction,
+                self._speed,
+                elapsed_sec,
+                self._segment_length,
+            )
+        else:
+            self._distance = min(
+                self._distance + self._speed * elapsed_sec,
+                self._segment_length,
+            )
         endpoint = interpolate_endpoint(
             self._endpoint_a,
             self._endpoint_b,

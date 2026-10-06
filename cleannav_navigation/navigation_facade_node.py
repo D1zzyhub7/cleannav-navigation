@@ -28,6 +28,8 @@ from rclpy.action import ActionClient, ActionServer, CancelResponse, GoalRespons
 from rclpy.callback_groups import ReentrantCallbackGroup
 from rclpy.node import Node
 from rclpy.task import Future
+from rclpy.time import Time
+from tf2_ros import Buffer, TransformException, TransformListener
 
 
 FACADE_ACTION_NAME = '/cleannav/navigate_to_pose'
@@ -37,7 +39,7 @@ FOLLOW_ACTION_NAME = '/follow_path'
 DEFAULT_PLANNER_ID = 'GridBased'
 DEFAULT_USE_START = False
 DEFAULT_CONTROLLER_ID = 'FollowPath'
-DEFAULT_GOAL_CHECKER_ID = ''
+DEFAULT_GOAL_CHECKER_ID = 'general_goal_checker'
 
 
 class _Stage(Enum):
@@ -49,11 +51,13 @@ class _InnerOutcome(Enum):
     RESULT = 'RESULT'
     CANCELED = 'CANCELED'
     CANCEL_FAILED = 'CANCEL_FAILED'
+    GOAL_REACHED = 'GOAL_REACHED'
 
 
 class _WakeReason(Enum):
     RESULT = 'RESULT'
     CANCEL = 'CANCEL'
+    GOAL_REACHED = 'GOAL_REACHED'
 
 
 @dataclass
@@ -65,8 +69,20 @@ class _Session:
     planner_goal_handle: Any | None = None
     follow_goal_handle: Any | None = None
     cancel_requested: bool = False
+    goal_reached: bool = False
+    goal_guard_samples: int = 0
+    controller_goal_pose: PoseStamped | None = None
     wake_future: Future | None = None
     terminal: bool = False
+
+
+def _yaw_from_quaternion(quaternion: Any) -> float:
+    """Return planar yaw from a geometry_msgs quaternion."""
+    siny_cosp = 2.0 * (
+        quaternion.w * quaternion.z + quaternion.x * quaternion.y)
+    cosy_cosp = 1.0 - 2.0 * (
+        quaternion.y * quaternion.y + quaternion.z * quaternion.z)
+    return math.atan2(siny_cosp, cosy_cosp)
 
 
 def _finite_pose(pose: PoseStamped) -> bool:
@@ -160,6 +176,9 @@ class NavigationFacadeRuntime:
         max_follow_retries: int = 5,
         follow_retry_delay_sec: float = 2.0,
         dynamic_obstacle_wait_sec: float = 0.0,
+        goal_reached_distance_m: float = 0.10,
+        goal_reached_yaw_rad: float = 0.15,
+        goal_reached_pose_samples: int = 3,
         clear_costmaps: Any | None = None,
         logger: Any | None = None,
         sleep_callback: Any | None = None,
@@ -182,6 +201,12 @@ class NavigationFacadeRuntime:
         self._follow_retry_delay_sec = max(0.0, float(follow_retry_delay_sec))
         self._dynamic_obstacle_wait_sec = max(
             0.0, float(dynamic_obstacle_wait_sec))
+        self._goal_reached_distance_m = max(
+            0.0, float(goal_reached_distance_m))
+        self._goal_reached_yaw_rad = max(
+            0.0, float(goal_reached_yaw_rad))
+        self._goal_reached_pose_samples = max(
+            1, int(goal_reached_pose_samples))
         self._clear_costmaps = clear_costmaps
         self._logger = logger
         self._sleep_callback = sleep_callback
@@ -203,6 +228,50 @@ class NavigationFacadeRuntime:
         """Return whether an outer goal slot is reserved or active."""
         with self._lock:
             return self._busy
+
+    @property
+    def active_controller_goal_pose(self) -> PoseStamped | None:
+        """Return a snapshot of the path endpoint used by FollowPath."""
+        with self._lock:
+            session = self._session
+            if session is None or session.controller_goal_pose is None:
+                return None
+            return copy.deepcopy(session.controller_goal_pose)
+
+    def observe_controller_pose(
+        self,
+        frame_id: str,
+        x: float,
+        y: float,
+        yaw: float,
+    ) -> bool:
+        """Feed a TF pose into the tight endpoint guard for active FollowPath."""
+        with self._lock:
+            session = self._session
+            if (
+                session is None
+                or session.stage is not _Stage.FOLLOWING
+                or session.controller_goal_pose is None
+                or session.controller_goal_pose.header.frame_id != frame_id
+            ):
+                return False
+            goal = session.controller_goal_pose.pose
+            goal_yaw = _yaw_from_quaternion(goal.orientation)
+            yaw_error = abs(math.atan2(
+                math.sin(yaw - goal_yaw), math.cos(yaw - goal_yaw)))
+            distance = math.hypot(x - goal.position.x, y - goal.position.y)
+            if (
+                distance <= self._goal_reached_distance_m
+                and yaw_error <= self._goal_reached_yaw_rad
+            ):
+                session.goal_guard_samples += 1
+            else:
+                session.goal_guard_samples = 0
+            if session.goal_guard_samples < self._goal_reached_pose_samples:
+                return False
+            session.goal_reached = True
+            self._try_wake_locked(session, _WakeReason.GOAL_REACHED)
+            return True
 
     def accept_goal(self, goal_request: NavigateToPose.Goal) -> bool:
         """Reserve the only outer goal slot after basic representation checks."""
@@ -387,6 +456,12 @@ class NavigationFacadeRuntime:
 
                 with self._lock:
                     session.stage = _Stage.FOLLOWING
+                    controller_goal_pose = copy.deepcopy(path.poses[-1])
+                    if not controller_goal_pose.header.frame_id:
+                        controller_goal_pose.header.frame_id = path.header.frame_id
+                    session.controller_goal_pose = controller_goal_pose
+                    session.goal_guard_samples = 0
+                    session.goal_reached = False
                 follow_handle = await self._send_goal(
                     self._follow_client,
                     follow_goal,
@@ -408,6 +483,13 @@ class NavigationFacadeRuntime:
                     return self._finish(outer_goal_handle, 'cancel')
                 if follow_outcome is _InnerOutcome.CANCEL_FAILED:
                     return self._finish(outer_goal_handle, 'abort')
+                if follow_outcome is _InnerOutcome.GOAL_REACHED:
+                    self._log(
+                        'info',
+                        'TF goal guard confirmed the final pose; '
+                        'stopped FollowPath after Nav2 missed completion',
+                    )
+                    return self._finish(outer_goal_handle, 'succeed')
                 if follow_wrapped is not None and (
                     follow_wrapped.status == GoalStatus.STATUS_SUCCEEDED
                 ):
@@ -470,10 +552,13 @@ class NavigationFacadeRuntime:
         with self._lock:
             session.wake_future = wake_future
             cancel_requested = session.cancel_requested
+            goal_reached = session.goal_reached
 
         if cancel_requested:
             # 已经收到的 outer cancel 必须优先于尚未观察到的 inner result。
             self._try_wake(session, _WakeReason.CANCEL)
+        elif goal_reached:
+            self._try_wake(session, _WakeReason.GOAL_REACHED)
         else:
             inner_result_future.add_done_callback(_on_inner_result)
 
@@ -499,6 +584,22 @@ class NavigationFacadeRuntime:
                     return _InnerOutcome.RESULT, wrapped_result
             if await self._cancel_and_confirm(inner_goal_handle):
                 return _InnerOutcome.CANCELED, None
+            return _InnerOutcome.CANCEL_FAILED, None
+
+        if wake_reason is _WakeReason.GOAL_REACHED:
+            if self._future_done(inner_result_future):
+                try:
+                    wrapped_result = inner_result_future.result()
+                except Exception:
+                    wrapped_result = None
+                if (
+                    wrapped_result is not None
+                    and getattr(wrapped_result, 'status', None)
+                    == GoalStatus.STATUS_SUCCEEDED
+                ):
+                    return _InnerOutcome.RESULT, wrapped_result
+            if await self._cancel_and_confirm(inner_goal_handle):
+                return _InnerOutcome.GOAL_REACHED, None
             return _InnerOutcome.CANCEL_FAILED, None
 
         try:
@@ -605,6 +706,12 @@ class NavigationFacadeNode(Node):
         self.declare_parameter('max_follow_retries', 20)
         self.declare_parameter('follow_retry_delay_sec', 1.0)
         self.declare_parameter('dynamic_obstacle_wait_sec', 10.0)
+        self.declare_parameter('goal_reached_distance_m', 0.10)
+        self.declare_parameter('goal_reached_yaw_rad', 0.15)
+        self.declare_parameter('goal_reached_pose_samples', 3)
+
+        self._tf_buffer = Buffer()
+        self._tf_listener = TransformListener(self._tf_buffer, self)
 
         self._planner_client = ActionClient(
             self,
@@ -640,6 +747,12 @@ class NavigationFacadeNode(Node):
                 'follow_retry_delay_sec').value,
             dynamic_obstacle_wait_sec=self.get_parameter(
                 'dynamic_obstacle_wait_sec').value,
+            goal_reached_distance_m=self.get_parameter(
+                'goal_reached_distance_m').value,
+            goal_reached_yaw_rad=self.get_parameter(
+                'goal_reached_yaw_rad').value,
+            goal_reached_pose_samples=self.get_parameter(
+                'goal_reached_pose_samples').value,
             clear_costmaps=self._clear_costmaps,
             logger=self.get_logger(),
             sleep_callback=self._sleep,
@@ -653,6 +766,28 @@ class NavigationFacadeNode(Node):
             goal_callback=self._goal_callback,
             cancel_callback=self._cancel_callback,
             callback_group=self._callback_group,
+        )
+        self._goal_guard_timer = self.create_timer(
+            0.1, self._sample_goal_guard_pose,
+            callback_group=self._callback_group,
+        )
+
+    def _sample_goal_guard_pose(self) -> None:
+        goal = self._runtime.active_controller_goal_pose
+        if goal is None or not goal.header.frame_id:
+            return
+        try:
+            transform = self._tf_buffer.lookup_transform(
+                goal.header.frame_id, 'base_link', Time())
+        except TransformException:
+            return
+        translation = transform.transform.translation
+        rotation = transform.transform.rotation
+        self._runtime.observe_controller_pose(
+            goal.header.frame_id,
+            translation.x,
+            translation.y,
+            _yaw_from_quaternion(rotation),
         )
 
     def _goal_callback(self, goal_request: NavigateToPose.Goal) -> GoalResponse:

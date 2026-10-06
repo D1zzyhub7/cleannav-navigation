@@ -14,8 +14,10 @@ from nav_msgs.msg import OccupancyGrid, Odometry, Path
 import rclpy
 from rclpy.executors import ExternalShutdownException
 from rclpy.node import Node
+from rclpy.time import Time
 from sensor_msgs.msg import LaserScan
 from std_msgs.msg import String
+from tf2_ros import Buffer, TransformException, TransformListener
 
 
 CHAIN_COLUMNS = [
@@ -57,6 +59,9 @@ class MotionMonitor(Node):
         self._chain_file = None
         self._chain_writer = None
         self._last_odom = None
+        self._last_robot_map_record_ns = 0
+        self._tf_buffer = Buffer()
+        self._tf_listener = TransformListener(self._tf_buffer, self)
         if chain_path is not None:
             self._chain_file = open(chain_path, 'w', newline='', buffering=1)
             self._chain_writer = csv.DictWriter(
@@ -145,6 +150,20 @@ class MotionMonitor(Node):
         self._record('odom', times, source_stamp_ns=_stamp_ns(msg.header),
                      frame_id=msg.header.frame_id, x=position.x,
                      y=position.y, yaw_rad=yaw)
+        if times[1] - self._last_robot_map_record_ns >= 200_000_000:
+            try:
+                transform = self._tf_buffer.lookup_transform(
+                    'map', 'base_link', Time())
+            except TransformException:
+                pass
+            else:
+                translation = transform.transform.translation
+                self._record(
+                    'robot_map', times,
+                    source_stamp_ns=_stamp_ns(transform.header),
+                    frame_id='map', x=translation.x, y=translation.y,
+                    yaw_rad=_yaw(transform.transform.rotation))
+                self._last_robot_map_record_ns = times[1]
 
     def _on_models(self, msg: ModelStates) -> None:
         times = self._times()

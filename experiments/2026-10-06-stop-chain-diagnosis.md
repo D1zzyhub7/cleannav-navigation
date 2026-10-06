@@ -60,3 +60,31 @@ at 3.13 s, resumed at 7.64 s and completed the goal. Run
 controller and final world pose, but FastDDS lost the outer action response;
 the batch script now restricts DDS to local UDP and independently recovers
 this result only when the controller log and Gazebo pose agree.
+
+## High-speed randomized batch result
+
+Final batch `batch-headless-cruise-20261006-235557` enabled randomized static
+obstacles and increased both pedestrian speed and laser obstacle/raytrace
+ranges. All three cases completed the goal and independently passed the
+stop/resume check.
+
+| Case | Pedestrian speed | Scan obstacle/raytrace range | Stop start | Resume | Stop duration | Displacement | Result |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| `fast_person_04` | 1.50 m/s | 3.5 / 4.0 m | 2.97 s | 7.60 s | 4.63 s | 2.42 m | succeeded |
+| `fast_person_05` | 1.80 m/s | 4.0 / 4.5 m | 3.10 s | 8.63 s | 5.53 s | 2.40 m | succeeded |
+| `fast_person_06` | 2.10 m/s | 4.5 / 5.0 m | 2.83 s | 8.27 s | 5.44 s | 2.19 m | succeeded |
+
+The intermittent goal-completion failure was also reproduced: MPPI could
+drive through the final pose even while `map -> base_link` was within the
+configured Nav2 goal tolerance. The facade now explicitly selects
+`general_goal_checker`. A tighter fallback uses the actual TF pose and only
+fires after three consecutive 10 Hz samples are within 0.10 m and 0.15 rad
+of the final path pose. It cancels the still-running inner `FollowPath`
+action so velocity output stops, then completes the outer navigation action.
+Case 04 exercised this fallback. Case 06 completed through Nav2's normal goal
+checker. Case 05 ended at 0.02 m from the final path pose after controller
+recovery and completed successfully.
+
+`FollowPath.distance_to_goal` must not be used for this fallback. During a
+controller retry it can briefly report a near-zero value while the vehicle is
+still about 1.87 m from the endpoint; the TF pose is the reliable signal.

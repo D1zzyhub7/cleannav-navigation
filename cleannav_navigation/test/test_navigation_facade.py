@@ -177,7 +177,7 @@ def test_inner_endpoints_and_verified_defaults_are_frozen(executor):
     assert DEFAULT_PLANNER_ID == 'GridBased'
     assert DEFAULT_USE_START is False
     assert DEFAULT_CONTROLLER_ID == 'FollowPath'
-    assert DEFAULT_GOAL_CHECKER_ID == ''
+    assert DEFAULT_GOAL_CHECKER_ID == 'general_goal_checker'
     assert hasattr(ComputePathToPose.Goal(), 'use_start')
     assert hasattr(FollowPath.Goal(), 'goal_checker_id')
 

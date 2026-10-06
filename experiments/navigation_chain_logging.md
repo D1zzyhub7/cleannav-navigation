@@ -25,14 +25,16 @@ sector has no valid return, not that it is guaranteed obstacle-free.
 empty scan. The scan is in `base_scan`, so its distance is measured from the
 laser, 0.50 m ahead of `base_link` in the demo vehicle.
 
-Costmap distances are calculated from `OccupancyGrid` cells with occupancy at
-least 90. `costmap_front_lethal_m` is the nearest such cell ahead of the robot
+Costmap distances are calculated from `OccupancyGrid` cells with occupancy
+exactly 100 (lethal). Lower values can be inflation costs.
+`costmap_front_lethal_m` is the nearest lethal cell ahead of the robot
 within 0.75 m laterally. It uses the most recently received `/odom` pose only
 when the odometry and costmap frame IDs match; `odom_age_sec` records the age
 of that pose. The full grid is not saved in this CSV. The costmap topic is
 published periodically, so `source_stamp_ns` also helps distinguish an old
-map from a fresh observation. `obstacle_world` coordinates are Gazebo world
-coordinates and must not be compared directly with odometry coordinates.
+map from a fresh observation. `obstacle_world` and `robot_world` coordinates
+are Gazebo world coordinates and must not be compared directly with odometry
+coordinates.
 
 The first instrumented run on 2026-10-06 is in
 `batch-headless-cruise-20261006-133654/fast_person_05`. It captured all seven
@@ -44,3 +46,9 @@ ranking navigation parameters: the car starts at world X=-1.875 and the
 pedestrian is placed at X=-1.25, only 0.625 m between centers. The vehicle's
 front collision extent is 0.45 m and the pedestrian's half extent is 0.325 m,
 so their projected collision volumes overlap by about 0.15 m at that pose.
+
+The revised experiment starts the pedestrian at world X=-0.40 and sends the
+car toward X=0.50. At the vehicle's initial pose, the front collision boxes
+have a 0.70 m gap and the laser has a 0.65 m gap to the pedestrian surface.
+The pedestrian remains on the route for 5 seconds after activation. The
+scenario log records these values for every case.

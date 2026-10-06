@@ -120,11 +120,20 @@ class MotionMonitor(Node):
                      y=position.y, yaw_rad=yaw)
 
     def _on_models(self, msg: ModelStates) -> None:
+        times = self._times()
+        try:
+            robot_index = msg.name.index('cleannav_ackermann')
+        except ValueError:
+            pass
+        else:
+            robot_pose = msg.pose[robot_index]
+            self._record('robot_world', times, frame_id='world',
+                         x=robot_pose.position.x, y=robot_pose.position.y,
+                         yaw_rad=_yaw(robot_pose.orientation))
         try:
             index = msg.name.index('cleannav_demo_dynamic_obstacle')
         except ValueError:
             return
-        times = self._times()
         position = msg.pose[index].position
         self._writer.writerow([
             times[0], 'obstacle', '', '', position.x, position.y
@@ -196,7 +205,10 @@ class MotionMonitor(Node):
                 if value < 0:
                     unknown_count += 1
                     continue
-                if value < 90:
+                # OccupancyGrid encodes lethal obstacles as 100. Values below
+                # 100 can be inflation costs; calling them lethal made the
+                # apparent obstacle look much closer than the laser return.
+                if value != 100:
                     continue
                 lethal_count += 1
                 gx = ((index % info.width) + 0.5) * resolution

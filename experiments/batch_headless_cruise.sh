@@ -135,6 +135,11 @@ run_case() {
   ACTIVE_DOMAIN="$domain"
   local case_dir="$OUT/$name"
   mkdir -p "$case_dir"
+  # Keep the pedestrian's collision box clear of both the car nose and the
+  # forward lidar at the instant it enters the route. The previous x=-1.25
+  # overlapped the car starting at x=-1.875 (0.45 m nose, 0.325 m half box).
+  local pedestrian_x=-0.40 goal_x=0.50 pedestrian_hold_sec=5.0
+  local goal_timeout_sec="${CLEANNAV_GOAL_TIMEOUT_SEC:-90}"
 
   # An interrupted ros2 launch can orphan grandchildren outside the original
   # process group. Clean only this case's isolated DDS domain.
@@ -147,8 +152,8 @@ run_case() {
   cylinder_x=$(awk -v s="$seed" 'BEGIN{srand(s+31); printf "%.2f", 0.2 + rand()*2.8}')
   cylinder_y=$(awk -v s="$seed" 'BEGIN{srand(s+47); printf "%.2f", -2.5 + rand()}')
   obstacle_b_y=$(awk -v r="$person_range" 'BEGIN{printf "%.2f", -4.00 + r}')
-  printf 'seed=%s block=(%s,%s) cylinder=(%s,%s) dynamic_speed=%s range=%s obstacle_scan=%s raytrace_scan=%s\n' \
-    "$seed" "$block_x" "$block_y" "$cylinder_x" "$cylinder_y" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" > "$case_dir/scenario.log"
+  printf 'seed=%s block=(%s,%s) cylinder=(%s,%s) dynamic_speed=%s range=%s obstacle_scan=%s raytrace_scan=%s pedestrian_x=%s goal_x=%s initial_hold_sec=%s initial_front_clearance=0.70m initial_lidar_clearance=0.65m\n' \
+    "$seed" "$block_x" "$block_y" "$cylinder_x" "$cylinder_y" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" "$pedestrian_x" "$goal_x" "$pedestrian_hold_sec" > "$case_dir/scenario.log"
 
   local param="/tmp/cleannav_${name}.yaml"
   cp "$BASE" "$param"
@@ -166,7 +171,7 @@ run_case() {
   # localization estimate away from the deterministic initial pose.
   sed -i 's/update_min_a: 0.2/update_min_a: 1000.0/; s/update_min_d: 0.25/update_min_d: 1000.0/' "$param"
 
-  setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 launch cleannav_simulation ackermann_mcity_obstacles_demo.launch.py gui:=false world:=/usr/share/gazebo-11/worlds/empty.world model_path:=/usr/share/gazebo-11/models spawn_x:=-1.875 spawn_y:=0.415 enable_static_obstacles:=true static_block_x:=$block_x static_block_y:=$block_y static_cylinder_x:=$cylinder_x static_cylinder_y:=$cylinder_y enable_dynamic_obstacle:=true dynamic_obstacle_speed:=$person_speed dynamic_obstacle_a_x:=-1.25 dynamic_obstacle_a_y:=-4.00 dynamic_obstacle_b_x:=-1.25 dynamic_obstacle_b_y:=$obstacle_b_y" > "$case_dir/sim.log" 2>&1 &
+  setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 launch cleannav_simulation ackermann_mcity_obstacles_demo.launch.py gui:=false world:=/usr/share/gazebo-11/worlds/empty.world model_path:=/usr/share/gazebo-11/models spawn_x:=-1.875 spawn_y:=0.415 enable_static_obstacles:=true static_block_x:=$block_x static_block_y:=$block_y static_cylinder_x:=$cylinder_x static_cylinder_y:=$cylinder_y enable_dynamic_obstacle:=true dynamic_obstacle_speed:=$person_speed dynamic_obstacle_a_x:=$pedestrian_x dynamic_obstacle_a_y:=-4.00 dynamic_obstacle_b_x:=$pedestrian_x dynamic_obstacle_b_y:=$obstacle_b_y" > "$case_dir/sim.log" 2>&1 &
   local sim_pid=$!
   setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 launch nav2_bringup localization_launch.py map:=$EMPTY_MAP_YAML params_file:=$param use_sim_time:=True autostart:=True" > "$case_dir/localization.log" 2>&1 &
   local loc_pid=$!
@@ -238,14 +243,13 @@ run_case() {
     : > "$case_dir/goal.log"
     # This goal crosses the moving obstacle's path and must both succeed and
     # show a real stop/resume sequence in the independent motion log.
-    for waypoint in '-0.95,0.415'; do
+    for waypoint in "$goal_x,0.415"; do
       wx="${waypoint%,*}"; wy="${waypoint#*,}"
-      ROS_DOMAIN_ID=$domain timeout -k 5s --signal=INT 90s ros2 action send_goal /cleannav/navigate_to_pose nav2_msgs/action/NavigateToPose "{pose: {header: {frame_id: map}, pose: {position: {x: $wx, y: $wy, z: 0.0}, orientation: {w: 1.0}}}}" --feedback >> "$case_dir/goal.log" 2>&1 &
+      ROS_DOMAIN_ID=$domain timeout -k 5s --signal=INT "${goal_timeout_sec}s" ros2 action send_goal /cleannav/navigate_to_pose nav2_msgs/action/NavigateToPose "{pose: {header: {frame_id: map}, pose: {position: {x: $wx, y: $wy, z: 0.0}, orientation: {w: 1.0}}}}" --feedback >> "$case_dir/goal.log" 2>&1 &
       local goal_pid=$! motion_started=0
       # Start the pedestrian after the controller has issued a real motion
-      # command. Its short initial hold gives the safety chain a deterministic
-      # detection interval without occupying the route long enough to turn the
-      # short goal into an excessive detour.
+      # command. Hold it on the route long enough to observe the controller's
+      # reaction before the faster pedestrian moves away.
       for _ in $(seq 1 300); do
         if awk -F, '$2 == "cmd" && ($3 > 0.03 || $3 < -0.03) {found=1} END {exit !found}' "$case_dir/motion.csv" 2>/dev/null; then
           motion_started=1
@@ -255,7 +259,7 @@ run_case() {
       done
       if [ "$motion_started" -eq 1 ]; then
         restart_obstacle_b_y=$(awk -v r="$person_range" 'BEGIN{printf "%.2f", 0.415 + r}')
-        setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 run cleannav_simulation dynamic_obstacle_controller --ros-args -p obstacle_name:=cleannav_demo_dynamic_obstacle -p a_x:=-1.25 -p a_y:=0.415 -p b_x:=-1.25 -p b_y:=$restart_obstacle_b_y -p speed:=$person_speed -p update_rate:=20.0 -p initial_hold_sec:=1.0" > "$case_dir/controlled_obstacle.log" 2>&1 &
+        setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 run cleannav_simulation dynamic_obstacle_controller --ros-args -p obstacle_name:=cleannav_demo_dynamic_obstacle -p a_x:=$pedestrian_x -p a_y:=0.415 -p b_x:=$pedestrian_x -p b_y:=$restart_obstacle_b_y -p speed:=$person_speed -p update_rate:=20.0 -p initial_hold_sec:=$pedestrian_hold_sec" > "$case_dir/controlled_obstacle.log" 2>&1 &
         obstacle_pid=$!
       fi
       wait "$goal_pid"

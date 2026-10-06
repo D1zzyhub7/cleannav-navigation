@@ -9,7 +9,7 @@ from collections import Counter
 
 REQUIRED_EVENTS = (
     'scan', 'local_costmap', 'cmd_vel_candidate', 'safety_status',
-    'cmd_vel', 'odom', 'obstacle_world',
+    'cmd_vel', 'odom', 'robot_world', 'obstacle_world',
 )
 
 

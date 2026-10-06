@@ -231,7 +231,9 @@ run_case() {
   fi
   if [ -z "$readiness_error" ]; then
     ROS_DOMAIN_ID=$domain python3 "$PWD/experiments/dynamic_recovery_monitor.py" \
-      "$case_dir/motion.csv" > "$case_dir/monitor.log" 2>&1 & local monitor_pid=$!
+      "$case_dir/motion.csv" "$case_dir/chain.csv" \
+      --ros-args -p use_sim_time:=true \
+      > "$case_dir/monitor.log" 2>&1 & local monitor_pid=$!
     ROS_DOMAIN_ID=$domain timeout 10s ros2 service call /cleannav/safety/acquire_lease cleannav_interfaces/srv/SafetyLease "{execution_id: cruise_$name}" > "$case_dir/lease.log" 2>&1 || true
     : > "$case_dir/goal.log"
     # This goal crosses the moving obstacle's path and must both succeed and
@@ -274,6 +276,8 @@ run_case() {
     sleep 0.2
     kill -KILL "$monitor_pid" 2>/dev/null || true
     wait "$monitor_pid" 2>/dev/null || true
+    python3 "$PWD/experiments/analyze_navigation_chain.py" \
+      "$case_dir/chain.csv" > "$case_dir/chain_summary.json" 2>&1 || true
     if [ -n "$obstacle_pid" ]; then
       cleanup_group "$obstacle_pid"
     fi

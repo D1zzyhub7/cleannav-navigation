@@ -176,16 +176,21 @@ class MotionMonitor(Node):
             self._record('robot_world', times, frame_id='world',
                          x=robot_pose.position.x, y=robot_pose.position.y,
                          yaw_rad=_yaw(robot_pose.orientation))
-        try:
-            index = msg.name.index('cleannav_demo_dynamic_obstacle')
-        except ValueError:
-            return
-        position = msg.pose[index].position
-        self._writer.writerow([
-            times[0], 'obstacle', '', '', position.x, position.y
-        ])
-        self._record('obstacle_world', times, frame_id='world',
-                     x=position.x, y=position.y)
+        for obstacle_name, motion_event, chain_event in (
+            ('cleannav_demo_dynamic_obstacle', 'obstacle', 'obstacle_world'),
+            ('cleannav_demo_dynamic_obstacle_2', 'obstacle_secondary',
+             'obstacle_world_secondary'),
+        ):
+            try:
+                index = msg.name.index(obstacle_name)
+            except ValueError:
+                continue
+            position = msg.pose[index].position
+            self._writer.writerow([
+                times[0], motion_event, '', '', position.x, position.y
+            ])
+            self._record(chain_event, times, frame_id='world',
+                         x=position.x, y=position.y)
 
     def _on_scan(self, msg: LaserScan) -> None:
         nearest = None

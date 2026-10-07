@@ -22,7 +22,7 @@ mkdir -p "$OUT"
 BASE="/home/hyn/cleannav_ws/install/cleannav_navigation/share/cleannav_navigation/config/nav2_params_ackermann.yaml"
 EMPTY_MAP_YAML="/tmp/cleannav_headless_empty_map.yaml"
 python3 "$PWD/experiments/create_headless_empty_map.py" "$EMPTY_MAP_YAML"
-printf 'scenario,seed,controller_frequency,vx_max,inflation_radius,movement_time_allowance,person_speed,person_range,obstacle_scan_range,raytrace_scan_range,status,error_lines\n' > "$OUT/summary.csv"
+printf 'scenario,seed,controller_frequency,vx_max,inflation_radius,movement_time_allowance,person_speed,person_range,obstacle_scan_range,raytrace_scan_range,person_hold_sec,person_direction,person_x,multiple_dynamic,status,error_lines\n' > "$OUT/summary.csv"
 # Keep each batch away from domains used by earlier interrupted runs. The
 # shell PID changes on every invocation, reducing collisions with stale DDS
 # participants while staying within the ROS 2 domain range.
@@ -135,8 +135,37 @@ wait_for_transform() {
   return 1
 }
 
+model_exists() {
+  local domain="$1" model_name="$2"
+  ROS_DOMAIN_ID="$domain" timeout 5s ros2 topic echo \
+    --no-daemon --spin-time 1 --once /model_states \
+    2>/dev/null | grep -Fq "$model_name"
+}
+
+spawn_second_obstacle() {
+  local domain="$1" case_dir="$2" attempt
+  : > "$case_dir/obstacle2_spawn.log"
+  for attempt in 1 2 3; do
+    if model_exists "$domain" cleannav_demo_dynamic_obstacle_2; then
+      return 0
+    fi
+    printf 'spawn attempt=%s\n' "$attempt" >> "$case_dir/obstacle2_spawn.log"
+    ROS_DOMAIN_ID="$domain" timeout 20s ros2 run gazebo_ros spawn_entity.py \
+      -entity cleannav_demo_dynamic_obstacle_2 \
+      -file "$PWD/cleannav_simulation/models/cleannav_demo_dynamic_obstacle.sdf" \
+      -x 0.10 -y -8.0 -z 0.40 >> "$case_dir/obstacle2_spawn.log" 2>&1 || true
+    if grep -q -E 'Successfully spawned entity|already exists' \
+        "$case_dir/obstacle2_spawn.log"; then
+      return 0
+    fi
+    sleep 2
+  done
+  model_exists "$domain" cleannav_demo_dynamic_obstacle_2
+}
+
 run_case() {
   local name="$1" seed="$2" frequency="$3" vx="$4" inflation="$5" allowance="$6" person_speed="$7" person_range="$8" obstacle_scan_range="$9" raytrace_scan_range="${10}"
+  local pedestrian_hold_sec="${11:-5.0}" pedestrian_direction="${12:-forward}" pedestrian_x="${13:--0.40}" multiple_dynamic="${14:-false}"
   local domain=$((DOMAIN_BASE + seed % 20))
   ACTIVE_DOMAIN="$domain"
   local case_dir="$OUT/$name"
@@ -144,7 +173,7 @@ run_case() {
   # Keep the pedestrian's collision box clear of both the car nose and the
   # forward lidar at the instant it enters the route. The previous x=-1.25
   # overlapped the car starting at x=-1.875 (0.45 m nose, 0.325 m half box).
-  local pedestrian_x=-0.40 goal_x=0.50 pedestrian_hold_sec=5.0
+  local goal_x=0.50
   local goal_timeout_sec="${CLEANNAV_GOAL_TIMEOUT_SEC:-90}"
 
   # An interrupted ros2 launch can orphan grandchildren outside the original
@@ -158,9 +187,13 @@ run_case() {
   block_y=$(awk -v s="$seed" 'BEGIN{srand(s+17); printf "%.2f", 1.5 + rand()}')
   cylinder_x=$(awk -v s="$seed" 'BEGIN{srand(s+31); printf "%.2f", 0.2 + rand()*2.8}')
   cylinder_y=$(awk -v s="$seed" 'BEGIN{srand(s+47); printf "%.2f", -2.5 + rand()}')
-  obstacle_b_y=$(awk -v r="$person_range" 'BEGIN{printf "%.2f", -4.00 + r}')
-  printf 'seed=%s static_enabled=%s block=(%s,%s) cylinder=(%s,%s) dynamic_speed=%s range=%s obstacle_scan=%s raytrace_scan=%s pedestrian_x=%s goal_x=%s initial_hold_sec=%s initial_front_clearance=0.70m initial_lidar_clearance=0.65m\n' \
-    "$seed" "$static_enabled" "$block_x" "$block_y" "$cylinder_x" "$cylinder_y" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" "$pedestrian_x" "$goal_x" "$pedestrian_hold_sec" > "$case_dir/scenario.log"
+  if [ "$pedestrian_direction" = reverse ]; then
+    obstacle_b_y=$(awk -v r="$person_range" 'BEGIN{printf "%.2f", -4.00-r}')
+  else
+    obstacle_b_y=$(awk -v r="$person_range" 'BEGIN{printf "%.2f", -4.00+r}')
+  fi
+  printf 'seed=%s static_enabled=%s block=(%s,%s) cylinder=(%s,%s) dynamic_speed=%s range=%s obstacle_scan=%s raytrace_scan=%s pedestrian_x=%s direction=%s multiple_dynamic=%s goal_x=%s initial_hold_sec=%s\n' \
+    "$seed" "$static_enabled" "$block_x" "$block_y" "$cylinder_x" "$cylinder_y" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" "$pedestrian_x" "$pedestrian_direction" "$multiple_dynamic" "$goal_x" "$pedestrian_hold_sec" > "$case_dir/scenario.log"
 
   local param="/tmp/cleannav_${name}.yaml"
   cp "$BASE" "$param"
@@ -196,7 +229,7 @@ run_case() {
     echo 'amcl not active' > "$case_dir/readiness.log"
     cleanup_group "$loc_pid"; cleanup_group "$sim_pid"
     cleanup_domain "$domain"
-    printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,STARTUP_FAIL,0\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" >> "$OUT/summary.csv"
+    printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,STARTUP_FAIL,0\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" "$pedestrian_hold_sec" "$pedestrian_direction" "$pedestrian_x" "$multiple_dynamic" >> "$OUT/summary.csv"
     ACTIVE_DOMAIN=""
     return 0
   fi
@@ -205,7 +238,7 @@ run_case() {
     echo 'map->base_link transform did not become available' > "$case_dir/readiness.log"
     cleanup_group "$loc_pid"; cleanup_group "$sim_pid"
     cleanup_domain "$domain"
-    printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,STARTUP_FAIL,0\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" >> "$OUT/summary.csv"
+    printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,STARTUP_FAIL,0\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" "$pedestrian_hold_sec" "$pedestrian_direction" "$pedestrian_x" "$multiple_dynamic" >> "$OUT/summary.csv"
     ACTIVE_DOMAIN=""
     return 0
   fi
@@ -231,10 +264,25 @@ run_case() {
     readiness_error='scan topic produced no message'
   fi
   if [ -z "$readiness_error" ]; then
+    if ! ROS_DOMAIN_ID=$domain python3 \
+        "$PWD/experiments/reset_gazebo_vehicle.py" \
+        --x -1.875 --y 0.415 --yaw 0.0 \
+        > "$case_dir/vehicle_reset.log" 2>&1; then
+      readiness_error='vehicle Gazebo pose reset could not be verified'
+    else
+      ROS_DOMAIN_ID=$domain python3 \
+        "$PWD/experiments/set_initial_pose_experiment.py" \
+        > "$case_dir/initialpose_after_reset.log" 2>&1 || true
+      if ! wait_for_transform "$domain"; then
+        readiness_error='map->base_link transform unavailable after vehicle reset'
+      fi
+    fi
+  fi
+  if [ -z "$readiness_error" ]; then
     # Restart only the demo obstacle controller immediately before the goal.
     # Launch/readiness time otherwise changes its ping-pong phase, so some
     # runs never put the pedestrian in front of the moving vehicle.
-    local old_obstacle_pid obstacle_pid="" reset_obstacle_pid="" restart_obstacle_b_y
+    local old_obstacle_pid obstacle_pid="" obstacle2_pid="" reset_obstacle_pid="" restart_obstacle_b_y
     while read -r old_obstacle_pid; do
       if tr '\0' ' ' < "/proc/$old_obstacle_pid/cmdline" 2>/dev/null \
           | grep -q 'dynamic_obstacle_controller'; then
@@ -249,6 +297,10 @@ run_case() {
       cleanup_group "$reset_obstacle_pid"
     else
       readiness_error='temporary obstacle reset controller not discovered'
+    fi
+    if [ -z "$readiness_error" ] && [ "$multiple_dynamic" = true ]; then
+      spawn_second_obstacle "$domain" "$case_dir" || \
+        readiness_error='second dynamic obstacle failed to spawn after 3 attempts'
     fi
   fi
   if [ -z "$readiness_error" ]; then
@@ -275,9 +327,21 @@ run_case() {
         sleep 0.1
       done
       if [ "$motion_started" -eq 1 ]; then
-        restart_obstacle_b_y=$(awk -v r="$person_range" 'BEGIN{printf "%.2f", 0.415 + r}')
+        if [ "$pedestrian_direction" = reverse ]; then
+          restart_obstacle_b_y=$(awk -v r="$person_range" 'BEGIN{printf "%.2f", 0.415-r}')
+        else
+          restart_obstacle_b_y=$(awk -v r="$person_range" 'BEGIN{printf "%.2f", 0.415+r}')
+        fi
         setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 run cleannav_simulation dynamic_obstacle_controller --ros-args -p obstacle_name:=cleannav_demo_dynamic_obstacle -p a_x:=$pedestrian_x -p a_y:=0.415 -p b_x:=$pedestrian_x -p b_y:=$restart_obstacle_b_y -p speed:=$person_speed -p update_rate:=20.0 -p initial_hold_sec:=$pedestrian_hold_sec -p ping_pong:=false" > "$case_dir/controlled_obstacle.log" 2>&1 &
         obstacle_pid=$!
+        if [ "$multiple_dynamic" = true ]; then
+          local second_speed second_end_y second_hold
+          second_speed=$(awk -v s="$person_speed" 'BEGIN{printf "%.2f", s*0.85}')
+          second_end_y=$(awk -v r="$person_range" 'BEGIN{printf "%.2f", 0.415-r}')
+          second_hold=$(awk -v h="$pedestrian_hold_sec" 'BEGIN{printf "%.2f", h+2.0}')
+          setsid bash -c "export ROS_DOMAIN_ID=$domain; exec ros2 run cleannav_simulation dynamic_obstacle_controller --ros-args -r __node:=cleannav_dynamic_obstacle_controller_2 -p obstacle_name:=cleannav_demo_dynamic_obstacle_2 -p a_x:=0.10 -p a_y:=0.415 -p b_x:=0.10 -p b_y:=$second_end_y -p speed:=$second_speed -p update_rate:=20.0 -p initial_hold_sec:=$second_hold -p ping_pong:=false" > "$case_dir/controlled_obstacle_2.log" 2>&1 &
+          obstacle2_pid=$!
+        fi
       fi
       wait "$goal_pid"
       goal_rc=$?
@@ -296,9 +360,22 @@ run_case() {
         goal_rc=0
         echo "RESULT_RECOVERED_FROM_CONTROLLER_AND_WORLD_POSE" >> "$case_dir/goal.log"
       fi
+      local world_goal_ok=0
+      if awk -F, -v gx="$wx" -v gy="$wy" '
+           $6 == "robot_world" {x=$10; y=$11; found=1}
+           END {if (!found) exit 1; dx=x-gx; dy=y-gy;
+                exit !((dx*dx + dy*dy) <= 0.1225)}' \
+         "$case_dir/chain.csv"; then
+        world_goal_ok=1
+      fi
       if [ "$motion_started" -ne 1 ] || [ "$goal_rc" -ne 0 ] || [ "$goal_status" != "SUCCEEDED" ]; then
         cruise_ok=0
         echo "WAYPOINT_FAILED,$wx,$wy,status=${goal_status:-NO_RESULT},rc=$goal_rc,motion_started=$motion_started" >> "$case_dir/goal.log"
+        break
+      fi
+      if [ "$world_goal_ok" -ne 1 ]; then
+        cruise_ok=0
+        echo "WORLD_GOAL_MISS,$wx,$wy,tolerance_m=0.35" >> "$case_dir/goal.log"
         break
       fi
     done
@@ -315,6 +392,9 @@ run_case() {
       "$case_dir/chain.csv" > "$case_dir/chain_summary.json" 2>&1 || true
     if [ -n "$obstacle_pid" ]; then
       cleanup_group "$obstacle_pid"
+    fi
+    if [ -n "$obstacle2_pid" ]; then
+      cleanup_group "$obstacle2_pid"
     fi
     if python3 "$PWD/experiments/analyze_dynamic_recovery.py" \
         "$case_dir/motion.csv" > "$case_dir/recovery.json" 2>&1; then
@@ -337,7 +417,7 @@ run_case() {
   ACTIVE_DOMAIN=""
   local errors
   errors=$(grep -h '\[ERROR\]' "$case_dir"/*.log 2>/dev/null | grep -v -E 'context is invalid|rcl_shutdown already called|process has died' | wc -l | tr -d ' ')
-  printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" "$status" "$errors" >> "$OUT/summary.csv"
+  printf '%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n' "$name" "$seed" "$frequency" "$vx" "$inflation" "$allowance" "$person_speed" "$person_range" "$obstacle_scan_range" "$raytrace_scan_range" "$pedestrian_hold_sec" "$pedestrian_direction" "$pedestrian_x" "$multiple_dynamic" "$status" "$errors" >> "$OUT/summary.csv"
 }
 
 if [ -z "${CLEANNAV_CASE_FILTER:-}" ] || [ "$CLEANNAV_CASE_FILTER" = fast_person_01 ]; then
@@ -357,5 +437,27 @@ if [ -z "${CLEANNAV_CASE_FILTER:-}" ] || [ "$CLEANNAV_CASE_FILTER" = extended ] 
 fi
 if [ -z "${CLEANNAV_CASE_FILTER:-}" ] || [ "$CLEANNAV_CASE_FILTER" = extended ] || [ "$CLEANNAV_CASE_FILTER" = fast_person_06 ]; then
   run_case fast_person_06 606 20.0 0.55 0.60 120.0 2.10 17.0 4.5 5.0 || true
+fi
+stress_repeats="${CLEANNAV_REPEAT_COUNT:-5}"
+if [ "${CLEANNAV_CASE_FILTER:-}" = stress ] || [ "${CLEANNAV_CASE_FILTER:-}" = stress_a ]; then
+  for repeat in $(seq 1 "$stress_repeats"); do
+    run_case "stress_a_r${repeat}" "$((7100 + repeat))" 20.0 0.55 0.60 120.0 2.40 20.0 5.0 5.5 3.0 forward -0.55 false || true
+  done
+fi
+if [ "${CLEANNAV_CASE_FILTER:-}" = stress ] || [ "${CLEANNAV_CASE_FILTER:-}" = stress_b ]; then
+  for repeat in $(seq 1 "$stress_repeats"); do
+    run_case "stress_b_r${repeat}" "$((7200 + repeat))" 20.0 0.55 0.60 120.0 2.70 22.0 6.0 6.5 5.0 reverse -0.30 false || true
+  done
+fi
+if [ "${CLEANNAV_CASE_FILTER:-}" = stress ] || [ "${CLEANNAV_CASE_FILTER:-}" = stress_c ]; then
+  for repeat in $(seq 1 "$stress_repeats"); do
+    run_case "stress_c_r${repeat}" "$((7300 + repeat))" 20.0 0.55 0.60 120.0 3.00 24.0 7.0 7.5 7.0 forward -0.55 true || true
+  done
+fi
+if [ "${CLEANNAV_CASE_FILTER:-}" = stress_a_retry ]; then
+  run_case stress_a_retry_7105 7105 20.0 0.55 0.60 120.0 2.40 20.0 5.0 5.5 3.0 forward -0.55 false || true
+fi
+if [ "${CLEANNAV_CASE_FILTER:-}" = stress_b_retry ]; then
+  run_case stress_b_retry_7204 7204 20.0 0.55 0.60 120.0 2.70 22.0 6.0 6.5 7.0 reverse -0.30 false || true
 fi
 echo "$OUT"

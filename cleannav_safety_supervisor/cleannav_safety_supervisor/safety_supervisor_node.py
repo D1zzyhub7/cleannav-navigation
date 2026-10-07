@@ -218,7 +218,13 @@ class SafetySupervisorNode(Node):
             self._cmd_vel_pub.publish(Twist())
             return
 
-        # Priority 2: autonomous timeout (checked before stale, so timeout
+        # Priority 2: block_all is an unconditional output interlock.
+        if self._block_all:
+            self._last_output_limited = False
+            self._cmd_vel_pub.publish(Twist())
+            return
+
+        # Priority 3: autonomous timeout (checked before stale, so timeout
         # works even without candidate)
         if (
             self._autonomous_enabled
@@ -235,7 +241,7 @@ class SafetySupervisorNode(Node):
                 self._cmd_vel_pub.publish(Twist())
                 return
 
-        # Priority 3: stale / no candidate → zero
+        # Priority 4: stale / no candidate → zero
         now = self.get_clock().now()
         age = (now - self._last_candidate_time).nanoseconds * 1e-9
         stale = (
@@ -246,12 +252,12 @@ class SafetySupervisorNode(Node):
             self._cmd_vel_pub.publish(Twist())
             return
 
-        # Priority 4: not autonomous → zero (default block_all)
+        # Priority 5: not autonomous → zero
         if not self._autonomous_enabled:
             self._cmd_vel_pub.publish(Twist())
             return
 
-        # Priority 5: independently forward/reverse limited candidate
+        # Priority 6: independently forward/reverse limited candidate
         limited = self._limit_twist(self._last_candidate_twist)
         self._last_output_limited = (
             limited.linear.x != self._last_candidate_twist.linear.x
@@ -306,14 +312,17 @@ class SafetySupervisorNode(Node):
         message = SafetyStatus()
         message.header.stamp = self.get_clock().now().to_msg()
         message.header.frame_id = ''
-        message.interface_version = '1.0'
+        message.interface_version = '1.1'
         message.emergency_stop_active = self._emergency_stop
         message.autonomous_enabled = self._autonomous_enabled
+        message.block_all = self._block_all
         message.lease_owner_execution_id = (
             self._lease_owner_execution_id or ''
         )
         if self._emergency_stop:
             message.message = 'emergency stop active'
+        elif self._block_all:
+            message.message = 'block_all active'
         elif self._autonomous_enabled:
             message.message = 'autonomous enabled'
         else:

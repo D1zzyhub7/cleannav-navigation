@@ -42,7 +42,14 @@ def _lease_response():
     return SafetyLease.Response()
 
 
-def _run_candidate(node, linear_x, *, angular_z=0.0, autonomous=True):
+def _run_candidate(
+    node,
+    linear_x,
+    *,
+    angular_z=0.0,
+    autonomous=True,
+    block_all=False,
+):
     published = []
     node._cmd_vel_pub.publish = published.append
     candidate = Twist()
@@ -50,6 +57,7 @@ def _run_candidate(node, linear_x, *, angular_z=0.0, autonomous=True):
     candidate.angular.z = angular_z
     node._candidate_cb(candidate)
     node._autonomous_enabled = autonomous
+    node._block_all = block_all
     if autonomous:
         node._lease_owner_execution_id = 'execution-a'
     node._cmd_timer_cb()
@@ -100,6 +108,27 @@ def test_autonomous_disabled_blocks_reverse(node):
     assert output.linear.x == 0.0
 
 
+def test_block_all_blocks_even_with_autonomous_lease(node):
+    node._max_reverse_linear_x = 0.10
+
+    output = _run_candidate(
+        node, -0.06, autonomous=True, block_all=True
+    )
+
+    assert output.linear.x == 0.0
+    assert output.angular.z == 0.0
+    assert node._structured_status_message().block_all is True
+
+
+def test_block_all_false_allows_lease_after_limits(node):
+    output = _run_candidate(
+        node, 0.04, autonomous=True, block_all=False
+    )
+
+    assert output.linear.x == pytest.approx(0.04)
+    assert node._structured_status_message().block_all is False
+
+
 def test_emergency_stop_blocks_reverse(node):
     node._max_reverse_linear_x = 0.10
     candidate = Twist()
@@ -136,6 +165,7 @@ def test_stale_reverse_candidate_is_blocked(node):
 
 def test_lease_release_blocks_previously_allowed_reverse(node):
     node._max_reverse_linear_x = 0.10
+    node._block_all = False
     node._acquire_lease_cb(_lease_request('execution-a'), _lease_response())
     candidate = Twist()
     candidate.linear.x = -0.06
@@ -168,6 +198,7 @@ def test_forward_and_reverse_limits_are_independent(node):
 
 
 def test_default_owner_and_autonomous_state(node):
+    assert node._block_all is True
     assert node._lease_owner_execution_id is None
     assert node._autonomous_enabled is False
     assert node._emergency_stop is False
@@ -274,6 +305,7 @@ def test_lease_owned_autonomous_ignores_legacy_timeout(node, monkeypatch):
     node._last_candidate_twist = Twist()
     node._last_candidate_twist.linear.x = 0.2
     node._last_candidate_time = node.get_clock().now()
+    node._block_all = False
     node._autonomous_enabled = True
     node._autonomous_start_time = 0.0
     node._lease_owner_execution_id = 'execution-a'
@@ -290,6 +322,7 @@ def test_legacy_autonomous_still_times_out_without_lease(node, monkeypatch):
     published = []
     node._cmd_vel_pub.publish = published.append
     node._candidate_count = 0
+    node._block_all = False
     node._autonomous_enabled = True
     node._autonomous_start_time = 0.0
     node._lease_owner_execution_id = None
@@ -326,7 +359,8 @@ def test_structured_status_initial_state_and_legacy_publisher_preserved(node):
     status = published[0]
     assert isinstance(status, SafetyStatus)
     assert status.header.frame_id == ''
-    assert status.interface_version == '1.0'
+    assert status.interface_version == '1.1'
+    assert status.block_all is True
     assert status.emergency_stop_active is False
     assert status.autonomous_enabled is False
     assert status.lease_owner_execution_id == ''

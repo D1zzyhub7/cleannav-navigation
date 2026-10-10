@@ -190,9 +190,20 @@ APP、Voice 和 Mission Manager 不允许直接发布最终 `/cmd_vel`。
 
 Navigation Controller 产生的是候选控制，不允许绕过 Safety Supervisor。
 
+PC Simulation V2 Step 1 的工作区实现将 Ackermann launch 的执行入口改为互斥模式：
+默认 `execution_mode:=facade` 只启用 Navigation Facade；`execution_mode:=legacy`
+只启用 Hybrid Planner Bridge / Path Executor。默认模式不消费 `/goal_pose`，
+也不启用 Legacy 的周期重规划。`safety_block_all` 默认保持 `true`。
+具体 ownership、终态清理及剩余安全边界见
+[Step 1 说明](docs/simulation_v2_step1.md)。以下比赛基线描述保留为历史记录。
+
 ---
 
-## 5. 当前 Ackermann 冻结参数
+## 5. Ackermann 比赛冻结参数与当前仿真差异
+
+以下列出历史比赛基线。Step 2.1 的当前 PC 仿真配置已将
+`nav2_params_ackermann.yaml` 的 `vx_std` 改为 `0.2`；该值经过单参数
+Gazebo 对照和三次普通 Task 31 回归，不代表实车参数已验收。
 
 比赛导航基线中的主要生产参数包括：
 

@@ -126,7 +126,9 @@ controller_server:
       time_steps: 50
       model_dt: 0.1
       batch_size: 750
-      vx_std: 0.02
+      # Step 2.1: 0.02 trapped the real controller near zero with reverse chatter.
+      # Single-parameter Gazebo experiment at 0.2 restored normal Task 31 success.
+      vx_std: 0.2
       vy_std: 0.0
       wz_std: 0.16
       vx_max: 0.50

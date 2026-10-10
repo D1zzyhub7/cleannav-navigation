@@ -35,8 +35,9 @@ def test_mppi_allows_only_the_frozen_reverse_candidate_limit(params):
     assert controller['vx_max'] == pytest.approx(0.50)
     assert controller['AckermannConstraints']['min_turning_r'] == pytest.approx(
         1.12)
-    # P1-RV must not absorb the separate vx_std A/B tuning.
-    assert controller['vx_std'] == pytest.approx(0.02)
+    # Step 2.1's isolated runtime A/B established the required sampling width.
+    # The frozen reverse bounds and geometry above remain unchanged.
+    assert controller['vx_std'] == pytest.approx(0.2)
 
 
 def test_mppi_uses_humble_1_1_20_cusp_parameters(params):

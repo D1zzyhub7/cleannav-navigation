@@ -185,8 +185,17 @@ def generate_launch_description():
             target_action=spawn_entity,
             on_exit=[
                 joint_state_broadcaster_spawner,
-                ackermann_controller_spawner,
             ],
+        )
+    )
+    # Do not race two spawner clients through controller-manager startup.
+    ackermann_after_joint_states = RegisterEventHandler(
+        OnProcessExit(
+            target_action=joint_state_broadcaster_spawner,
+            on_exit=lambda event, context: (
+                [ackermann_controller_spawner]
+                if event.returncode == 0 and not context.is_shutdown else []
+            ),
         )
     )
 
@@ -244,6 +253,7 @@ def generate_launch_description():
             gazebo,
             robot_state_publisher,
             controllers_after_spawn,
+            ackermann_after_joint_states,
             delayed_robot_spawn,
         ]
     )

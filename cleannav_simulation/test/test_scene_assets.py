@@ -1278,6 +1278,18 @@ def test_vehicle_visual_upgrade_preserves_physical_contract():
         "gazebo[@reference='base_scan']/sensor/"
         "plugin[@name='cleannav_laser_scan']"
     ) is not None
+    # Validate the sole sensor-output change, then use the original hash to
+    # protect all geometry, inertia, transforms and physical collision settings.
+    sensor = expanded.find("gazebo[@reference='base_scan']/sensor")
+    self_filter = sensor.find("plugin[@name='cleannav_laser_self_filter']")
+    assert self_filter.attrib['filename'] == 'libcleannav_laser_self_filter.so'
+    assert self_filter.findtext('frame_name') == 'base_scan'
+    assert self_filter.findtext('robot_name') == 'cleannav_ackermann'
+    assert self_filter.findtext('ros/remapping') == '~/out:=scan'
+    sensor.remove(self_filter)
+    remap = sensor.find("plugin[@name='cleannav_laser_scan']/ros/remapping")
+    assert remap.text == '~/out:=scan_raw'
+    remap.text = '~/out:=scan'
     assert _physical_contract_hash(expanded) == (
         VEHICLE_PHYSICAL_CONTRACT_SHA256
     )

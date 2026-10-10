@@ -490,10 +490,17 @@
       </ray>
       <plugin name="cleannav_laser_scan" filename="libgazebo_ros_ray_sensor.so">
         <ros>
-          <remapping>~/out:=scan</remapping>
+          <remapping>~/out:=scan_raw</remapping>
         </ros>
         <output_type>sensor_msgs/LaserScan</output_type>
         <frame_name>base_scan</frame_name>
+      </plugin>
+      <!-- Entity-aware self returns are invalid measurements, never free rays.
+           Keep the standard plugin's unmodified scan available for diagnostics. -->
+      <plugin name="cleannav_laser_self_filter" filename="libcleannav_laser_self_filter.so">
+        <ros><remapping>~/out:=scan</remapping></ros>
+        <frame_name>base_scan</frame_name>
+        <robot_name>cleannav_ackermann</robot_name>
       </plugin>
     </sensor>
   </gazebo>

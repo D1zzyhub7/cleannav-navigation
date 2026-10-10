@@ -223,7 +223,8 @@ def test_planner_success_is_forwarded_to_follow_and_follow_success_finishes(
     _execute(runtime, outer, executor)
     assert outer.terminals == ['SUCCEEDED']
     assert len(planner.send_calls) == 1
-    assert planner.send_calls[0].goal is outer.request.pose
+    assert planner.send_calls[0].goal == outer.request.pose
+    assert planner.send_calls[0].goal is not outer.request.pose
     assert planner.send_calls[0].planner_id == 'GridBased'
     assert planner.send_calls[0].use_start is False
     assert len(follow.send_calls) == 1
@@ -256,6 +257,29 @@ def test_planner_rejected_finishes_outer_aborted(executor):
     assert outer.terminals == ['ABORTED']
     assert len(planner.send_calls) == 1
     assert follow.send_calls == []
+
+
+@pytest.mark.parametrize('stage', ['planner', 'follow'])
+@pytest.mark.parametrize('raises', [False, True])
+def test_ambiguous_goal_submit_keeps_ownership_closed(executor, stage, raises):
+    planner_handle = FakeGoalHandle(result=_wrapped(GoalStatus.STATUS_SUCCEEDED))
+    runtime, planner, follow = _runtime(planner_handle, None)
+    client = planner if stage == 'planner' else follow
+
+    def ambiguous_send(_goal):
+        future = Future()
+        if raises:
+            future.set_exception(RuntimeError('goal reply lost'))
+        else:
+            future.set_result(None)
+        return future
+
+    client.send_goal_async = ambiguous_send
+    outer = FakeOuterGoal()
+    _execute(runtime, outer, executor)
+    assert outer.terminals == ['ABORTED']
+    assert runtime.busy
+    assert not runtime.accept_goal(FakeOuterGoal().request)
 
 
 def test_planner_empty_path_finishes_outer_aborted(executor):
@@ -395,6 +419,28 @@ def test_inner_cancel_failure_finishes_outer_aborted(cancel_response, executor):
     assert planner_handle.cancel_calls == 1
     assert outer.terminals == ['ABORTED']
     assert follow.send_calls == []
+    assert runtime.busy
+    assert not runtime.accept_goal(_goal())
+    planner_handle.result_future.set_result(_wrapped(GoalStatus.STATUS_ABORTED))
+    assert not runtime.busy
+
+
+def test_cancel_failure_cannot_overlap_a_second_follow_path(executor):
+    planner_handle = FakeGoalHandle(result=_wrapped(GoalStatus.STATUS_SUCCEEDED))
+    follow_handle = FakeGoalHandle(cancel_response=SimpleNamespace(
+        return_code=CancelGoal.Response.ERROR_REJECTED, goals_canceling=[],
+    ))
+    runtime, _, follow = _runtime(planner_handle, follow_handle)
+    outer = FakeOuterGoal()
+    task = _start(runtime, outer, executor)
+    _spin_until(executor, lambda: runtime.active_stage is _Stage.FOLLOWING)
+    assert runtime.request_cancel(outer)
+    _spin_until_done(executor, task)
+    assert outer.terminals == ['ABORTED']
+    assert not runtime.accept_goal(_goal())
+    assert len(follow.send_calls) == 1
+    follow_handle.result_future.set_result(_wrapped(GoalStatus.STATUS_CANCELED))
+    assert runtime.accept_goal(_goal())
 
 
 class _CancelBeforeFollowRuntime(NavigationFacadeRuntime):

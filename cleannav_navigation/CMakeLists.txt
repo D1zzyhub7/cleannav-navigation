@@ -28,6 +28,7 @@ if(BUILD_TESTING)
     ackermann_reverse_config
     test/test_ackermann_reverse_config.py
   )
+  ament_add_pytest_test(execution_mode test/test_execution_mode.py)
 endif()
 
 ament_package()

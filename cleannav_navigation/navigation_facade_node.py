@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import math
 import threading
 from dataclasses import dataclass
@@ -58,12 +59,16 @@ class _Session:
     """一条 outer goal 的异步生命周期状态。"""
 
     outer_goal_handle: Any
+    original_goal: PoseStamped | None = None
     stage: _Stage = _Stage.PLANNING
     planner_goal_handle: Any | None = None
     follow_goal_handle: Any | None = None
     cancel_requested: bool = False
     wake_future: Future | None = None
     terminal: bool = False
+    inner_goal_handle: Any | None = None
+    inner_result_future: Any | None = None
+    inner_terminal: bool = True
 
 
 def _finite_pose(pose: PoseStamped) -> bool:
@@ -210,7 +215,10 @@ class NavigationFacadeRuntime:
 
     async def execute(self, outer_goal_handle: Any) -> NavigateToPose.Result:
         """Run planner → path controller and finish the outer action once."""
-        session = _Session(outer_goal_handle=outer_goal_handle)
+        session = _Session(
+            outer_goal_handle=outer_goal_handle,
+            original_goal=copy.deepcopy(outer_goal_handle.request.pose),
+        )
         with self._lock:
             session.cancel_requested = self._pending_cancel
             self._pending_cancel = False
@@ -219,22 +227,33 @@ class NavigationFacadeRuntime:
 
         try:
             planner_goal = ComputePathToPose.Goal()
-            planner_goal.goal = outer_goal_handle.request.pose
+            # Retain the immutable destination for future STOP/WAIT/REPLAN
+            # stages. Only this runtime submits the managed inner actions.
+            planner_goal.goal = copy.deepcopy(session.original_goal)
             planner_goal.planner_id = self._planner_id
             planner_goal.use_start = self._use_start
 
             if not self._planner_client.server_is_ready():
                 return self._finish(outer_goal_handle, 'abort')
 
+            # Until a reply proves rejection, a dispatched request may have
+            # created a remote goal even if the transport reply is lost.
+            with self._lock:
+                session.inner_terminal = False
             planner_handle = await self._send_goal(
                 self._planner_client,
                 planner_goal,
             )
             if planner_handle is None or not getattr(planner_handle, 'accepted', False):
+                if planner_handle is not None:
+                    session.inner_terminal = True
                 return self._finish(outer_goal_handle, 'abort')
 
             with self._lock:
                 session.planner_goal_handle = planner_handle
+                session.inner_goal_handle = planner_handle
+                session.inner_result_future = None
+                session.inner_terminal = False
 
             planner_outcome, planner_wrapped = await self._wait_inner_result(
                 session,
@@ -268,15 +287,23 @@ class NavigationFacadeRuntime:
 
             with self._lock:
                 session.stage = _Stage.FOLLOWING
+                session.inner_goal_handle = None
+                session.inner_result_future = None
+                session.inner_terminal = False
             follow_handle = await self._send_goal(
                 self._follow_client,
                 follow_goal,
             )
             if follow_handle is None or not getattr(follow_handle, 'accepted', False):
+                if follow_handle is not None:
+                    session.inner_terminal = True
                 return self._finish(outer_goal_handle, 'abort')
 
             with self._lock:
                 session.follow_goal_handle = follow_handle
+                session.inner_goal_handle = follow_handle
+                session.inner_result_future = None
+                session.inner_terminal = False
 
             follow_outcome, follow_wrapped = await self._wait_inner_result(
                 session,
@@ -294,19 +321,54 @@ class NavigationFacadeRuntime:
         except Exception:
             return self._finish(outer_goal_handle, 'abort')
         finally:
+            if session.inner_result_future is not None:
+                self._observe_inner_terminal(
+                    session, session.inner_goal_handle,
+                    session.inner_result_future,
+                )
             with self._lock:
                 session.terminal = True
-                if self._session is session:
+                if self._session is session and session.inner_terminal:
                     self._session = None
                     self._busy = False
                     self._reserved = False
+            if (
+                not session.inner_terminal
+                and session.inner_goal_handle is not None
+                and not session.cancel_requested
+            ):
+                # An outer ABORT is not proof that its inner action stopped.
+                # Keep the slot closed until a real terminal result is seen.
+                try:
+                    session.inner_goal_handle.cancel_goal_async()
+                except Exception:
+                    pass
+
+    def _observe_inner_terminal(self, session, goal_handle, future) -> None:
+        """Release ownership only after an identified inner terminal result."""
+        if not self._future_done(future):
+            return
+        try:
+            status = future.result().status
+        except Exception:
+            return
+        if status not in (
+            GoalStatus.STATUS_SUCCEEDED, GoalStatus.STATUS_CANCELED,
+            GoalStatus.STATUS_ABORTED,
+        ):
+            return
+        with self._lock:
+            if session.inner_goal_handle is not goal_handle:
+                return
+            session.inner_terminal = True
+            if session.terminal and self._session is session:
+                self._session = None
+                self._busy = False
+                self._reserved = False
 
     async def _send_goal(self, client: Any, goal: Any) -> Any:
         """Await one non-blocking ActionClient goal request."""
-        try:
-            return await client.send_goal_async(goal)
-        except Exception:
-            return None
+        return await client.send_goal_async(goal)
 
     async def _wait_inner_result(
         self,
@@ -318,6 +380,13 @@ class NavigationFacadeRuntime:
             inner_result_future = inner_goal_handle.get_result_async()
         except Exception:
             return _InnerOutcome.RESULT, None
+
+        session.inner_result_future = inner_result_future
+        inner_result_future.add_done_callback(
+            lambda future: self._observe_inner_terminal(
+                session, inner_goal_handle, future,
+            )
+        )
 
         wake_future = Future()
 
@@ -351,7 +420,7 @@ class NavigationFacadeRuntime:
                 if (
                     wrapped_result is not None
                     and getattr(wrapped_result, 'status', None)
-                    == GoalStatus.STATUS_SUCCEEDED
+                    in (GoalStatus.STATUS_SUCCEEDED, GoalStatus.STATUS_ABORTED)
                 ):
                     return _InnerOutcome.RESULT, wrapped_result
             if await self._cancel_and_confirm(inner_goal_handle):
@@ -505,6 +574,14 @@ class NavigationFacadeNode(Node):
         goal_handle: Any,
     ) -> NavigateToPose.Result:
         """Delegate execution to the dependency-injected runtime."""
+        pose = goal_handle.request.pose
+        q = pose.pose.orientation
+        self.get_logger().info('NAVIGATION_GOAL ' + json.dumps({
+            'frame_id': pose.header.frame_id,
+            'stamp': [pose.header.stamp.sec, pose.header.stamp.nanosec],
+            'x': pose.pose.position.x, 'y': pose.pose.position.y,
+            'yaw': math.atan2(2*(q.w*q.z+q.x*q.y), 1-2*(q.y*q.y+q.z*q.z)),
+        }))
         return await self._runtime.execute(goal_handle)
 
     def destroy_node(self) -> None:

@@ -23,6 +23,7 @@ import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
+from launch.conditions import IfCondition, LaunchConfigurationEquals
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
@@ -64,7 +65,8 @@ def generate_launch_description():
     )
 
     planner_bridge = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(
+        condition=LaunchConfigurationEquals('execution_mode', 'legacy'),
+        launch_description_source=PythonLaunchDescriptionSource(os.path.join(
             global_planner_share,
             'launch',
             'cleannav_hybrid_planner_bridge.launch.py',
@@ -78,7 +80,8 @@ def generate_launch_description():
     )
 
     path_executor = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(
+        condition=LaunchConfigurationEquals('execution_mode', 'legacy'),
+        launch_description_source=PythonLaunchDescriptionSource(os.path.join(
             path_executor_share,
             'launch',
             'cleannav_path_executor.launch.py',
@@ -91,7 +94,8 @@ def generate_launch_description():
     )
 
     safety_supervisor = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(os.path.join(
+        condition=IfCondition(LaunchConfiguration('start_safety_supervisor', default='true')),
+        launch_description_source=PythonLaunchDescriptionSource(os.path.join(
             safety_share,
             'launch',
             'safety_supervisor.launch.py',
@@ -129,10 +133,12 @@ def generate_launch_description():
     )
 
     navigation_facade = Node(
+        condition=LaunchConfigurationEquals('execution_mode', 'facade'),
         package='cleannav_navigation',
         executable='navigation_facade_node.py',
         name='cleannav_navigation_facade',
         output='screen',
+        parameters=[{'use_sim_time': use_sim_time, 'planner_id': planner_id}],
         arguments=node_log_args,
     )
 
@@ -150,6 +156,15 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        DeclareLaunchArgument(
+            'start_safety_supervisor', default_value='true', choices=['true', 'false'],
+            description='Keep true unless the parent launch owns the single Safety instance',
+        ),
+        DeclareLaunchArgument(
+            'execution_mode', default_value='facade',
+            choices=['facade', 'legacy'],
+            description='Exclusive execution owner: managed facade or legacy goal_pose chain',
+        ),
         DeclareLaunchArgument(
             'params_file',
             default_value=os.path.join(

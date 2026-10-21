@@ -1,0 +1,29 @@
+{
+  "files": {
+    "cleannav_rtabmap/launch/startup_smoke_rtabmap.launch.py": "07bfe6304239b0568d2717162ea3e457ffb953fb86a7c4c9a14e38556fb2a8d0",
+    "cleannav_simulation/launch/startup_smoke_simulation.launch.py": "636f4591a40c60efd646737b99e60ef0aa6d7f366f863f6547ca0ad2e9958d65",
+    "cleannav_simulation/urdf/cleannav_ackermann_startup_smoke.urdf.xacro": "59036f677ae1dd873157132583f41fd7ad0cd722bf7bc790734b379343287a3a",
+    "cleannav_simulation/worlds/startup_smoke_mcity.world": "c7c38234503b91c06a4f743c714b3448b22d21ebd65732f2b75beae0e3862637",
+    "tools/startup_smoke/mapping_mode_retry.py": "115ef39bbf243c5102e7c17d8f6f681ed6a781841ee9b224f4da2cc6008a3411",
+    "tools/startup_smoke/publisher_graph_gate.py": "124471a5f0a8157bcd015fad9634082284ef5ecb51888e4aad053b257a401f86",
+    "tools/startup_smoke/roof_lidar_runtime.py": "814adab8d2fdf5ce1f4c67647f421aff699c79b1b982a7fe5338b6a417c41328",
+    "tools/startup_smoke/run_static_checks.sh": "798775af3d5399e6fee73e482115b6298069e3fa581bd1ca90d29995597b0f98",
+    "tools/startup_smoke/startup_smoke.launch.py": "c0bc980767236fa00b16e02e43bf5e5fd5e03ad80e0def8ffb174a1b5eec39f7",
+    "tools/startup_smoke/startup_smoke.sh": "36132f5b116e6801aa1c778cbac67e6f493a3509a2eab79b4d1987a7747a6939",
+    "tools/startup_smoke/startup_supervisor.py": "86e78b9e482be1efdb8aa773d06d57789e0d5ba283c312e7e33e60beee5c77f7",
+    "tools/startup_smoke/tests/test_publisher_graph_gate.py": "c127a1be9bda71a27632de393fb1fbb26294bbf92c58244416f46afb6f771e09",
+    "tools/startup_smoke/tests/test_startup_smoke_contract.py": "d33ffc019fc33e6d6271e4187fb32b70cf19c2f07783cc99d3b452c37b1399ed",
+    "tools/startup_smoke/update_manifest.py": "f844de15ff039c3af2bb93b5d2f9fc77bae16d5323c53708dffdfe65c43533a8"
+  },
+  "operation": "startup_smoke",
+  "provenance": {
+    "git_parent_commit": "403639cafbc5b19d8a7ffc0699c0677831ba0fc6",
+    "historical_candidate_sha256": "17effab2ee69b967789f1aa486f6e1224832053fbcfca19b2e4287f089765f96",
+    "historical_roof_xacro_sha256": "59036f677ae1dd873157132583f41fd7ad0cd722bf7bc790734b379343287a3a",
+    "historical_rtabmap_launch_sha256": "07bfe6304239b0568d2717162ea3e457ffb953fb86a7c4c9a14e38556fb2a8d0",
+    "historical_simulation_launch_sha256": "76ce38574c5bfaeaa07d1e6b9eaae25ca9b47902d89b652d7067aee62f98c9a0",
+    "historical_world_sha256": "c7c38234503b91c06a4f743c714b3448b22d21ebd65732f2b75beae0e3862637",
+    "verified_reference_entry_sha256": "bd07e9a48940e92660a9a349fca95c951d30418eb92dba1c5d35509356f73da8"
+  },
+  "schema_version": 1
+}

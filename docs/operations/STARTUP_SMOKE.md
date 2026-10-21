@@ -63,6 +63,16 @@ the expected Simulation and RTAB-Map prefix values. Never replace that stack
 by guessing a different install tree. The source/overlay relation is part of
 each run's identity and evidence.
 
+For historical comparison only, the successful reference run reported
+Simulation at
+`/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261019T041000Z-mapping-050/install/cleannav_simulation`
+and RTAB-Map at
+`/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_rtabmap`.
+These are recorded observations, not defaults embedded in the launcher. The
+local overlay setup must set the expected prefix variables to the approved
+current paths; if the historical paths are no longer the approved install,
+stop and verify the replacement stack before runtime use.
+
 ## Invocation contract
 
 Use a child process so the caller's interactive shell remains available:

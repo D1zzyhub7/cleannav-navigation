@@ -19,6 +19,11 @@ CleanNav Navigation 是 CleanNav 无人清扫车系统的 ROS 2 导航、定位�
 
 `2e6b3225d9d6c571f04aab90c7bb8d94d7901709`
 
+Repository operations and the no-motion startup check are documented in
+[`docs/operations/STARTUP_SMOKE.md`](docs/operations/STARTUP_SMOKE.md). The
+startup check is not a navigation or motion test; its repository-owned copy
+currently has static validation only.
+
 ---
 
 ## 1. 仓库职责

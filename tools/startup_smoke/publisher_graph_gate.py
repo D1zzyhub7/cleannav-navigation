@@ -11,6 +11,7 @@ EXPECTED_TOPIC_TYPE = "geometry_msgs/msg/Twist"
 UNKNOWN_NODE_NAMES = {"", "_NODE_NAME_UNKNOWN_", "UNKNOWN"}
 UNKNOWN_NAMESPACES = {None, "", "_NODE_NAMESPACE_UNKNOWN_", "UNKNOWN"}
 UNKNOWN_TOPIC_TYPES = {None, "", "_TOPIC_TYPE_UNKNOWN_", "UNKNOWN"}
+UNKNOWN_ENDPOINT_GIDS = {None, "", "_ENDPOINT_GID_UNKNOWN_", "UNKNOWN"}
 
 
 class PublisherGraphGateError(RuntimeError):
@@ -105,6 +106,10 @@ def _unknown_identity_fields(endpoint: dict[str, Any]) -> list[str]:
         unknown.append("node_namespace")
     if endpoint.get("topic_type") in UNKNOWN_TOPIC_TYPES:
         unknown.append("topic_type")
+    gid = endpoint.get("endpoint_gid")
+    if (gid is None or gid == [] or
+            (isinstance(gid, str) and gid in UNKNOWN_ENDPOINT_GIDS)):
+        unknown.append("endpoint_gid")
     return unknown
 
 
@@ -124,34 +129,64 @@ class PublisherGraphConvergence:
         self.last_endpoints: list[dict[str, Any]] = []
         self.failure_reason: str | None = None
         self.converged = False
+        self.convergence_achieved = False
+        self.converged_endpoint_key: tuple[Any, ...] | None = None
         self.samples: list[dict[str, Any]] = []
 
-    def sample(self, endpoints: Iterable[Any], monotonic_ns: int) -> dict[str, Any]:
+    def sample_query(
+        self, query: Callable[[], Iterable[Any]], monotonic_ns: Any,
+    ) -> dict[str, Any]:
+        """Sample a ROS graph query and retain query failures as fail-closed evidence."""
+        try:
+            endpoints = query()
+        except Exception as error:
+            now = monotonic_ns() if callable(monotonic_ns) else int(monotonic_ns)
+            return self.sample(
+                [], now,
+                query_error=f"publisher_graph_query_failed:{type(error).__name__}",
+            )
+        now = monotonic_ns() if callable(monotonic_ns) else int(monotonic_ns)
+        return self.sample(endpoints, now)
+
+    def sample(
+        self, endpoints: Iterable[Any], monotonic_ns: int, *,
+        query_error: str | None = None,
+    ) -> dict[str, Any]:
         now = int(monotonic_ns)
-        records = [endpoint_record(endpoint) for endpoint in endpoints]
+        try:
+            records = [endpoint_record(endpoint) for endpoint in endpoints]
+        except Exception as error:
+            records = []
+            query_error = query_error or f"publisher_graph_record_failed:{type(error).__name__}"
         self.sample_count += 1
         self.last_endpoints = records
         reason = None
         observation_reason = None
-        identity_unknown_fields: list[str] = []
+        identity_unknown_fields = (
+            _unknown_identity_fields(records[0]) if len(records) == 1 else []
+        )
 
-        if now > self.deadline_ns:
-            reason = "publisher_convergence_timeout"
+        if self.failure_reason is not None:
+            reason = self.failure_reason
+        elif query_error is not None:
+            reason = query_error
+        elif self.convergence_achieved:
+            # The initial discovery deadline no longer applies. Keep checking
+            # the full endpoint identity on every later sample and fail closed
+            # if the established publisher disappears, changes, or is joined.
+            reason = publisher_snapshot_error(records)
+            if reason is None and endpoint_key(records[0]) != self.converged_endpoint_key:
+                reason = "publisher_identity_changed"
         elif len(records) > 1:
             reason = "publisher_count_not_one"
         elif records:
-            identity_unknown_fields = _unknown_identity_fields(records[0])
             if identity_unknown_fields:
-                # A single endpoint with incomplete identity can be a transient
-                # DDS graph-discovery state. Record it and keep polling within
-                # the existing hard deadline; it is never accepted as a match.
-                observation_reason = "publisher_identity_unknown"
-                self.last_key = None
-                self.stable_since_ns = None
-                self.stable_count = 0
+                reason = "publisher_identity_unknown"
             else:
                 reason = publisher_snapshot_error(records)
-            if reason is None and not identity_unknown_fields:
+            if reason is None and now > self.deadline_ns:
+                reason = "publisher_convergence_timeout"
+            if reason is None:
                 key = endpoint_key(records[0])
                 if key != self.last_key:
                     self.last_key = key
@@ -160,23 +195,25 @@ class PublisherGraphConvergence:
                 else:
                     self.stable_count += 1
                 stable_elapsed_ns = now - int(self.stable_since_ns)
-                self.converged = (
-                    self.stable_count >= self.minimum_samples
-                    and stable_elapsed_ns >= self.minimum_stable_ns
-                )
+                if (self.stable_count >= self.minimum_samples
+                        and stable_elapsed_ns >= self.minimum_stable_ns):
+                    self.converged = True
+                    self.convergence_achieved = True
+                    self.converged_endpoint_key = key
+            if reason is None and not self.converged and now >= self.deadline_ns:
+                reason = "publisher_convergence_timeout"
         else:
             self.last_key = None
             self.stable_since_ns = None
             self.stable_count = 0
+            if now >= self.deadline_ns:
+                reason = "publisher_convergence_timeout"
 
         if reason is not None:
             self.failure_reason = reason
-        elif not self.converged and now >= self.deadline_ns:
-            self.failure_reason = (
-                "publisher_identity_unknown"
-                if identity_unknown_fields
-                else "publisher_convergence_timeout"
-            )
+            self.converged = False
+        elif self.convergence_achieved:
+            self.converged = True
 
         stable_elapsed_ns = (now - int(self.stable_since_ns)
                              if self.stable_since_ns is not None else 0)
@@ -190,6 +227,7 @@ class PublisherGraphConvergence:
             "stable_count": self.stable_count,
             "stable_elapsed_ns": stable_elapsed_ns,
             "converged": self.converged,
+            "convergence_achieved": self.convergence_achieved,
             "failure_reason": self.failure_reason,
         }
         self.samples.append(record)
@@ -204,6 +242,7 @@ class PublisherGraphConvergence:
             "minimum_stable_seconds": self.minimum_stable_ns / 1e9,
             "timeout_seconds": (self.deadline_ns - self.start_ns) / 1e9,
             "failure_reason": self.failure_reason,
+            "convergence_achieved": self.convergence_achieved,
             "stable_count": self.stable_count,
             "endpoints": self.last_endpoints,
             "samples": list(self.samples),
@@ -230,17 +269,7 @@ def converge_publisher_graph(
     next_poll_ns = start
     while True:
         now = monotonic_ns()
-        try:
-            endpoints = list(query())
-        except Exception as error:
-            gate.sample([], now)
-            gate.failure_reason = f"publisher_graph_query_failed:{type(error).__name__}"
-            sample = gate.samples[-1]
-            sample["failure_reason"] = gate.failure_reason
-            if on_sample:
-                on_sample(sample)
-            break
-        sample = gate.sample(endpoints, monotonic_ns())
+        sample = gate.sample_query(query, monotonic_ns)
         if on_sample:
             on_sample(sample)
         if sample["failure_reason"] or sample["converged"]:

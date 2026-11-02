@@ -5,7 +5,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import LaunchConfiguration
 
-DEFAULTS = dict(mode='startup_smoke', motion_profile='patrol_030_candidate',
+DEFAULTS = dict(odometry_mode='wheel', localization_mode='none', map_yaml='', sensor_only='false', mode='startup_smoke', motion_profile='patrol_030_candidate',
     gui='false', start_rviz='false', enable_rviz_goals='false', auto_start_task='false',
     enable_motion='false', ros_domain_id='204', gazebo_port='11704',
     spawn_x='0.0', spawn_y='-8.0', spawn_z='0.02', spawn_yaw='0.0', spawn_delay_sec='10.0',

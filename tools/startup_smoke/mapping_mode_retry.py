@@ -10,9 +10,10 @@ import uuid
 
 import yaml
 
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python.packages import get_package_prefix, get_package_share_directory
 from launch.actions import (EmitEvent, GroupAction, IncludeLaunchDescription, LogInfo,
-                            RegisterEventHandler, SetEnvironmentVariable, ExecuteProcess)
+                            RegisterEventHandler, SetEnvironmentVariable, ExecuteProcess,
+                            UnsetEnvironmentVariable)
 from launch.event_handlers import OnProcessExit, OnProcessStart, OnProcessIO
 from launch.events import Shutdown
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -28,6 +29,9 @@ RECOVERY_SIMULATION_LAUNCH = (
     SOURCE_ROOT / 'cleannav_simulation' / 'launch' / 'startup_smoke_simulation.launch.py')
 RECOVERY_ROOF_XACRO = (
     SOURCE_ROOT / 'cleannav_simulation' / 'urdf' / 'cleannav_ackermann_startup_smoke.urdf.xacro')
+AMCL_PARAMETER_NAMES = (
+    'use_sim_time', 'transform_tolerance', 'scan_topic', 'global_frame_id',
+    'odom_frame_id', 'base_frame_id', 'tf_broadcast')
 RECOVERY_RTAB_LAUNCH = (
     SOURCE_ROOT / 'cleannav_rtabmap' / 'launch' / 'startup_smoke_rtabmap.launch.py')
 try:
@@ -209,6 +213,15 @@ def compose_mapping(context, arg):
         raise ValueError('mapping mode refuses automatic tasks and RViz navigation goals')
     if arg('database_path'):
         raise ValueError('mapping owns a new persistent session database; database_path must be empty')
+    oracle_mode = arg('odometry_mode') == 'oracle'
+    localization_mode = arg('localization_mode')
+    amcl_mode = localization_mode == 'amcl'
+    if localization_mode not in ('none', 'amcl'):
+        raise ValueError('unsupported startup_smoke localization mode')
+    if oracle_mode and (arg('sensor_only') != 'true' or not Path(arg('map_yaml')).is_file()):
+        raise ValueError('Oracle diagnostic requires sensor_only and frozen map YAML')
+    if amcl_mode and (not oracle_mode or arg('sensor_only') != 'true'):
+        raise ValueError('AMCL localization requires the sensor-only Oracle map path')
     profile, profile_sha256 = load_motion_profile(arg('motion_profile'))
     collision_config = (Path(get_package_share_directory('cleannav_simulation'))
                         / 'config' / 'mapping_collision_monitor.yaml')
@@ -289,11 +302,92 @@ def compose_mapping(context, arg):
             PythonLaunchDescriptionSource(str(path)),
             launch_arguments=arguments.items())])
 
+    oracle_actions = []
+    oracle_arguments = {}
+    localization_contract = None
+    model_xacro = RECOVERY_ROOF_XACRO
+    if oracle_mode:
+        import importlib.util
+        helper = NAV_ROOT / 'tools/rviz_navigation/integration.py'
+        spec = importlib.util.spec_from_file_location('startup_oracle_inputs', helper)
+        contract = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(contract)
+        profile_id = ('simple-four-wall-nohit-v1-oracle-localization' if amcl_mode
+                       else 'simple-four-wall-nohit-v1-oracle-static')
+        selected = contract.verify_map(Path(arg('map_yaml')).parent, world_source,
+                                       profile=profile_id, odometry_mode='oracle')
+        controllers = Path(get_package_share_directory('cleannav_simulation')) / 'config/ackermann_controllers.yaml'
+        oracle = contract.prepare_oracle_odometry_inputs(RECOVERY_ROOF_XACRO, controllers, session)
+        model_xacro = Path(oracle['model_xacro'])
+        oracle_arguments = dict(controllers_file=oracle['controller_yaml'], publish_rear_axle_tf='false')
+        oracle_actions.append(ExecuteProcess(name='gazebo_oracle_odometry', output='log', cmd=[
+            sys.executable, str(NAV_ROOT/'tools/rviz_navigation/oracle_odometry.py'),
+            '--ros-args', '-p', 'use_sim_time:=true', '-p',
+            'truth_output:=' + str(Path(logs)/'oracle-truth.jsonl')]))
+        oracle_actions.append(Node(package='nav2_map_server', executable='map_server', name='map_server',
+            output='log', parameters=[{'use_sim_time': True, 'yaml_filename': arg('map_yaml'), 'frame_id': 'map'}]))
+        if amcl_mode:
+            localization_contract = contract.verify_map(
+                Path(arg('map_yaml')).parent, world_source, profile=profile_id,
+                odometry_mode='oracle')['localization_runtime']
+            params_source = selected['source_bindings']['amcl_params_source']
+            amcl_params = Path(get_package_share_directory('cleannav_navigation')) / 'config/nav2_params_ackermann.yaml'
+            diagnostic_profile_path = NAV_ROOT / 'tools/startup_smoke/amcl_diagnostic_profile.py'
+            diagnostic_spec = importlib.util.spec_from_file_location(
+                'startup_amcl_diagnostic_profile', diagnostic_profile_path)
+            diagnostic_module = importlib.util.module_from_spec(diagnostic_spec)
+            diagnostic_spec.loader.exec_module(diagnostic_module)
+            diagnostic_identity = diagnostic_module.verify_selected_profile('amcl', os.environ)
+            if diagnostic_identity is None:
+                runtime_identity = contract.verify_localization_runtime(
+                    selected, get_package_prefix, amcl_params)
+                amcl_additional_env = None
+            else:
+                runtime_identity = diagnostic_identity['localization_runtime_identity']
+                amcl_additional_env = diagnostic_identity['amcl_node_environment']
+            pose = [float(value) for value in selected['localization_initial_pose'].split()]
+            if len(pose) != 6:
+                raise ValueError('profile initial pose must contain x y z roll pitch yaw')
+            if params_source['sha256'] != runtime_identity['params_sha256']:
+                raise ValueError('AMCL parameter source and installed identity differ')
+            amcl_overrides = {
+                'use_sim_time': True,
+                'scan_topic': selected['scan_topic'],
+                'base_frame_id': localization_contract['base_frame_id'],
+                'global_frame_id': localization_contract['global_frame_id'],
+                'odom_frame_id': localization_contract['odom_frame_id'],
+                'tf_broadcast': localization_contract['tf_broadcast'],
+                'transform_tolerance': localization_contract['transform_tolerance_s'],
+                'set_initial_pose': localization_contract['set_initial_pose'],
+                'initial_pose.x': pose[0], 'initial_pose.y': pose[1],
+                'initial_pose.z': pose[2], 'initial_pose.yaw': pose[5],
+            }
+            if diagnostic_identity is not None:
+                amcl_overrides.update(diagnostic_identity['amcl_parameter_overrides'])
+            yaml_parameters = yaml.safe_load(amcl_params.read_text(encoding='utf-8'))
+            yaml_defaults = yaml_parameters.get('amcl', {}).get('ros__parameters', {})
+            amcl_parameter_sources = {
+                'requested': {name: amcl_overrides[name] for name in AMCL_PARAMETER_NAMES},
+                'yaml_defaults': {name: yaml_defaults.get(name, 'NOT_DEFINED')
+                                  for name in AMCL_PARAMETER_NAMES},
+            }
+            amcl_node_options = {}
+            if amcl_additional_env is not None:
+                amcl_node_options['additional_env'] = amcl_additional_env
+            oracle_actions.append(Node(package='nav2_amcl', executable='amcl', name='amcl', namespace='/',
+                output='log', parameters=[str(amcl_params), amcl_overrides], **amcl_node_options))
+            session_file.write_text(json.dumps({**json.loads(session_file.read_text()),
+                'localization_profile': profile_id,
+                'localization_contract': localization_contract,
+                'localization_runtime_identity': runtime_identity,
+                'amcl_parameter_sources': amcl_parameter_sources,
+                'localization_initial_pose': pose}, indent=2))
+
     simulation = include_recovery(RECOVERY_SIMULATION_LAUNCH,
         world=str(runtime_world), model_path=arg('model_path'), gui=arg('gui'),
         spawn_x=arg('spawn_x'), spawn_y=arg('spawn_y'), spawn_z=arg('spawn_z'),
         spawn_yaw=arg('spawn_yaw'), spawn_delay_sec=arg('spawn_delay_sec'),
-        robot_xacro_file=str(RECOVERY_ROOF_XACRO),
+        robot_xacro_file=str(model_xacro), **oracle_arguments,
         sim_lidar_samples='181', sim_lidar_rate='8')
     safety = GroupAction(actions=[
         SetParameter(name='simulation_motion_authorization', value=False),
@@ -307,7 +401,8 @@ def compose_mapping(context, arg):
         package='nav2_lifecycle_manager', executable='lifecycle_manager',
         name='mapping_collision_lifecycle_manager', output='log',
         parameters=[{'use_sim_time': True}, {'autostart': True},
-                    {'node_names': ['collision_monitor']}])
+                    {'node_names': ['collision_monitor'] + (['map_server'] if oracle_mode else [])
+                     + (['amcl'] if amcl_mode else [])}])
     collision_monitor = Node(
         package='nav2_collision_monitor', executable='collision_monitor',
         name='collision_monitor', output='log',
@@ -340,7 +435,7 @@ def compose_mapping(context, arg):
         # Start lifecycle management only after Gazebo clock, sensor topics and
         # rear-axle TF have passed the simulation probe. The monitor process is
         # already present but stays inactive until its inputs are usable.
-        return [collision_lifecycle, slam, input_guard]
+        return [collision_lifecycle] if arg('sensor_only') == 'true' else [collision_lifecycle, slam, input_guard]
 
     def started(event, context):
         if event.process_name.startswith('rtabmap-'):
@@ -350,7 +445,7 @@ def compose_mapping(context, arg):
         return []
 
     critical = ('gzserver', 'robot_state_publisher', 'rtabmap-', 'safety_supervisor_node',
-                'collision_monitor', 'mapping_collision_lifecycle_manager',
+                'collision_monitor', 'mapping_collision_lifecycle_manager', 'gazebo_oracle_odometry', 'map_server', 'amcl',
                 'mapping_status_monitor')
     def exited(event, context):
         if event.action is probe:
@@ -383,12 +478,17 @@ def compose_mapping(context, arg):
         SetEnvironmentVariable('GAZEBO_IP', '127.0.0.1'),
         SetEnvironmentVariable('GAZEBO_MODEL_DATABASE_URI', ''),
         SetEnvironmentVariable('ROS_LOG_DIR', logs),
+        # The wrapper enables profile verification; only AMCL's additional_env
+        # enables the private diagnostics in a runtime child process.
+        *([UnsetEnvironmentVariable('CLEANNAV_TF_PRIVATE_DIAGNOSTICS')]
+          if os.environ.get('CLEANNAV_AMCL_DIAGNOSTIC_PROFILE') else []),
         SetParameter(name='use_sim_time', value=True),
         LogInfo(msg=f'[MAPPING] STARTING session={session_file}; startup_smoke; motion authorization disabled; no broker/route/Lease'),
         RegisterEventHandler(OnProcessExit(target_action=probe, on_exit=simulated)),
         RegisterEventHandler(OnProcessStart(on_start=started)),
         RegisterEventHandler(OnProcessExit(on_exit=exited)),
         RegisterEventHandler(OnProcessIO(on_stdout=output, on_stderr=output)),
-        safety, collision_monitor, coverage, monitor,
-        simulation, probe,
+        safety, collision_monitor, *oracle_actions,
+        *([] if arg('sensor_only') == 'true' else [coverage, monitor]),
+        simulation, *([collision_lifecycle] if oracle_mode else [probe]),
     ]

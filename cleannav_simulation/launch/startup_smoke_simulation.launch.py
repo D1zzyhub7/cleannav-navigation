@@ -37,12 +37,38 @@ from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 from launch_ros.substitutions import FindPackageShare
 import importlib.util
+import json
+import os
+import time
 from pathlib import Path
 
 
 # Demo-first: mcity needs significantly more startup time than empty_world.
 SPAWN_SERVICE_TIMEOUT_SEC = "120.0"
 CONTROLLER_MANAGER_TIMEOUT_SEC = "120.0"
+
+
+class DiagnosticSpawnTimer(TimerAction):
+    """Observe the real timer without changing its period or child actions."""
+    def _record(self, context, event):
+        from launch.utilities import perform_substitutions
+        row = {"event": event, "run_id": os.environ["CLEANNAV_RVIZ_RUN_ID"],
+               "monotonic_ns": time.monotonic_ns(), "wall_ns": time.time_ns(),
+               "pid": os.getpid(),
+               "spawn": {key: LaunchConfiguration(key).perform(context) for key in
+                         ("spawn_x", "spawn_y", "spawn_z", "spawn_yaw", "spawn_delay_sec")},
+               "resolved_timer_period_s": float(perform_substitutions(context, self.period))}
+        with (Path(os.environ["ROS_LOG_DIR"]) / "spawn-timing.jsonl").open("a") as stream:
+            stream.write(json.dumps(row) + "\n")
+
+    async def _wait_to_fire_event(self, context):
+        self._record(context, "wait_started")
+        await super()._wait_to_fire_event(context)
+
+    def handle(self, context):
+        actions = super().handle(context)
+        self._record(context, "wait_fired")
+        return actions
 
 
 def _rear_axle_tf_actions(context):
@@ -202,7 +228,11 @@ def generate_launch_description():
         )
     )
 
-    delayed_robot_spawn = TimerAction(
+    timer_type = (DiagnosticSpawnTimer if
+        os.environ.get("CLEANNAV_RVIZ_TIMING_PROFILE") == "localization-diagnostic"
+        and os.environ.get("CLEANNAV_RVIZ_RUN_ID") and os.environ.get("ROS_LOG_DIR")
+        else TimerAction)
+    delayed_robot_spawn = timer_type(
         period=LaunchConfiguration("spawn_delay_sec"),
         actions=[spawn_entity],
     )

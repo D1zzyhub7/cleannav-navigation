@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "profile_id": "mcity-localization07-canonical-debug",
+  "map_id": "mcity_step32c_e2e_20261011_canonical_debug",
+  "map_directory_relative": "cleannav-maps/mcity_step32c_e2e_20261011_canonical_debug",
+  "world_relative": "cleannav-experiments/step3-2-b-20261010-215600/mcity-ground-truth.world",
+  "world_sha256": "1090861ce5d9f765db071bd7efdfe6e8e06c17841a2927dec2094a4c3401e284",
+  "files": {
+    "manifest.json": "a640db3d3fd05f89b5525f983c73961db0f81a43576c9a45d1dbc90410e0ed5c",
+    "map.pgm": "b35376df8750a5f68dd67433d73cdc3c3ea569a9cc66874967c3d8cc06b914ea",
+    "map.yaml": "c7cc053573ba3f4848040394c1de8491690d9508f367496770fcd75fb5c1dd43",
+    "map_export.log": "bdf18b53df3866d01eab666c58c04bc862eb060de78b89ba405d0cf24d57d264",
+    "map_saver_original.yaml": "4429f9c9741efdda9402f6b56b21200a73f49ac75cf32aea27ef34872fdbf36b",
+    "occupancy_grid.json": "f43de7868c122c2fa9260a7fe2ad39abc5df77b28d04188cf41452b0c4889607",
+    "rtabmap.db": "d06309260b0aff4a903d27a9965728e047a7d13d1edaa2a5ee02b7cb03f1bde8",
+    "rtabmap_config.ini": "8ca817c175a8e41bddc3186abd9a2cc58f9322df447646b39ff6538e0e45420e",
+    "rtabmap_params.yaml": "82fefdd539502a9da1549384ed0e1cdc38ac3f92b57bb9db8ecc52d0387d87a7"
+  },
+  "scan_topic": "/scan",
+  "scan_frame": "base_scan",
+  "frame_id": "base_footprint",
+  "odom_mode": "topic",
+  "odom_topic": "/odom",
+  "odom_frame_id": "",
+  "localization_initial_pose": "0.3 0 0 0 0 0",
+  "spawn": {
+    "x": "0.0",
+    "y": "-5.0",
+    "z": "0.02",
+    "yaw": "0.0"
+  },
+  "spawn_delay_sec": "60.0",
+  "safety_scan_topic": "/scan",
+  "roof_mapping_topics": [
+    "/mapping/scan_raw",
+    "/mapping/scan"
+  ],
+  "startup_order": [
+    "safety_blocked",
+    "gazebo_vehicle",
+    "collision_monitor_active",
+    "disk_map_and_rtabmap_localization",
+    "rviz_initialization_ui",
+    "nav2",
+    "mission_manager",
+    "goal_adapter"
+  ],
+  "source_bindings": {
+    "simulation_model_xacro": {
+      "path": "cleannav_simulation/urdf/cleannav_ackermann_startup_smoke.urdf.xacro",
+      "sha256": "59036f677ae1dd873157132583f41fd7ad0cd722bf7bc790734b379343287a3a"
+    },
+    "rviz_config": {
+      "path": "tools/rviz_navigation/navigation.rviz",
+      "sha256": "9a798040298f4b7fdcdae0669bc4ae9ce9bf9cc30bc941ca58a0b97ea81e5995"
+    },
+    "runtime_dependencies_sha256": "33c68e0f15a9e534732352b0865354e90bc643fa5bac2c890bbc81a017feaabf",
+    "expected_prefix_packages": [
+      "cleannav_global_planner",
+      "cleannav_interfaces",
+      "cleannav_mission_manager",
+      "cleannav_navigation",
+      "cleannav_path_executor",
+      "cleannav_rtabmap",
+      "cleannav_safety_supervisor",
+      "cleannav_simulation"
+    ],
+    "overlay_setup_env": "CLEANNAV_RVIZ_OVERLAY_SETUP",
+    "overlay_identity_config_env": "CLEANNAV_RVIZ_MACHINE_CONFIG"
+  },
+  "provenance": {
+    "historical_run": "localization07",
+    "native_initial_pose_source": "historical RViz localization07 launch arguments and RTAB-Map log",
+    "map_world_pair_source": "historical saved map manifest and successful localization07 command",
+    "source_scope": "Restoration profile binds inputs; it does not certify current runtime localization or navigation",
+    "derived_from_profile": "mcity-localization07",
+    "canonicalized_from_frozen_occupancy_grid": true,
+    "installed_validator_sha256": "f1b0359987f9ffe87984a5eb9f2f6a09e1929b06e33f6f771c88734f65513ae8"
+  },
+  "activation_status": "READY_FOR_STATIC_ALLOWLISTED_VALIDATION"
+}

@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "map_id": "roof-lidar-360-map-20261020T035612Z",
+  "scan_topic": "/mapping/scan",
+  "scan_frame": "mapping_lidar_link",
+  "frame_id": "base_footprint",
+  "odom_frame_id": "odom",
+  "world_sha256": "c7c38234503b91c06a4f743c714b3448b22d21ebd65732f2b75beae0e3862637",
+  "files": {
+    "manifest.json": "3f706c9714209d65238e27388f475c393103a2d7eef47403bb19020070502e70",
+    "map.yaml": "38e1df926728dd25ee0dc6e7ca1d34167fe702f24f82d8c38ede1c91dc40820c",
+    "map.pgm": "f2e496e78228d4b12e8b9d6fce317681563b44c04a2725772c2d31dd6f8f4ba8",
+    "rtabmap_config.ini": "9b80b09b1c87414ce4d1466319f3c11865a5df6d34434f5a41d24c5cfc490155",
+    "map_saver_original.yaml": "28bb715a4899d890813215cce64b7418293f36173a1df227f3ca6d16304619af",
+    "rtabmap_params.yaml": "9bd21f6f4a2aa6534728a9d06324a8e497ead1b90383865846988fe8653d9f6b",
+    "map_export.log": "7342b36ba1e6ce690d62a5967be7d732558839a2b8f561a5c59dc238c4718eb4",
+    "rtabmap.db": "ac33b8a42346eafc3d140b54202c143bdfba3bc1b0c88861cb7538bb9b968325",
+    "occupancy_grid.json": "68c8571fddaea9e59686e0c3f15008701a42c650ec10c056b4d12dfc0a3fce5d"
+  },
+  "provenance": {
+    "run_id": "roof-lidar-g3-offset-20261020T035612Z",
+    "session_id": "9cd36bd0d62d46d092238a3fe7f602e2",
+    "rtab_log": "cleannav-deliverables/map-quality-localization-patrol-20261020T034159Z/runs/roof-lidar-g3-offset-20261020T035612Z/ros-log/2026-10-20-11-57-05-765106-LAPTOP-E32NM2PD-80808/rtabmap_81173_1792468642918.log",
+    "rtab_log_sha256": "e0403b35dac7998901269d23c151f17cac85d30d281266dc18802d5916e472b1",
+    "scan_subscription_lines": [
+      52,
+      53,
+      54
+    ],
+    "source_scope": "This binds inputs; it does not certify map geometry or localization"
+  }
+}

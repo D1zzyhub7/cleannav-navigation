@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "ros_setup": "/opt/ros/humble/setup.bash",
+  "overlay_setup": "/absolute/path/to/reviewed-success-environment.sh",
+  "local_setup": "/absolute/path/to/local-rviz-overlay.bash",
+  "source_manifest_sha256": "REPLACE_AFTER_SOURCE_REVIEW",
+  "runtime_dependencies_sha256": "REPLACE_AFTER_DEPENDENCY_REVIEW",
+  "source_inputs": {
+    "/opt/ros/humble/setup.bash": "REPLACE_WITH_REVIEWED_SHA256",
+    "/absolute/path/to/reviewed-success-environment.sh": "REPLACE_WITH_REVIEWED_SHA256",
+    "/absolute/path/to/local-rviz-overlay.bash": "REPLACE_WITH_REVIEWED_SHA256"
+  },
+  "expected_prefixes": {
+    "cleannav_interfaces": "/absolute/reviewed/install/cleannav_interfaces",
+    "cleannav_mission_manager": "/absolute/reviewed/install/cleannav_mission_manager",
+    "cleannav_navigation": "/absolute/reviewed/install/cleannav_navigation",
+    "cleannav_rtabmap": "/absolute/reviewed/install/cleannav_rtabmap",
+    "cleannav_safety_supervisor": "/absolute/reviewed/install/cleannav_safety_supervisor",
+    "cleannav_simulation": "/absolute/reviewed/install/cleannav_simulation"
+  }
+}

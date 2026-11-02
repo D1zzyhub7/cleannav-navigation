@@ -4,12 +4,13 @@ import os
 from pathlib import Path
 import re
 import shutil
+import sys
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import (
     DeclareLaunchArgument, EmitEvent, GroupAction, IncludeLaunchDescription,
-    LogInfo, OpaqueFunction, RegisterEventHandler, SetEnvironmentVariable,
+    LogInfo, OpaqueFunction, RegisterEventHandler, SetEnvironmentVariable, ExecuteProcess,
 )
 from launch.event_handlers import OnProcessExit, OnProcessIO
 from launch.events import Shutdown
@@ -35,7 +36,21 @@ def _error_identity(line):
     return None
 
 
-def _compose(context):
+def readiness_failure_actions(reason, *, diagnostic_startup_wait=False):
+    """Only ordinary no-motion initialization failures wait for the global bound.
+
+    Critical process exits use their separate unchanged Shutdown handler.
+    A failed probe never advances a stage and never manufactures readiness.
+    """
+    if diagnostic_startup_wait:
+        return [LogInfo(msg='[WAITING] '+reason+'; global startup window remains authoritative')]
+    return [LogInfo(msg='[ERROR] FAILED '+reason), EmitEvent(event=Shutdown(reason=reason))]
+
+
+def _compose(context, integration=None):
+    # The repository RViz adapter supplies explicit source/asset bindings.
+    # The historical online-demo composition keeps its existing defaults.
+    integration = integration or {}
     def arg(name):
         return LaunchConfiguration(name).perform(context)
 
@@ -52,7 +67,7 @@ def _compose(context):
     os.environ['OVERRIDE_LAUNCH_PROCESS_OUTPUT'] = 'own_log'
     logs = launch_config.log_dir
     simulation_world = arg('world')
-    if arg('enable_diagnostics') == 'true':
+    if arg('enable_diagnostics') == 'true' or integration.get('oracle_odometry'):
         # Read-only ground truth service; leave the original MCity asset intact.
         world_text = Path(simulation_world).read_text()
         state_plugin = (
@@ -61,16 +76,19 @@ def _compose(context):
         )
         simulation_world = str(Path(logs) / 'diagnostic.world')
         Path(simulation_world).write_text(world_text.replace('</world>', state_plugin+'</world>'))
-    database = arg('database_path') or str(Path(logs) / 'rtabmap.db')
+    database = integration.get('database') or arg('database_path') or str(Path(logs) / 'rtabmap.db')
     # RTAB-Map writes its cfg on shutdown. Give each run a private copy.
     rtab_cfg = str(Path(logs) / 'rtabmap_lidar.ini')
-    shutil.copyfile(Path(get_package_share_directory('cleannav_rtabmap'))
-                    / 'config' / 'rtabmap_lidar.ini', rtab_cfg)
+    shutil.copyfile(integration.get('cfg') or (
+        Path(get_package_share_directory('cleannav_rtabmap')) / 'config' / 'rtabmap_lidar.ini'), rtab_cfg)
 
     def include(package, filename, **arguments):
+        key = package + '/' + filename
+        arguments.update(integration.get('arguments', {}).get(key, {}))
+        source = integration.get('includes', {}).get(key) or (
+            Path(get_package_share_directory(package)) / 'launch' / filename)
         child = IncludeLaunchDescription(
-            PythonLaunchDescriptionSource(str(
-                Path(get_package_share_directory(package)) / 'launch' / filename)),
+            PythonLaunchDescriptionSource(str(source)),
             launch_arguments=arguments.items(),
         )
         # Included launch defaults (notably Gazebo's empty params_file)
@@ -78,10 +96,18 @@ def _compose(context):
         return GroupAction(scoped=True, actions=[child])
 
     def probe(stage):
+        if integration.get('localization_monitor_source'):
+            return ExecuteProcess(name='cleannav_probe_'+stage, output='log', cmd=[
+                sys.executable, str(integration['localization_monitor_source']),
+                '--session', integration['session'], '--probe', stage,
+                '--timeout', arg(f'{stage}_timeout'), '--ros-args', '-p', 'use_sim_time:=true'])
+        localization = bool(integration) and stage == 'slam'
         return Node(
-            package='cleannav_simulation', executable='simulation_status_monitor',
+            package='cleannav_simulation', executable=(
+                'localization_status_monitor' if localization else 'simulation_status_monitor'),
             name=f'cleannav_probe_{stage}', output='log',
-            arguments=['--probe', stage, '--timeout', arg(f'{stage}_timeout')],
+            arguments=['--probe', stage, '--timeout', arg(f'{stage}_timeout')] + (
+                ['--session', integration['session']] if localization else []),
             parameters=[{'use_sim_time': True}],
         )
 
@@ -91,13 +117,25 @@ def _compose(context):
         spawn_x=arg('spawn_x'), spawn_y=arg('spawn_y'),
         spawn_z=arg('spawn_z'), spawn_yaw=arg('spawn_yaw'),
     )
-    slam = include('cleannav_rtabmap', 'cleannav_rtabmap_lidar.launch.py',
-                   database_path=database, cfg=rtab_cfg)
+    if integration.get('localization_kind') == 'amcl':
+        slam = GroupAction(actions=integration['localization_node_actions'])
+    else:
+        slam = include('cleannav_rtabmap', 'cleannav_rtabmap_lidar.launch.py',
+                       database_path=database, cfg=rtab_cfg)
+        if integration:
+            slam = GroupAction(actions=[SetParameter(name='is_rtabmap_paused', value=True), slam])
     safety = GroupAction(actions=[
+        *([SetEnvironmentVariable('PYTHONPATH', integration['mission_environment']['PYTHONPATH'])]
+          if integration.get('mission_environment') else []),
         SetParameter(name='simulation_motion_authorization', value=motion),
+        *([SetParameter(name='require_localization', value=True)] if integration else []),
         include('cleannav_safety_supervisor', 'safety_supervisor.launch.py',
-                use_sim_time='true', block_all='true', max_forward_linear_x='0.35',
-                max_reverse_linear_x='0.10', max_angular_z='0.60'),
+                use_sim_time='true', block_all='true',
+                # The integrated guard requires status younger than 0.5 wall seconds.
+                status_publish_frequency='10.0' if integration else '2.0',
+                max_forward_linear_x=integration.get('forward_limit', '0.35'),
+                max_reverse_linear_x=integration.get('reverse_limit', '0.10'),
+                max_angular_z=integration.get('angular_limit', '0.60')),
     ])
     navigation = GroupAction(actions=[
         include('cleannav_navigation', 'cleannav_ackermann_navigation.launch.py',
@@ -109,25 +147,43 @@ def _compose(context):
     ])
     manager = Node(
         package='cleannav_mission_manager', executable='cleannav_simulation_mission_manager',
-        name='mission_manager_node', output='log', parameters=[{
+        name='mission_manager_node', output='log',
+        additional_env=integration.get('mission_environment', {}), parameters=[{
             'use_sim_time': True, 'enable_rviz_goals': arg('enable_rviz_goals') == 'true',
-            'pose_motion_enabled': motion}],
+            'pose_motion_enabled': motion, **integration.get('mission_parameters', {})}],
     )
     monitor = Node(
-        package='cleannav_simulation', executable='simulation_status_monitor',
+        package='cleannav_simulation', executable=(
+            'localization_status_monitor' if integration else 'simulation_status_monitor'),
         name='cleannav_simulation_status_monitor', output='log',
-        arguments=['--enable-motion'] if motion else [],
+        # The unified RViz supervisor owns the one-shot Motion Admission.
+        # In that composition, keep Safety.block_all asserted until the
+        # outer supervisor has checked every readiness fact and explicitly
+        # opens the existing simulation interlock. Legacy full-sim behavior
+        # remains unchanged when this integration flag is absent.
+        arguments=(['--enable-motion'] if motion and not integration.get(
+            'defer_motion_authorization', False) else []) + (
+            ['--session', integration['session']] if integration else []),
         parameters=[{'use_sim_time': True}],
     )
+    if integration.get('localization_monitor_source'):
+        monitor = ExecuteProcess(name='localization_status_monitor', output='log', cmd=[
+            sys.executable, str(integration['localization_monitor_source']),
+            '--session', integration['session']] + (
+            ['--enable-motion'] if motion and not integration.get(
+                'defer_motion_authorization', False) else []) + [
+            '--ros-args', '-p', 'use_sim_time:=true'])
     probes = {stage: probe(stage) for stage in ('simulation', 'slam', 'navigation', 'mission')}
     next_actions = {
-        'simulation': [slam, probes['slam']],
+        'simulation': [slam, *integration.get('localization_actions', []), probes['slam']],
         'slam': [navigation, probes['navigation']],
         'navigation': [manager, probes['mission']],
-        'mission': ([Node(
-            package='cleannav_simulation', executable='rviz_goal_adapter', output='screen',
-            parameters=[{'use_sim_time': True}],
-        )] if arg('enable_rviz_goals') == 'true' else []),
+        'mission': (integration.get('mission_goal_actions') if integration and
+                    integration.get('mission_goal_actions') is not None else
+                    ([Node(
+                        package='cleannav_simulation', executable='rviz_goal_adapter', output='screen',
+                        parameters=[{'use_sim_time': True}],
+                    )] if arg('enable_rviz_goals') == 'true' else [])),
     }
 
     def stage_exit(stage):
@@ -135,20 +191,52 @@ def _compose(context):
             if context.is_shutdown:
                 return []
             if event.returncode != 0:
-                return [LogInfo(msg=f'[ERROR] FAILED {stage} readiness; diagnostics={logs}'),
-                        EmitEvent(event=Shutdown(reason=f'{stage} readiness failed'))]
+                return readiness_failure_actions(f'{stage} readiness failed; diagnostics={logs}',
+                    diagnostic_startup_wait=integration.get('diagnostic_startup_wait') is True)
             return next_actions[stage]
         return callback
 
     handlers = [RegisterEventHandler(OnProcessExit(
         target_action=action, on_exit=stage_exit(stage))) for stage, action in probes.items()]
+    if integration:
+        # The existing CM coordinator is the transition owner. Only its
+        # successful ACTIVE receipt admits localization, then Nav2/Mission.
+        admitted = next_actions['simulation']
+        next_actions['simulation'] = integration['collision_actions']
+        def collision_exit(event, context):
+            if context.is_shutdown:
+                return []
+            if event.returncode:
+                return readiness_failure_actions('Collision Monitor startup failed',
+                    diagnostic_startup_wait=integration.get('diagnostic_startup_wait') is True)
+            return admitted
+        handlers.append(RegisterEventHandler(OnProcessExit(
+            target_action=integration['collision_gate'], on_exit=collision_exit)))
+        mission_admitted = next_actions['navigation']
+        next_actions['navigation'] = [integration['guard_gate']]
+        def guard_exit(event, context):
+            if context.is_shutdown:
+                return []
+            if event.returncode:
+                return readiness_failure_actions('navigation safety guard admission failed',
+                    diagnostic_startup_wait=integration.get('diagnostic_startup_wait') is True)
+            return mission_admitted
+        handlers.append(RegisterEventHandler(OnProcessExit(
+            target_action=integration['guard_gate'], on_exit=guard_exit)))
     critical = ('gzserver', 'robot_state_publisher', 'rtabmap', 'planner_server',
                 'controller_server', 'navigation_facade_node', 'safety_supervisor_node',
-                'cleannav_simulation_mission_manager', 'simulation_status_monitor')
+                'cleannav_simulation_mission_manager', 'simulation_status_monitor',
+                'localization_status_monitor', 'collision_monitor', 'navigation_safety_guard', 'map_server',
+                'amcl', 'amcl_lifecycle_manager') + (
+                    ('gazebo_oracle_odometry',) if integration.get('oracle_odometry') else ())
 
     def process_exit(event, context):
         if context.is_shutdown or event.action in probes.values():
             return []
+        if event.action in integration.get('oneshot_actions', []):
+            return ([] if event.returncode == 0 else
+                    readiness_failure_actions('navigation one-shot dependency failed',
+                        diagnostic_startup_wait=integration.get('diagnostic_startup_wait') is True))
         name = event.process_name
         if (any(component in name for component in critical)
                 or (event.returncode != 0 and any(
@@ -179,7 +267,7 @@ def _compose(context):
                     continue
                 last_errors[source] = message
             if re.match(
-                r'^\[(CLEANNAV|SIMULATION|SLAM|NAVIGATION|MISSION|SAFETY|ERROR|NAV|MM|RVIZ_GOAL)\]', line,
+                r'^\[(CLEANNAV|SIMULATION|SLAM|LOCALIZATION|NAVIGATION|MISSION|SAFETY|ERROR|NAV|MM|RVIZ_GOAL)\]', line,
             ):
                 actions.append(LogInfo(msg=line))
             elif re.search(r'\b(ERROR|FATAL|Exception|Traceback)\b', line):
@@ -200,15 +288,22 @@ def _compose(context):
     if arg('start_rviz') == 'true':
         if os.environ.get('DISPLAY') or os.environ.get('WAYLAND_DISPLAY'):
             rviz = [Node(
-                package='rviz2', executable='rviz2', output='log',
-                arguments=['-d', str(Path(get_package_share_directory('cleannav_simulation'))
+                package='rviz2', executable='rviz2', name='rviz', output='log',
+                arguments=['-d', str(integration.get('rviz_config') or (Path(get_package_share_directory('cleannav_simulation'))
                                      / 'config' / ('simulation_v2_goals.rviz'
                                                   if arg('enable_rviz_goals') == 'true'
-                                                  else 'simulation_v2.rviz'))],
+                                                  else 'simulation_v2.rviz')))],
                 parameters=[{'use_sim_time': True}],
             ), LogInfo(msg='[RVIZ] STARTING visualization; verify displays in GUI')]
         else:
             rviz = [LogInfo(msg='[RVIZ] PARTIAL_READY no DISPLAY; running headless')]
+    # Localization may require RViz's real initial-pose input. Start the GUI
+    # alongside disk localization after CM admission, not after Mission READY.
+    # The goal adapter remains behind Mission admission; this grants no motion.
+    root_rviz = rviz
+    if integration:
+        admitted.extend(rviz)
+        root_rviz = []
     diagnostics = []
     if arg('enable_diagnostics') == 'true':
         diagnostics = [Node(
@@ -230,7 +325,9 @@ def _compose(context):
         RegisterEventHandler(OnProcessExit(on_exit=process_exit)),
         RegisterEventHandler(OnProcessIO(on_stdout=process_io, on_stderr=process_io)),
         SetParameter(name='use_sim_time', value=True),
-        monitor, safety, simulation, probes['simulation'], *rviz, *diagnostics,
+        *integration.get('environment_actions', []),
+        monitor, safety, *integration.get('initial_actions', []),
+        simulation, probes['simulation'], *root_rviz, *diagnostics,
     ]
 
 

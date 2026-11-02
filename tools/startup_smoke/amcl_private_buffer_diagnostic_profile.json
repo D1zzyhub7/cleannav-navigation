@@ -1,0 +1,1109 @@
+{
+  "allowed_package_markers": {
+    "nav2_amcl": [
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/nav2_amcl",
+      "/opt/ros/humble"
+    ],
+    "nav2_lifecycle_manager": [
+      "/opt/ros/humble"
+    ],
+    "tf2_ros": [
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros",
+      "/opt/ros/humble"
+    ]
+  },
+  "amcl_parameters": {
+    "frames": {
+      "base_frame_id": "base_footprint",
+      "global_frame_id": "map",
+      "odom_frame_id": "odom"
+    },
+    "initial_pose": "0.0015082397731021 -7.99616241455078 0 0 0 0.0131529364734888",
+    "map_contract": "/home/d1zzy/code/cleannav_modularization/cleannav-worktrees/navigation-startup-baseline-20261021/tools/rviz_navigation/map_contract_simple_four_wall_nohit_v1_oracle_localization.json",
+    "map_contract_sha256": "5095a10595794b8d99f98ed3001facdee39f39436b2a4b76f9438aa4ca639c2d",
+    "path": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261023-unknown-facade/install/cleannav_navigation/share/cleannav_navigation/config/nav2_params_ackermann.yaml",
+    "scan_tf_wait_timeout": 0.3,
+    "scan_topic": "/mapping/scan",
+    "sha256": "cca61d9447fb0c93f8510bd01c79c82401508a49efb5aac124c210fb0d42edaf"
+  },
+  "amcl_process": {
+    "diagnostic_environment": {
+      "CLEANNAV_TF_PRIVATE_DIAGNOSTICS": "1"
+    },
+    "ld_library_path_prefix": [
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/lib",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros/lib"
+    ],
+    "required_libraries": {
+      "libamcl_core.so": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/lib/libamcl_core.so",
+      "libtf2_ros.so": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros/lib/libtf2_ros.so"
+    }
+  },
+  "lifecycle_manager": {
+    "executable": "/opt/ros/humble/lib/nav2_lifecycle_manager/lifecycle_manager",
+    "executable_sha256": "9a921df9e17825d0c2214356e6f7fc3e3d468bdaf77a0bb862741aa449f60a4c",
+    "package": "nav2_lifecycle_manager",
+    "package_xml": "/opt/ros/humble/share/nav2_lifecycle_manager/package.xml",
+    "package_xml_sha256": "cc00f5a9a171167288ce29322a593d93f4d4346872d7622393f9513e8fd4270f",
+    "prefix": "/opt/ros/humble",
+    "version": "1.1.20"
+  },
+  "nodes": {
+    "amcl": {
+      "executable": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/lib/nav2_amcl/amcl",
+      "executable_sha256": "ca36c197d9fbf82dead1a1e6ec0f657b8d5681adada8978b790cad5341c886e1",
+      "package": "nav2_amcl",
+      "runtime_dependencies": [
+        {
+          "needed": "ld-linux-x86-64.so.2",
+          "path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+          "sha256": "41daf7836f7fce21a40ca63a00c5caf21b05a35a76ccc075d86f1716212cdf01"
+        },
+        {
+          "needed": "libaction_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libaction_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "fc8ab99472cfa75792fe88f364fa99c10132e6cc27bc5fdbbbe8896c5839b37b"
+        },
+        {
+          "needed": "libamcl_core.so",
+          "path": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/lib/libamcl_core.so",
+          "sha256": "b52172fc6b47573fa4922de15e1b7b70a3936432c228b7d8aacfae6f1fa800de"
+        },
+        {
+          "needed": "libament_index_cpp.so",
+          "path": "/opt/ros/humble/lib/libament_index_cpp.so",
+          "sha256": "512d31ee3ace65980c2daefbf529289179b8324da00b5c3d89dc3e93998d95bf"
+        },
+        {
+          "needed": "libbond__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libbond__rosidl_typesupport_cpp.so",
+          "sha256": "0cd05e75894e339a1789bd258fea676ed68ec99056c044287bc3991a68bf589d"
+        },
+        {
+          "needed": "libbondcpp.so",
+          "path": "/opt/ros/humble/lib/libbondcpp.so",
+          "sha256": "91bab61d91c2e8f9976c665d1f33c64344137943bf556cc71cd1a91bb8b0f1a3"
+        },
+        {
+          "needed": "libbuiltin_interfaces__rosidl_generator_c.so",
+          "path": "/opt/ros/humble/lib/libbuiltin_interfaces__rosidl_generator_c.so",
+          "sha256": "306fa173a0dc60c785f36d378accebe9d7eac045aeb2f17950bab28947ae9e2e"
+        },
+        {
+          "needed": "libc.so.6",
+          "path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+          "sha256": "b2cf6c33b74d2f22543b7a469a75b538911e690f769d0b238843a49465b83793"
+        },
+        {
+          "needed": "libclass_loader.so",
+          "path": "/opt/ros/humble/lib/libclass_loader.so",
+          "sha256": "b20b38113e6136041e4b90dc3df523bd451e1e73d22fdec3724fcc88c68d8773"
+        },
+        {
+          "needed": "libconsole_bridge.so.1.0",
+          "path": "/usr/lib/x86_64-linux-gnu/libconsole_bridge.so.1.0",
+          "sha256": "e5c857beaaa32a74078a1192b37fba8e299fee1e893f2091f29ca246018517a7"
+        },
+        {
+          "needed": "libfmt.so.8",
+          "path": "/usr/lib/x86_64-linux-gnu/libfmt.so.8.1.1",
+          "sha256": "d463bedd51d449b2346d329fad8080e0900120ad0aeab8bf93e325b6cff4a587"
+        },
+        {
+          "needed": "libgcc_s.so.1",
+          "path": "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+          "sha256": "fc9d43b2f6c20e53b009238f767c5b949d202389e20de9e202ea684b4ba3729a"
+        },
+        {
+          "needed": "libgeometry_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libgeometry_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "0d747e1fc1b3f7d5188c81cf68c91940e043828de9f9cd7072c6157986d3d2d7"
+        },
+        {
+          "needed": "liblibstatistics_collector.so",
+          "path": "/opt/ros/humble/lib/liblibstatistics_collector.so",
+          "sha256": "462a23a53cc6404d3e6a57988cb222d3e798897dcade56b09fd74cc44620616d"
+        },
+        {
+          "needed": "liblifecycle_msgs__rosidl_generator_c.so",
+          "path": "/opt/ros/humble/lib/liblifecycle_msgs__rosidl_generator_c.so",
+          "sha256": "fbdd283804f185d7258af073405dfa91aeefcc74335c84278a3ea391058a9ea3"
+        },
+        {
+          "needed": "liblifecycle_msgs__rosidl_typesupport_c.so",
+          "path": "/opt/ros/humble/lib/liblifecycle_msgs__rosidl_typesupport_c.so",
+          "sha256": "b72309cc33b0d4ee3297a4df7d42f06acaa983a90ed4d531da6c94f12307f9c3"
+        },
+        {
+          "needed": "liblifecycle_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/liblifecycle_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "31d85597b038579f26a1067afc643fe8cb6f32d7db49ab559099478828378877"
+        },
+        {
+          "needed": "libm.so.6",
+          "path": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+          "sha256": "3dd5511ae94785c9f921429b0f2b2f7aabb461b6f0e6de6dfdbef15f24bdfee6"
+        },
+        {
+          "needed": "libmap_lib.so",
+          "path": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/lib/libmap_lib.so",
+          "sha256": "0307bc9afa927f68df052e7e5d25526ccd447705d672bcca37581d03a7d28950"
+        },
+        {
+          "needed": "libmessage_filters.so",
+          "path": "/opt/ros/humble/lib/libmessage_filters.so",
+          "sha256": "db682546458b958419a7e5524a8fbc687d0d5b3cb9b1be25796cbdb20e42f5ab"
+        },
+        {
+          "needed": "libnav2_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libnav2_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "0b8f72d4ab0756055de03eb10b5767a3393fa2ed739b61a9b6707de598f13c1e"
+        },
+        {
+          "needed": "libnav2_util_core.so",
+          "path": "/opt/ros/humble/lib/libnav2_util_core.so",
+          "sha256": "683fa7d2f96859f6d7c881d8d0350d5decbc5226802bc32cded53d501ca2867d"
+        },
+        {
+          "needed": "libnav_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libnav_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "542089daef776e6f95a357099f6c52a3dbdd74f3bdb03464efd3ae598fa393d4"
+        },
+        {
+          "needed": "liborocos-kdl.so.1.5",
+          "path": "/usr/lib/x86_64-linux-gnu/liborocos-kdl.so.1.5.1",
+          "sha256": "0b042c1cdd7c34bf2ba5ac600ce7353dd47f8e98b5cd881a178a5f3b1d04a745"
+        },
+        {
+          "needed": "libpf_lib.so",
+          "path": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/lib/libpf_lib.so",
+          "sha256": "ea5ccbc345dac85850d823c298106a40bb22c2c638ab1cc55cea5c0836caa201"
+        },
+        {
+          "needed": "librcl.so",
+          "path": "/opt/ros/humble/lib/librcl.so",
+          "sha256": "ef5a6dfdf39d5dd0e3d80eb4c43eb230a8be57ca12406b42977fe6c564582ade"
+        },
+        {
+          "needed": "librcl_action.so",
+          "path": "/opt/ros/humble/lib/librcl_action.so",
+          "sha256": "6e33d93aab6f5aea35fe81db75308a559f11084375c99aebd3090310ca2b4e17"
+        },
+        {
+          "needed": "librcl_interfaces__rosidl_generator_c.so",
+          "path": "/opt/ros/humble/lib/librcl_interfaces__rosidl_generator_c.so",
+          "sha256": "55812d4f9133861a56e4e068385a979ea09f8520880ca84e4241b1f4b0e25fb5"
+        },
+        {
+          "needed": "librcl_interfaces__rosidl_typesupport_c.so",
+          "path": "/opt/ros/humble/lib/librcl_interfaces__rosidl_typesupport_c.so",
+          "sha256": "1899b64c701d020e09ea062b3dc0f295e2341c2eecb8fc097a0efac93354c800"
+        },
+        {
+          "needed": "librcl_interfaces__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/librcl_interfaces__rosidl_typesupport_cpp.so",
+          "sha256": "d9818bd7b5bdd2a2bb0a3feca004bfcada12f40ea488def8717cf763e9affca1"
+        },
+        {
+          "needed": "librcl_lifecycle.so",
+          "path": "/opt/ros/humble/lib/librcl_lifecycle.so",
+          "sha256": "556240df62c063d9a246da15c34adc8812976de95e1f0f09485504fb4c2e6aff"
+        },
+        {
+          "needed": "librcl_logging_interface.so",
+          "path": "/opt/ros/humble/lib/librcl_logging_interface.so",
+          "sha256": "39ef13b9d92727835d9d37434be461868c80173970abe8000966a625d267de20"
+        },
+        {
+          "needed": "librcl_logging_spdlog.so",
+          "path": "/opt/ros/humble/lib/librcl_logging_spdlog.so",
+          "sha256": "054cb1535d4e3f6847f2085577cf473f5e803b48c968340d4b1992497b047ec2"
+        },
+        {
+          "needed": "librcl_yaml_param_parser.so",
+          "path": "/opt/ros/humble/lib/librcl_yaml_param_parser.so",
+          "sha256": "d4f121bb50e30372236df66ed3dd5147ddc18e2c4f4687c85db7c85891583778"
+        },
+        {
+          "needed": "librclcpp.so",
+          "path": "/opt/ros/humble/lib/librclcpp.so",
+          "sha256": "20640a059215a771eb2d3ededa04ba99a13b39256711b2cfae853777ac35b5ac"
+        },
+        {
+          "needed": "librclcpp_action.so",
+          "path": "/opt/ros/humble/lib/librclcpp_action.so",
+          "sha256": "1a799632e9b227abe598a5a0dbd7a9c81ba6750ad7129e80c3bc2d8a55ea5162"
+        },
+        {
+          "needed": "librclcpp_lifecycle.so",
+          "path": "/opt/ros/humble/lib/librclcpp_lifecycle.so",
+          "sha256": "ce066bcbd5351ce610a22903f1806c207bc4bbb31ea7589c5f03f396a5dcc08b"
+        },
+        {
+          "needed": "librcpputils.so",
+          "path": "/opt/ros/humble/lib/librcpputils.so",
+          "sha256": "92f1083af887460e44783905f31045ed4feacaedb9ab9d6b845044ecce797a7f"
+        },
+        {
+          "needed": "librcutils.so",
+          "path": "/opt/ros/humble/lib/librcutils.so",
+          "sha256": "7f204739601728084595837ddd9c728b2cdf2709453145f97644d31e94e8d595"
+        },
+        {
+          "needed": "librmw.so",
+          "path": "/opt/ros/humble/lib/librmw.so",
+          "sha256": "6301cef6523967fa4d04e10504ed688caaecabf085e1045f75f2676415cc06c6"
+        },
+        {
+          "needed": "librmw_implementation.so",
+          "path": "/opt/ros/humble/lib/librmw_implementation.so",
+          "sha256": "0ded14f25759e7bb5a389c1e04f006c833e98e2f28704f27a8301eb7ec7212b2"
+        },
+        {
+          "needed": "librosgraph_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/librosgraph_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "4e4990e900d0debbbe9f8a51a9473062cc604e333d751a0d54f38f25bded05e6"
+        },
+        {
+          "needed": "librosidl_runtime_c.so",
+          "path": "/opt/ros/humble/lib/librosidl_runtime_c.so",
+          "sha256": "2dd9b20363ff871ec3b8dec54f81ba47072dc7c30597e8f500fd86b702d735b3"
+        },
+        {
+          "needed": "librosidl_typesupport_c.so",
+          "path": "/opt/ros/humble/lib/librosidl_typesupport_c.so",
+          "sha256": "77bf79cce29d27c0771f1d21122f868dd2b782bf7f6e00d2b0a883c80dae95d0"
+        },
+        {
+          "needed": "librosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/librosidl_typesupport_cpp.so",
+          "sha256": "2e874108f801d810853258f8b6b45927338cddc86ccf5868a4afe5362953e33c"
+        },
+        {
+          "needed": "libsensor_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libsensor_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "6e59ac218c1fecd5284d957cc82d1e9f4f4c508e949264a3524020993d6e646f"
+        },
+        {
+          "needed": "libsensors_lib.so",
+          "path": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/lib/libsensors_lib.so",
+          "sha256": "3f22bedcd1a83dd838085604eede4eb3b0e6458fec9848b28bec6cfa8908328f"
+        },
+        {
+          "needed": "libspdlog.so.1",
+          "path": "/usr/lib/x86_64-linux-gnu/libspdlog.so.1.9.2",
+          "sha256": "1de96ba8296808433bf3ad601f2410c179a3e422a05ad012b49e4ad364f72bc0"
+        },
+        {
+          "needed": "libstatistics_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libstatistics_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "7310ba40d5e8a3af61dd0482651818d01062cc9b2429302a21cba0cc752c6f95"
+        },
+        {
+          "needed": "libstd_srvs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libstd_srvs__rosidl_typesupport_cpp.so",
+          "sha256": "afdda9e5cc81e569149b94d71be9ad860700b9873c98192f089b5ed00220f93f"
+        },
+        {
+          "needed": "libstdc++.so.6",
+          "path": "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30",
+          "sha256": "ff0825e113603c3866680d5d52216bc6d8eedf3a59f52a0aef67ff01994db128"
+        },
+        {
+          "needed": "libtf2.so",
+          "path": "/opt/ros/humble/lib/libtf2.so",
+          "sha256": "ab97a943f3c12148b03724ff4d48533082f6780ce84f5022efab7970149c391e"
+        },
+        {
+          "needed": "libtf2_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libtf2_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "485ffe16aa53c99d86ccebd181b69ef2f6cd2a23f4d9090aae272d6189494a7e"
+        },
+        {
+          "needed": "libtf2_ros.so",
+          "path": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros/lib/libtf2_ros.so",
+          "sha256": "9a1c7dde466c2f4db81a2e8a016e75808894d6bff3735ade3048df4b086c9760"
+        },
+        {
+          "needed": "libtinyxml2.so.9",
+          "path": "/usr/lib/x86_64-linux-gnu/libtinyxml2.so.9.0.0",
+          "sha256": "05059e5dd45e4f6bde1c827e20c7b229e659e5d7b523677afaf565db65d9badf"
+        },
+        {
+          "needed": "libtracetools.so",
+          "path": "/opt/ros/humble/lib/libtracetools.so",
+          "sha256": "1bf5e82bedef882ea90fc4d2e9b72fb3ca9421734d3f3462e3b7936982d67851"
+        },
+        {
+          "needed": "libuuid.so.1",
+          "path": "/usr/lib/x86_64-linux-gnu/libuuid.so.1.3.0",
+          "sha256": "4472cf91dbc01395761fb45d0f4b25f6241406fe54cbf540c13755a3706a7b17"
+        },
+        {
+          "needed": "libyaml.so",
+          "path": "/opt/ros/humble/lib/libyaml.so",
+          "sha256": "627ead721f568545018a0608ae514937255dc0304c8dec4bd1b98914102d6f5c"
+        }
+      ]
+    },
+    "lifecycle_manager": {
+      "executable": "/opt/ros/humble/lib/nav2_lifecycle_manager/lifecycle_manager",
+      "executable_sha256": "9a921df9e17825d0c2214356e6f7fc3e3d468bdaf77a0bb862741aa449f60a4c",
+      "package": "nav2_lifecycle_manager",
+      "runtime_dependencies": [
+        {
+          "needed": "ld-linux-x86-64.so.2",
+          "path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+          "sha256": "41daf7836f7fce21a40ca63a00c5caf21b05a35a76ccc075d86f1716212cdf01"
+        },
+        {
+          "needed": "libaction_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libaction_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "fc8ab99472cfa75792fe88f364fa99c10132e6cc27bc5fdbbbe8896c5839b37b"
+        },
+        {
+          "needed": "libament_index_cpp.so",
+          "path": "/opt/ros/humble/lib/libament_index_cpp.so",
+          "sha256": "512d31ee3ace65980c2daefbf529289179b8324da00b5c3d89dc3e93998d95bf"
+        },
+        {
+          "needed": "libbond__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libbond__rosidl_typesupport_cpp.so",
+          "sha256": "0cd05e75894e339a1789bd258fea676ed68ec99056c044287bc3991a68bf589d"
+        },
+        {
+          "needed": "libbondcpp.so",
+          "path": "/opt/ros/humble/lib/libbondcpp.so",
+          "sha256": "91bab61d91c2e8f9976c665d1f33c64344137943bf556cc71cd1a91bb8b0f1a3"
+        },
+        {
+          "needed": "libbuiltin_interfaces__rosidl_generator_c.so",
+          "path": "/opt/ros/humble/lib/libbuiltin_interfaces__rosidl_generator_c.so",
+          "sha256": "306fa173a0dc60c785f36d378accebe9d7eac045aeb2f17950bab28947ae9e2e"
+        },
+        {
+          "needed": "libc.so.6",
+          "path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+          "sha256": "b2cf6c33b74d2f22543b7a469a75b538911e690f769d0b238843a49465b83793"
+        },
+        {
+          "needed": "libclass_loader.so",
+          "path": "/opt/ros/humble/lib/libclass_loader.so",
+          "sha256": "b20b38113e6136041e4b90dc3df523bd451e1e73d22fdec3724fcc88c68d8773"
+        },
+        {
+          "needed": "libconsole_bridge.so.1.0",
+          "path": "/usr/lib/x86_64-linux-gnu/libconsole_bridge.so.1.0",
+          "sha256": "e5c857beaaa32a74078a1192b37fba8e299fee1e893f2091f29ca246018517a7"
+        },
+        {
+          "needed": "libdiagnostic_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libdiagnostic_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "e99eade35955f803eee34b075ab175afaf47015e4e3dd36f2b3ffbecb67bbecc"
+        },
+        {
+          "needed": "libfmt.so.8",
+          "path": "/usr/lib/x86_64-linux-gnu/libfmt.so.8.1.1",
+          "sha256": "d463bedd51d449b2346d329fad8080e0900120ad0aeab8bf93e325b6cff4a587"
+        },
+        {
+          "needed": "libgcc_s.so.1",
+          "path": "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+          "sha256": "fc9d43b2f6c20e53b009238f767c5b949d202389e20de9e202ea684b4ba3729a"
+        },
+        {
+          "needed": "liblibstatistics_collector.so",
+          "path": "/opt/ros/humble/lib/liblibstatistics_collector.so",
+          "sha256": "462a23a53cc6404d3e6a57988cb222d3e798897dcade56b09fd74cc44620616d"
+        },
+        {
+          "needed": "liblifecycle_msgs__rosidl_generator_c.so",
+          "path": "/opt/ros/humble/lib/liblifecycle_msgs__rosidl_generator_c.so",
+          "sha256": "fbdd283804f185d7258af073405dfa91aeefcc74335c84278a3ea391058a9ea3"
+        },
+        {
+          "needed": "liblifecycle_msgs__rosidl_typesupport_c.so",
+          "path": "/opt/ros/humble/lib/liblifecycle_msgs__rosidl_typesupport_c.so",
+          "sha256": "b72309cc33b0d4ee3297a4df7d42f06acaa983a90ed4d531da6c94f12307f9c3"
+        },
+        {
+          "needed": "liblifecycle_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/liblifecycle_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "31d85597b038579f26a1067afc643fe8cb6f32d7db49ab559099478828378877"
+        },
+        {
+          "needed": "libm.so.6",
+          "path": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+          "sha256": "3dd5511ae94785c9f921429b0f2b2f7aabb461b6f0e6de6dfdbef15f24bdfee6"
+        },
+        {
+          "needed": "libnav2_lifecycle_manager_core.so",
+          "path": "/opt/ros/humble/lib/libnav2_lifecycle_manager_core.so",
+          "sha256": "0b4fe3e79bfe7c5371cd3c705fdbd9175d382be0aece6c8d98a1d8a670e8e073"
+        },
+        {
+          "needed": "libnav2_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libnav2_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "0b8f72d4ab0756055de03eb10b5767a3393fa2ed739b61a9b6707de598f13c1e"
+        },
+        {
+          "needed": "libnav2_util_core.so",
+          "path": "/opt/ros/humble/lib/libnav2_util_core.so",
+          "sha256": "683fa7d2f96859f6d7c881d8d0350d5decbc5226802bc32cded53d501ca2867d"
+        },
+        {
+          "needed": "libnav_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libnav_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "542089daef776e6f95a357099f6c52a3dbdd74f3bdb03464efd3ae598fa393d4"
+        },
+        {
+          "needed": "liborocos-kdl.so.1.5",
+          "path": "/usr/lib/x86_64-linux-gnu/liborocos-kdl.so.1.5.1",
+          "sha256": "0b042c1cdd7c34bf2ba5ac600ce7353dd47f8e98b5cd881a178a5f3b1d04a745"
+        },
+        {
+          "needed": "librcl.so",
+          "path": "/opt/ros/humble/lib/librcl.so",
+          "sha256": "ef5a6dfdf39d5dd0e3d80eb4c43eb230a8be57ca12406b42977fe6c564582ade"
+        },
+        {
+          "needed": "librcl_interfaces__rosidl_generator_c.so",
+          "path": "/opt/ros/humble/lib/librcl_interfaces__rosidl_generator_c.so",
+          "sha256": "55812d4f9133861a56e4e068385a979ea09f8520880ca84e4241b1f4b0e25fb5"
+        },
+        {
+          "needed": "librcl_interfaces__rosidl_typesupport_c.so",
+          "path": "/opt/ros/humble/lib/librcl_interfaces__rosidl_typesupport_c.so",
+          "sha256": "1899b64c701d020e09ea062b3dc0f295e2341c2eecb8fc097a0efac93354c800"
+        },
+        {
+          "needed": "librcl_interfaces__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/librcl_interfaces__rosidl_typesupport_cpp.so",
+          "sha256": "d9818bd7b5bdd2a2bb0a3feca004bfcada12f40ea488def8717cf763e9affca1"
+        },
+        {
+          "needed": "librcl_lifecycle.so",
+          "path": "/opt/ros/humble/lib/librcl_lifecycle.so",
+          "sha256": "556240df62c063d9a246da15c34adc8812976de95e1f0f09485504fb4c2e6aff"
+        },
+        {
+          "needed": "librcl_logging_interface.so",
+          "path": "/opt/ros/humble/lib/librcl_logging_interface.so",
+          "sha256": "39ef13b9d92727835d9d37434be461868c80173970abe8000966a625d267de20"
+        },
+        {
+          "needed": "librcl_logging_spdlog.so",
+          "path": "/opt/ros/humble/lib/librcl_logging_spdlog.so",
+          "sha256": "054cb1535d4e3f6847f2085577cf473f5e803b48c968340d4b1992497b047ec2"
+        },
+        {
+          "needed": "librcl_yaml_param_parser.so",
+          "path": "/opt/ros/humble/lib/librcl_yaml_param_parser.so",
+          "sha256": "d4f121bb50e30372236df66ed3dd5147ddc18e2c4f4687c85db7c85891583778"
+        },
+        {
+          "needed": "librclcpp.so",
+          "path": "/opt/ros/humble/lib/librclcpp.so",
+          "sha256": "20640a059215a771eb2d3ededa04ba99a13b39256711b2cfae853777ac35b5ac"
+        },
+        {
+          "needed": "librclcpp_lifecycle.so",
+          "path": "/opt/ros/humble/lib/librclcpp_lifecycle.so",
+          "sha256": "ce066bcbd5351ce610a22903f1806c207bc4bbb31ea7589c5f03f396a5dcc08b"
+        },
+        {
+          "needed": "librcpputils.so",
+          "path": "/opt/ros/humble/lib/librcpputils.so",
+          "sha256": "92f1083af887460e44783905f31045ed4feacaedb9ab9d6b845044ecce797a7f"
+        },
+        {
+          "needed": "librcutils.so",
+          "path": "/opt/ros/humble/lib/librcutils.so",
+          "sha256": "7f204739601728084595837ddd9c728b2cdf2709453145f97644d31e94e8d595"
+        },
+        {
+          "needed": "librmw.so",
+          "path": "/opt/ros/humble/lib/librmw.so",
+          "sha256": "6301cef6523967fa4d04e10504ed688caaecabf085e1045f75f2676415cc06c6"
+        },
+        {
+          "needed": "librmw_implementation.so",
+          "path": "/opt/ros/humble/lib/librmw_implementation.so",
+          "sha256": "0ded14f25759e7bb5a389c1e04f006c833e98e2f28704f27a8301eb7ec7212b2"
+        },
+        {
+          "needed": "librosgraph_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/librosgraph_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "4e4990e900d0debbbe9f8a51a9473062cc604e333d751a0d54f38f25bded05e6"
+        },
+        {
+          "needed": "librosidl_runtime_c.so",
+          "path": "/opt/ros/humble/lib/librosidl_runtime_c.so",
+          "sha256": "2dd9b20363ff871ec3b8dec54f81ba47072dc7c30597e8f500fd86b702d735b3"
+        },
+        {
+          "needed": "librosidl_typesupport_c.so",
+          "path": "/opt/ros/humble/lib/librosidl_typesupport_c.so",
+          "sha256": "77bf79cce29d27c0771f1d21122f868dd2b782bf7f6e00d2b0a883c80dae95d0"
+        },
+        {
+          "needed": "librosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/librosidl_typesupport_cpp.so",
+          "sha256": "2e874108f801d810853258f8b6b45927338cddc86ccf5868a4afe5362953e33c"
+        },
+        {
+          "needed": "libspdlog.so.1",
+          "path": "/usr/lib/x86_64-linux-gnu/libspdlog.so.1.9.2",
+          "sha256": "1de96ba8296808433bf3ad601f2410c179a3e422a05ad012b49e4ad364f72bc0"
+        },
+        {
+          "needed": "libstatistics_msgs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libstatistics_msgs__rosidl_typesupport_cpp.so",
+          "sha256": "7310ba40d5e8a3af61dd0482651818d01062cc9b2429302a21cba0cc752c6f95"
+        },
+        {
+          "needed": "libstd_srvs__rosidl_typesupport_cpp.so",
+          "path": "/opt/ros/humble/lib/libstd_srvs__rosidl_typesupport_cpp.so",
+          "sha256": "afdda9e5cc81e569149b94d71be9ad860700b9873c98192f089b5ed00220f93f"
+        },
+        {
+          "needed": "libstdc++.so.6",
+          "path": "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30",
+          "sha256": "ff0825e113603c3866680d5d52216bc6d8eedf3a59f52a0aef67ff01994db128"
+        },
+        {
+          "needed": "libtf2.so",
+          "path": "/opt/ros/humble/lib/libtf2.so",
+          "sha256": "ab97a943f3c12148b03724ff4d48533082f6780ce84f5022efab7970149c391e"
+        },
+        {
+          "needed": "libtracetools.so",
+          "path": "/opt/ros/humble/lib/libtracetools.so",
+          "sha256": "1bf5e82bedef882ea90fc4d2e9b72fb3ca9421734d3f3462e3b7936982d67851"
+        },
+        {
+          "needed": "libuuid.so.1",
+          "path": "/usr/lib/x86_64-linux-gnu/libuuid.so.1.3.0",
+          "sha256": "4472cf91dbc01395761fb45d0f4b25f6241406fe54cbf540c13755a3706a7b17"
+        },
+        {
+          "needed": "libyaml.so",
+          "path": "/opt/ros/humble/lib/libyaml.so",
+          "sha256": "627ead721f568545018a0608ae514937255dc0304c8dec4bd1b98914102d6f5c"
+        }
+      ]
+    }
+  },
+  "package_prefixes": {
+    "nav2_amcl": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl",
+    "nav2_lifecycle_manager": "/opt/ros/humble",
+    "tf2_ros": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros"
+  },
+  "packages": {
+    "nav2_amcl": {
+      "build_receipt": {
+        "artifacts_path": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/step3-2-f-20261011/safe-build-evidence/20261030T173612-115023-amcl-node-diagnostics/artifacts.json",
+        "commands_path": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/step3-2-f-20261011/safe-build-evidence/20261030T173612-115023-amcl-node-diagnostics/commands.jsonl",
+        "files": [
+          {
+            "path": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/step3-2-f-20261011/safe-build-evidence/20261030T173612-115023-amcl-node-diagnostics/result.json",
+            "sha256": "5dd15e6ead3fc58bf1ad1db580cb501a4adbf0db25b07a2d3fc7d1fe77f42922"
+          },
+          {
+            "path": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/step3-2-f-20261011/safe-build-evidence/20261030T173612-115023-amcl-node-diagnostics/commands.jsonl",
+            "sha256": "9d0eecd98cc7a160bcd216c230936d1de01f67fe79fccb9f3b52731d88a7ac73"
+          },
+          {
+            "path": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/step3-2-f-20261011/safe-build-evidence/20261030T173612-115023-amcl-node-diagnostics/artifacts.json",
+            "sha256": "c83c7e9e50171cc75771f857e2bb1bcfadc4f13dcf2da3cdddf65e4d196e3af4"
+          }
+        ],
+        "result_path": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/step3-2-f-20261011/safe-build-evidence/20261030T173612-115023-amcl-node-diagnostics/result.json",
+        "target": "amcl-node-diagnostics"
+      },
+      "executables": [
+        {
+          "path": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/lib/nav2_amcl/amcl",
+          "sha256": "ca36c197d9fbf82dead1a1e6ec0f657b8d5681adada8978b790cad5341c886e1"
+        }
+      ],
+      "installed_files": {
+        "include/nav2_amcl/amcl_node.hpp": "6a6afc124ba098c78805b593f1d01a43346dc6a4647784fbce4a409f5c1c8a28",
+        "include/nav2_amcl/angleutils.hpp": "e84153118322e9531fb92a9eeb5f47189af7f86af8854bce855da66b106d64df",
+        "include/nav2_amcl/map/map.hpp": "5aa7632d3705cd937e3a353c21a0aa4231ed44587affcdae88963ab2e37e709b",
+        "include/nav2_amcl/motion_model/differential_motion_model.hpp": "d94f2db89932252f90d0379870cfb2109d64392b891102fb8d9be6aeb9966bde",
+        "include/nav2_amcl/motion_model/motion_model.hpp": "59060ff2e3603093814408e3f0bcbbd92b2e256f0a23f791e6f0b19e23067b10",
+        "include/nav2_amcl/motion_model/omni_motion_model.hpp": "2c701a2d14198df3cde2cd4f164815a6188d10de8cab8e59ff09c0374362553d",
+        "include/nav2_amcl/pf/eig3.hpp": "ded0cd9eb84c4cec085212b32ff16181ddb5fc2dc7bbd217c254747c354a55cb",
+        "include/nav2_amcl/pf/pf.hpp": "e3a5f7c84e1ae290faa56ff386ffc151c5c071d52421279bebdec34f1296659a",
+        "include/nav2_amcl/pf/pf_kdtree.hpp": "2cd9157e9570afe56522f1565757d40df813db39f8fb548c5175a3795c624fbd",
+        "include/nav2_amcl/pf/pf_pdf.hpp": "228e4a9bb6fe5ba3bd59879106110bc3721fdec3cab6a5f0e2776f60cb80542c",
+        "include/nav2_amcl/pf/pf_vector.hpp": "1cafc26520ff368848614d6291094c55d83be9f7832516a23cea25d1cd45539f",
+        "include/nav2_amcl/portable_utils.hpp": "7d23316bedb70d9e49a2780b5937fccf312497c92e1c854f39018abb29c1f2d0",
+        "include/nav2_amcl/sensors/laser/laser.hpp": "602056f75249a084d3e0f26040114e74351bbacfdc2bcfb424339663be07a0db",
+        "lib/libamcl_core.so": "b52172fc6b47573fa4922de15e1b7b70a3936432c228b7d8aacfae6f1fa800de",
+        "lib/libmap_lib.so": "0307bc9afa927f68df052e7e5d25526ccd447705d672bcca37581d03a7d28950",
+        "lib/libmotions_lib.so": "94caf55a10451c7133390213ac3e7d77d71266ad0e8f7f54ed47c82d4b298819",
+        "lib/libpf_lib.so": "ea5ccbc345dac85850d823c298106a40bb22c2c638ab1cc55cea5c0836caa201",
+        "lib/libsensors_lib.so": "3f22bedcd1a83dd838085604eede4eb3b0e6458fec9848b28bec6cfa8908328f",
+        "lib/nav2_amcl/amcl": "ca36c197d9fbf82dead1a1e6ec0f657b8d5681adada8978b790cad5341c886e1",
+        "lib/nav2_amcl/scan_tf_wait_regression": "927b120aecf0665b28fe898ff7058f3268bb4243521f58f24f1cc43f22ac0118",
+        "share/ament_index/resource_index/nav2_amcl__pluginlib__plugin/nav2_amcl": "cdd2b3c3d090d4937d417c1c584c22432f7ff38046bb0f4efeed41bb00552fbc",
+        "share/ament_index/resource_index/package_run_dependencies/nav2_amcl": "c9bc7ef51091be2a304a582923b2010c610e66ed9967554ba629c2a10dfdc0bf",
+        "share/ament_index/resource_index/packages/nav2_amcl": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "share/ament_index/resource_index/parent_prefix_path/nav2_amcl": "92121d7a341ff90dacbcc89865fe2b539bae3d366f0331ac5964b765c05643c9",
+        "share/ament_index/resource_index/rclcpp_components/nav2_amcl": "85c0448a429bcd23b4d28ada367ac677bf2c852a4c66c9fbc0d0b80a6ae23b8c",
+        "share/colcon-core/packages/nav2_amcl": "7c7499010a672632484e6e0cb108e04160c51bf957f9021ca55ded7cab6fa204",
+        "share/nav2_amcl/DIAGNOSTIC_SOURCE_MANIFEST.json": "e24228410c85232c2dcbda3803b66f13a194c90215d759289f1568a2b21b5229",
+        "share/nav2_amcl/cmake/ament_cmake_export_dependencies-extras.cmake": "ba9ad077139a2b1938e92eba22f016e2776ace242b05d07fe1dbd58e5f438155",
+        "share/nav2_amcl/cmake/ament_cmake_export_include_directories-extras.cmake": "3b2d747dbc90bb7561dc2f0f9608fbe1558d755f25634288da23fede20c14461",
+        "share/nav2_amcl/cmake/ament_cmake_export_libraries-extras.cmake": "01140c61dfbd0942ee733260a15678063ddd805825ab16466e111b3d43b81487",
+        "share/nav2_amcl/cmake/nav2_amclConfig-version.cmake": "c76257905278a5cf8da9476907b995256741f07c6c71c74ff97f3e5d341bb82c",
+        "share/nav2_amcl/cmake/nav2_amclConfig.cmake": "c8fa493ab16cb8a343bae4398b137ffdd952bfd961aa3ddcfec2c2ff13a9f8be",
+        "share/nav2_amcl/environment/ament_prefix_path.dsv": "c4797d0a0670c70b4d3bcb5b7d47563635c7950595603f3af66f70af546ad57e",
+        "share/nav2_amcl/environment/ament_prefix_path.sh": "6658f14efe913e291c0bf2c74059a9e14fb8abdb5a31628bef61d3b41e206679",
+        "share/nav2_amcl/environment/library_path.dsv": "038195297fbe5e22d78680bf0f2b1b182fea46aaececf77d84daadad1fdfa665",
+        "share/nav2_amcl/environment/library_path.sh": "9f85b113cb295c5c431b91985839eb7838a7e3c4416552f7b29bb6530fd2166e",
+        "share/nav2_amcl/environment/path.dsv": "3f2cdf6234ea2525c1670c140b6a03700d98a2408e7a232107791fa96c08b58b",
+        "share/nav2_amcl/environment/path.sh": "abe10a0452bc4b93f665fc343a7e6d32fe3f3a2b6beb90d338044a71d2583f18",
+        "share/nav2_amcl/hook/cmake_prefix_path.dsv": "7ab2eb0a25c282f9a5bf62596b4c098865cd3a8aa5740601a9efa8620acd69d3",
+        "share/nav2_amcl/hook/cmake_prefix_path.ps1": "0c7394c1d89765deec81cb10e59a36d0d98867690b4b8781d5bc9186fc67885a",
+        "share/nav2_amcl/hook/cmake_prefix_path.sh": "ee9849def404b669097010f38735aa521e0731366a319b6e1abe996c793494b2",
+        "share/nav2_amcl/hook/ld_library_path_lib.dsv": "038195297fbe5e22d78680bf0f2b1b182fea46aaececf77d84daadad1fdfa665",
+        "share/nav2_amcl/hook/ld_library_path_lib.ps1": "c6e5dc5fc7ca92a59dec3b4107c761602c03e4ca0b4211ec2634efc3b43ef84e",
+        "share/nav2_amcl/hook/ld_library_path_lib.sh": "535fe00314bc8acdb36d1057e32d60c215005141a8c30a99bf665a29fed4e222",
+        "share/nav2_amcl/local_setup.bash": "41b30b6c107da94a2478e43953b8cbd0d920f5e8fc1ea847c61a213623d623b0",
+        "share/nav2_amcl/local_setup.dsv": "787f4d5e62e1e7025ddf408ecae60d8d2a7ae2dc74a8fa08dd932090c4452265",
+        "share/nav2_amcl/local_setup.sh": "118bc4ef375bde1eea729c2bd12d1c47e96b127bb3e4582a359e4f6aa30cffd1",
+        "share/nav2_amcl/local_setup.zsh": "56942873096201f4e7fe5e7b9bd87e56cc42ced33fadb53fbc25766fd9149c81",
+        "share/nav2_amcl/package.bash": "d7084c2579cedecc790e59fd6d197d031c84256d1f2fcddd424474abc41c2f2b",
+        "share/nav2_amcl/package.dsv": "38937e19a3025577e565f123afeacab4819e6ba145c76b45a26d6f7d219f6146",
+        "share/nav2_amcl/package.ps1": "2e7bf341d36a6829855a087e5c4634bd37c13a3e275d760e27dba50d4f42da08",
+        "share/nav2_amcl/package.sh": "3bdb5bf485fc4693b56d979fa06742ec3f2ec143334afaa4d2dad18aea328000",
+        "share/nav2_amcl/package.xml": "f8caaeb2a64e272f68b1f2e87da60598ab761a2a07ef4910fe025229af53039c",
+        "share/nav2_amcl/package.zsh": "354a56972713389bbdc8c18e2972ce0f0b881b467cc6069d113dfb2266daa5c5",
+        "share/nav2_amcl/plugins.xml": "39aa809b85e0b45d86bf08ee51000182be1972f98bc6e75293a8ec08a3c27258"
+      },
+      "libraries": {
+        "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/lib/libamcl_core.so": "b52172fc6b47573fa4922de15e1b7b70a3936432c228b7d8aacfae6f1fa800de",
+        "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/lib/libmap_lib.so": "0307bc9afa927f68df052e7e5d25526ccd447705d672bcca37581d03a7d28950",
+        "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/lib/libmotions_lib.so": "94caf55a10451c7133390213ac3e7d77d71266ad0e8f7f54ed47c82d4b298819",
+        "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/lib/libpf_lib.so": "ea5ccbc345dac85850d823c298106a40bb22c2c638ab1cc55cea5c0836caa201",
+        "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/lib/libsensors_lib.so": "3f22bedcd1a83dd838085604eede4eb3b0e6458fec9848b28bec6cfa8908328f"
+      },
+      "package_xml": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/share/nav2_amcl/package.xml",
+      "package_xml_sha256": "f8caaeb2a64e272f68b1f2e87da60598ab761a2a07ef4910fe025229af53039c",
+      "prefix": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl",
+      "primary_library": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/lib/libamcl_core.so",
+      "release_provenance": {
+        "archive_sha256": "edcf7de833acd052f6cf4ae3cb702459437be5886f9b2fc3fb169587c0f1e38a",
+        "evidence_path": "/home/d1zzy/code/cleannav_modularization/cleannav-deliverables/amcl-scan-tf-wait-fix-20261030/SOURCE_PROVENANCE.json",
+        "evidence_sha256": "9f48641e765ba47d70e4d0f03805f473544010eb20cc96d214a3335c8d35bf4c",
+        "release_tag": "release/humble/nav2_amcl/1.1.20-1",
+        "url": "https://codeload.github.com/ros2-gbp/navigation2-release/tar.gz/refs/tags/release/humble/nav2_amcl/1.1.20-1"
+      },
+      "source_manifest": {
+        "path": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/nav2_amcl/share/nav2_amcl/DIAGNOSTIC_SOURCE_MANIFEST.json",
+        "sha256": "e24228410c85232c2dcbda3803b66f13a194c90215d759289f1568a2b21b5229"
+      },
+      "source_manifest_source_path": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/amcl-scan-tf-wait-fix-20261030/src/nav2_amcl/DIAGNOSTIC_SOURCE_MANIFEST.json",
+      "source_root": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/amcl-scan-tf-wait-fix-20261030/src/nav2_amcl",
+      "version": "1.1.20"
+    },
+    "tf2_ros": {
+      "build_receipt": {
+        "artifacts_path": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/step3-2-f-20261011/safe-build-evidence/20261030T142243-73146-amcl-tf2-diagnostics/artifacts.json",
+        "commands_path": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/step3-2-f-20261011/safe-build-evidence/20261030T142243-73146-amcl-tf2-diagnostics/commands.jsonl",
+        "files": [
+          {
+            "path": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/step3-2-f-20261011/safe-build-evidence/20261030T142243-73146-amcl-tf2-diagnostics/result.json",
+            "sha256": "ec4b7b892965a24f003395ae2b42a41c5120f7c6bce51e211a904207d5b5acb3"
+          },
+          {
+            "path": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/step3-2-f-20261011/safe-build-evidence/20261030T142243-73146-amcl-tf2-diagnostics/commands.jsonl",
+            "sha256": "f790eead5e5e05aa5cbc156c5cee278afc57dbdddc3d588a4bded703293559e8"
+          },
+          {
+            "path": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/step3-2-f-20261011/safe-build-evidence/20261030T142243-73146-amcl-tf2-diagnostics/artifacts.json",
+            "sha256": "d7defcac272dde6b6ace5e8caf5181ee10f8b6fb05dee86ffcd411b87708c929"
+          }
+        ],
+        "result_path": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/step3-2-f-20261011/safe-build-evidence/20261030T142243-73146-amcl-tf2-diagnostics/result.json",
+        "target": "amcl-tf2-diagnostics"
+      },
+      "executables": [
+        {
+          "path": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros/lib/tf2_ros/buffer_server",
+          "sha256": "ca7b474f2e2ddd2203adc9d3cf13e22e4b87d5d920df100e69450202fd42ffec"
+        },
+        {
+          "path": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros/lib/tf2_ros/tf2_monitor",
+          "sha256": "bc9a3d803dc02ea97d9807501c4ab1407d200a5ed9952f9c92480dc9fa3467bf"
+        },
+        {
+          "path": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros/lib/tf2_ros/tf2_echo",
+          "sha256": "b34aba1da1df6475cfde4af98a63d31b77747bfbb466f975cc0b04010b44564c"
+        },
+        {
+          "path": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros/lib/tf2_ros/private_buffer_test",
+          "sha256": "f30defb8ad61fdedf8a933c823b623f46ca8bb8bdc81d9c45940b66b70f1aa3b"
+        },
+        {
+          "path": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros/lib/tf2_ros/static_transform_publisher",
+          "sha256": "ed2317a890bceb6c77ffb23acc7427c37243d11948ec30a9457dd0ac08f9348a"
+        }
+      ],
+      "installed_files": {
+        "include/tf2_ros/tf2_ros/async_buffer_interface.h": "6f35000f278531ab4899ee9e674991427812d5c2b02ab642697c4ec4a8ab5803",
+        "include/tf2_ros/tf2_ros/async_buffer_interface.hpp": "359eb35fc43cbd3c12661381bae5be1d94d1fee8904e9028c0ee16a5df189964",
+        "include/tf2_ros/tf2_ros/buffer.h": "787a70fe108340e2cbfc78764b0cba8a9bee29e41b5901a01d290916fca46137",
+        "include/tf2_ros/tf2_ros/buffer.hpp": "9c53d4deb703399d1561a11852b7de992250e0fa4640f69c749ed96004fa0ebd",
+        "include/tf2_ros/tf2_ros/buffer_client.h": "8f2d9ef8f5908a76e93c03fab19c567707462a60e117338acfb8903749a764ad",
+        "include/tf2_ros/tf2_ros/buffer_client.hpp": "df78e70ad99bea3f64ce38245e826891af1ebfd7d44d9503adb4beaeb7cf1af6",
+        "include/tf2_ros/tf2_ros/buffer_interface.h": "6ba04c2aecd85ba4f9a14a5f1133154d6c3a29a4859a684c742326003d680b2a",
+        "include/tf2_ros/tf2_ros/buffer_interface.hpp": "bb5f2ecb7b5fafbe2838f2fa66ef74e210ac6ce64a3f63eabaea5f61c4af7de0",
+        "include/tf2_ros/tf2_ros/buffer_server.h": "c03b4c9b22a464e45d5a0e86971752dac4bd5850e5d359689ed413e6e8857bfe",
+        "include/tf2_ros/tf2_ros/buffer_server.hpp": "4595da19185ed40cbd90bdb826b72c5897c5a111c5e252f22ec0e22315377d92",
+        "include/tf2_ros/tf2_ros/create_timer_interface.h": "f147db91e0e58ad3cfa4117cf580c5fc71ee7b5fd0957df869b35b9037683d7e",
+        "include/tf2_ros/tf2_ros/create_timer_interface.hpp": "a7f9b12404a12cf8c5673c867e6986457f59a28c629a99ccf3babfc251f7d69e",
+        "include/tf2_ros/tf2_ros/create_timer_ros.h": "04a50538ef565fa5d66ba86cbee5b7c7bf073df6afad46a99cd49c53e4704700",
+        "include/tf2_ros/tf2_ros/create_timer_ros.hpp": "ba1a38ba84bd657efc3c6e26b4073493744f0f20c6a4d710ca5586eba281809b",
+        "include/tf2_ros/tf2_ros/message_filter.h": "119be6e3c4e657ff7a88e9547d86c5634e89748da1e8786f88f657aa0f28c77a",
+        "include/tf2_ros/tf2_ros/message_filter.hpp": "3662a0674620388a8fa3e199efcc3e49de95fab31a183f9a938f3c6bba7bea72",
+        "include/tf2_ros/tf2_ros/private_buffer_diagnostics.hpp": "0644e1a3a426b8b1a7f8830458141f3922c2d15fd43c7a97afc23f286e37b285",
+        "include/tf2_ros/tf2_ros/qos.hpp": "63d82fd364978a24aabc4993ec0f13fcea1df2ebc97bed990bbde6cee7d378e1",
+        "include/tf2_ros/tf2_ros/static_transform_broadcaster.h": "f43cb8b69ab4a790f89a5d7577ae9663f6bc0e5d35345039ef75e67a731533b7",
+        "include/tf2_ros/tf2_ros/static_transform_broadcaster.hpp": "987d69a86edc308fad61cddf8c154f4e0f7e4b0154f321de90b5d3172b4bd956",
+        "include/tf2_ros/tf2_ros/static_transform_broadcaster_node.hpp": "38d498803642b89ea53a5a9f728330e0366e8310c449e08cd6d1211b520fa7b4",
+        "include/tf2_ros/tf2_ros/static_transform_broadcaster_visibility_control.h": "a0ff3a7048bfeb42758887185ae2fd011b648a8505f5961a7adffeb101eca379",
+        "include/tf2_ros/tf2_ros/static_transform_broadcaster_visibility_control.hpp": "69daf6892263f83169fed1b3bd4c6bcf9656e1288f721186b938f695d3d75886",
+        "include/tf2_ros/tf2_ros/transform_broadcaster.h": "51e32bfd56bf0c0ac59f695012f0a9567cec8d8b563e0f1165b4b5ff05f76339",
+        "include/tf2_ros/tf2_ros/transform_broadcaster.hpp": "f82a8c60aafa061b03d1d6a2a4350131f07783500aaac60edfa0d2964375bd49",
+        "include/tf2_ros/tf2_ros/transform_listener.h": "1267276c533d58743e1aa787986d26832956d029ffe305831e9b5e46957a1c69",
+        "include/tf2_ros/tf2_ros/transform_listener.hpp": "ffcb5c2eccaada48e18267f8d4c86d6866561b98911d180817fffc3edfaebaa0",
+        "include/tf2_ros/tf2_ros/visibility_control.h": "e7861b326daa61daacbf68ea81725c5ad7f13cfb9390d7e2eac87b4e024abf26",
+        "include/tf2_ros/tf2_ros/visibility_control.hpp": "79574533cdbdf74d595e8f3843dc97688d25e1edf4e60f5d6d6a20e42f4827f7",
+        "lib/libstatic_transform_broadcaster_node.so": "464de0f3661a97225e26c71dc37f04a69e038f3e544dc163d5e3a381e111108f",
+        "lib/libtf2_ros.so": "9a1c7dde466c2f4db81a2e8a016e75808894d6bff3735ade3048df4b086c9760",
+        "lib/tf2_ros/buffer_server": "ca7b474f2e2ddd2203adc9d3cf13e22e4b87d5d920df100e69450202fd42ffec",
+        "lib/tf2_ros/private_buffer_test": "f30defb8ad61fdedf8a933c823b623f46ca8bb8bdc81d9c45940b66b70f1aa3b",
+        "lib/tf2_ros/static_transform_publisher": "ed2317a890bceb6c77ffb23acc7427c37243d11948ec30a9457dd0ac08f9348a",
+        "lib/tf2_ros/tf2_echo": "b34aba1da1df6475cfde4af98a63d31b77747bfbb466f975cc0b04010b44564c",
+        "lib/tf2_ros/tf2_monitor": "bc9a3d803dc02ea97d9807501c4ab1407d200a5ed9952f9c92480dc9fa3467bf",
+        "share/ament_index/resource_index/package_run_dependencies/tf2_ros": "fac5addfe3a94de28d33841b70dd8f6fcc55e0456c26235bede319cb8c9f3a70",
+        "share/ament_index/resource_index/packages/tf2_ros": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "share/ament_index/resource_index/parent_prefix_path/tf2_ros": "88202ad0bb581155bf9070218f1334f36bc6e419b2887a7fdcf5816c350bc893",
+        "share/ament_index/resource_index/rclcpp_components/tf2_ros": "bf2b1e2bdb1988f82dbfc1a278c567b2421977d2cf1e9ee07298cfa6cf3a588d",
+        "share/colcon-core/packages/tf2_ros": "d2bbca84fc3b98b130df1e445adfe37e4b2981fe1ac9890f13bcce135690beb6",
+        "share/tf2_ros/DIAGNOSTIC_SOURCE_MANIFEST.json": "ecc4b407ccdc81f730d0121c114c8246deac287dba431e39b5a9054e0fd63c30",
+        "share/tf2_ros/cmake/ament_cmake_export_dependencies-extras.cmake": "05e3a36b20d9ecfd0dc0e71c1912c4626b7677de00259530f74735e629361b59",
+        "share/tf2_ros/cmake/ament_cmake_export_include_directories-extras.cmake": "f0dfd4e80d68155fba9a5921582e219dc2a82e7d13e7692b2ff1bbece403ea62",
+        "share/tf2_ros/cmake/ament_cmake_export_libraries-extras.cmake": "840bbc633a99bb58c5a80c9a10d36106e325639e7d09cc29da51fe3c56d3b836",
+        "share/tf2_ros/cmake/ament_cmake_export_targets-extras.cmake": "aecd771098a1d4186e1966bac125427da4370b34409385c47833ad95ca26856c",
+        "share/tf2_ros/cmake/export_tf2_rosExport-noconfig.cmake": "cb626204519f8cc69992f0aa7d224a2e24de0b23fdf429345e46c9faf7a46ccc",
+        "share/tf2_ros/cmake/export_tf2_rosExport.cmake": "9d86236f644c682939f0000fd293bbed6a3323b4ca3fd14a5c04bdca1a6101b9",
+        "share/tf2_ros/cmake/tf2_rosConfig-version.cmake": "5b9730e811a6716bab76f39b12c84491e29b7e5c1ffff2fdcc09cadae51271de",
+        "share/tf2_ros/cmake/tf2_rosConfig.cmake": "9c626c005e4438b7f29002dab9884fd8b2353480fe9d2fdb4c9e475b7aa930da",
+        "share/tf2_ros/environment/ament_prefix_path.dsv": "c4797d0a0670c70b4d3bcb5b7d47563635c7950595603f3af66f70af546ad57e",
+        "share/tf2_ros/environment/ament_prefix_path.sh": "6658f14efe913e291c0bf2c74059a9e14fb8abdb5a31628bef61d3b41e206679",
+        "share/tf2_ros/environment/library_path.dsv": "038195297fbe5e22d78680bf0f2b1b182fea46aaececf77d84daadad1fdfa665",
+        "share/tf2_ros/environment/library_path.sh": "9f85b113cb295c5c431b91985839eb7838a7e3c4416552f7b29bb6530fd2166e",
+        "share/tf2_ros/environment/path.dsv": "3f2cdf6234ea2525c1670c140b6a03700d98a2408e7a232107791fa96c08b58b",
+        "share/tf2_ros/environment/path.sh": "abe10a0452bc4b93f665fc343a7e6d32fe3f3a2b6beb90d338044a71d2583f18",
+        "share/tf2_ros/hook/cmake_prefix_path.dsv": "7ab2eb0a25c282f9a5bf62596b4c098865cd3a8aa5740601a9efa8620acd69d3",
+        "share/tf2_ros/hook/cmake_prefix_path.ps1": "0c7394c1d89765deec81cb10e59a36d0d98867690b4b8781d5bc9186fc67885a",
+        "share/tf2_ros/hook/cmake_prefix_path.sh": "ee9849def404b669097010f38735aa521e0731366a319b6e1abe996c793494b2",
+        "share/tf2_ros/hook/ld_library_path_lib.dsv": "038195297fbe5e22d78680bf0f2b1b182fea46aaececf77d84daadad1fdfa665",
+        "share/tf2_ros/hook/ld_library_path_lib.ps1": "c6e5dc5fc7ca92a59dec3b4107c761602c03e4ca0b4211ec2634efc3b43ef84e",
+        "share/tf2_ros/hook/ld_library_path_lib.sh": "535fe00314bc8acdb36d1057e32d60c215005141a8c30a99bf665a29fed4e222",
+        "share/tf2_ros/local_setup.bash": "41b30b6c107da94a2478e43953b8cbd0d920f5e8fc1ea847c61a213623d623b0",
+        "share/tf2_ros/local_setup.dsv": "59d3ad147e36673aa26cc7ceeefd730f47171e7b8bb26a78b6b730290bc56bf8",
+        "share/tf2_ros/local_setup.sh": "7e40b4345e5b02d58c7da2be6f4dc3ac2b6b764fc01e1b212cf5af7b13640260",
+        "share/tf2_ros/local_setup.zsh": "56942873096201f4e7fe5e7b9bd87e56cc42ced33fadb53fbc25766fd9149c81",
+        "share/tf2_ros/package.bash": "0415359b465f92fcd7cd0abcdccb2ed66a04ed6c35b3c515600ad15e2b1e50b0",
+        "share/tf2_ros/package.dsv": "65d28fd031c23403322c9d2a79ecb85fdf784e0fc9028b5ee95785e7b148e2e5",
+        "share/tf2_ros/package.ps1": "400ab49ed542a26b928618c2958f3527cb1b372c5b1ea09d96a63e83f8913e54",
+        "share/tf2_ros/package.sh": "886b5c6431809a0dc9ed80e7fc25edd55cab47885c241bbadd1bfb97f11564b7",
+        "share/tf2_ros/package.xml": "abc97bc3d0b7cdffbcf912779254cf0ee7c7e0f9cd9ea08d673361651c701f76",
+        "share/tf2_ros/package.zsh": "e0237dd3c5c9c8da442dadb3b6c86791f1da04ed534c91394342a4da61cfbf89"
+      },
+      "libraries": {
+        "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros/lib/libstatic_transform_broadcaster_node.so": "464de0f3661a97225e26c71dc37f04a69e038f3e544dc163d5e3a381e111108f",
+        "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros/lib/libtf2_ros.so": "9a1c7dde466c2f4db81a2e8a016e75808894d6bff3735ade3048df4b086c9760"
+      },
+      "package_xml": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros/share/tf2_ros/package.xml",
+      "package_xml_sha256": "abc97bc3d0b7cdffbcf912779254cf0ee7c7e0f9cd9ea08d673361651c701f76",
+      "prefix": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros",
+      "primary_library": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros/lib/libtf2_ros.so",
+      "release_provenance": {
+        "archive_sha256": "bbab74a783e687f7849c250c46eeeddb57927350af9dbb88986f3c3514309955",
+        "evidence_path": "/home/d1zzy/code/cleannav_modularization/cleannav-deliverables/amcl-scan-tf-wait-fix-20261030/SOURCE_PROVENANCE.json",
+        "evidence_sha256": "9f48641e765ba47d70e4d0f03805f473544010eb20cc96d214a3335c8d35bf4c",
+        "release_tag": "release/humble/tf2_ros/0.25.20-2",
+        "url": "https://codeload.github.com/ros2-gbp/geometry2-release/tar.gz/refs/tags/release/humble/tf2_ros/0.25.20-2"
+      },
+      "source_manifest": {
+        "path": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/tf2_ros/share/tf2_ros/DIAGNOSTIC_SOURCE_MANIFEST.json",
+        "sha256": "ecc4b407ccdc81f730d0121c114c8246deac287dba431e39b5a9054e0fd63c30"
+      },
+      "source_manifest_source_path": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/amcl-private-buffer-20261030/src/tf2_ros/DIAGNOSTIC_SOURCE_MANIFEST.json",
+      "source_root": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/amcl-private-buffer-20261030/src/tf2_ros",
+      "version": "0.25.20"
+    }
+  },
+  "profile_id": "amcl-private-buffer-diagnostics-20261030",
+  "schema_version": 1,
+  "scope": "opt-in static identity profile for one isolated AMCL process; no ROS/Gazebo runtime approval",
+  "selection": {
+    "base_machine_config": "/home/d1zzy/code/cleannav_modularization/cleannav-local/rviz-navigation/overlay_config.json",
+    "base_machine_config_sha256_without_source_manifest": "b4fe7f2a9f6e706e7c6fab9e82afec0726b78026ae2444751a46d0cbc59b4b2d",
+    "base_overlay_setup": "/home/d1zzy/code/cleannav_modularization/cleannav-local/rviz-navigation/overlay_setup.bash",
+    "expected_navigation_prefix": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261023-unknown-facade/install/cleannav_navigation",
+    "setup_file_hashes": {
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/campus-navigation-b/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/campus-navigation-v2-m0/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/mission-sequence-region-candidate/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/patrol-030-candidate/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261015T083500Z-rtab-continuation/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261015T225200-mapping-consumer-fix/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T010052-patrol-stability/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T020431-patrol-clear-window/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T024500-patrol-consolidated/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T040600-path-safety-costmap-semantics/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T043000-patrol-cancel-diagnostics/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T051500-patrol-tf-based-replan/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T054242-patrol-region-interfaces/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T054242-patrol-region-mission/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T054242-patrol-region-navigation-r2/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T054242-patrol-region-navigation-r3/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T054242-patrol-region-navigation/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T130700-patrol-runtime-recovery/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T133850-initial-pose-contract/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T142200-global-costmap-snapshot/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T145400-nav2-costmap-block-semantics/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T153000-patrol-complete-runtime-overlay-r1/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T154500-mission-action-readiness-runtime-r1/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261016T231329-patrol-costmap-rejection-evidence/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261017T013948-patrol-segment-corridor/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261017T162600-tf-consistent-patrol-guard/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261017T165300-patrol-constrained-facade/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261018T184142Z-nomotion-closure/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261019T022930Z-follow-replacement/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261019T034800Z-continuous-facade/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261019T034800Z-continuous-mission/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261019T041000Z-mapping-050/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261023-safety-sync/install/_local_setup_util_sh.py": "1d288ded3830dfd38e01684c2b3bd0fcefa5ccbe583ab37499333aff73e69356",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261023-safety-sync/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261023-unknown-facade/install/_local_setup_util_sh.py": "1d288ded3830dfd38e01684c2b3bd0fcefa5ccbe583ab37499333aff73e69356",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261023-unknown-facade/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261023-unknown-planner/install/_local_setup_util_sh.py": "1d288ded3830dfd38e01684c2b3bd0fcefa5ccbe583ab37499333aff73e69356",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261023-unknown-planner/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261030-oracle-executor/install/_local_setup_util_sh.py": "1d288ded3830dfd38e01684c2b3bd0fcefa5ccbe583ab37499333aff73e69356",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-20261030-oracle-executor/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/_local_setup_util_sh.py": "1d288ded3830dfd38e01684c2b3bd0fcefa5ccbe583ab37499333aff73e69356",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-amcl-scan-tf-wait-20261030/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-candidate43-grid-contract-20261017T155201Z-r2/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-patrol-goal-checker-interfaces-r1/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-patrol-goal-checker-r2/install/local_setup.bash": "0e10d666bbf43cf559467b11b75cf6d26cf8d210e7f94e79dfe5a7dddb2fe91c",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-deliverables/startup-and-git-recovery-20261021/workcopy/candidate-run/env.sh": "c95b5f37e7ed1bd3f68270304b5dce3b6783061b3d9ccd3f6d44e3cd40d78c9d",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-deliverables/startup-and-git-recovery-20261021/workcopy/tools/startup_smoke.sh": "bd07e9a48940e92660a9a349fca95c951d30418eb92dba1c5d35509356f73da8",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-facade-grid-contract-candidate43-20261017T155201Z/candidate-run43/env.sh": "045c614519f1db6715850c81fb351a55f58dc5b9ce7d9332932e56c88146b8ea",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-runtime-time-consistency-20261016T162600Z/candidate-run38/env.sh": "5d715a383e0e3772e69396f1ab94ddd3cdf366bef0bab9d1af0af0b408dceb28",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-local/rviz-navigation/amcl-private-buffer-diagnostics/overlay_setup.bash": "168055022f13735e3d10c70fd3cabe42b40a0d709c594334fad6b7d84e50560a",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-local/rviz-navigation/oracle-static-sim-20261030/environment.bash": "ce65cbda34d47ae568303b8683b090a134af3aef7c1cc7b621910d0dd024eb28",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-local/rviz-navigation/overlay_setup.bash": "ed9a14c71793628e47967a73004084616464b82e852e4c6857a9fa88e8c1e71f",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-local/rviz-navigation/path-unknown-policy-20261023/environment.bash": "41a0ec87bf155ab9bfca35886f8fe6d62be9f1e0c11dc8b419c48ba78a6b1c5a",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-local/rviz-navigation/safety-sync-20261023/environment.bash": "563a2d73b453c8cd039a6bfd1ce6a33d6dfd8376159e6152c7a2d2f2ba75743d",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-worktrees/navigation-startup-baseline-20261021/tools/rviz_navigation/RUNTIME_DEPENDENCIES.json": "33c68e0f15a9e534732352b0865354e90bc643fa5bac2c890bbc81a017feaabf",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-worktrees/navigation-startup-baseline-20261021/tools/rviz_navigation/overlay_setup.template.bash": "fc9674659c144e4abdd2d4841c056e6acf8b7e93d69d50596cb460f2523cac13",
+      "/opt/ros/humble/setup.bash": "12556a2725a823c3841f8fbab50892c8b8c69df9654d2a74761407226ecca4df",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-local/rviz-navigation/motion-admission-20261031/environment.bash": "65924b0b9073e89e18dbd7ae8b07513fa04f4f0d90f22519e42a5f47239a06e4"
+    },
+    "startup_overlay_setup": "/home/d1zzy/code/cleannav_modularization/cleannav-local/rviz-navigation/amcl-private-buffer-diagnostics/overlay_setup.bash"
+  },
+  "source_provenance": {
+    "path": "/home/d1zzy/code/cleannav_modularization/cleannav-deliverables/amcl-scan-tf-wait-fix-20261030/SOURCE_PROVENANCE.json",
+    "sha256": "9f48641e765ba47d70e4d0f03805f473544010eb20cc96d214a3335c8d35bf4c"
+  },
+  "tf2_ros_runtime_dependencies": [
+    {
+      "needed": "ld-linux-x86-64.so.2",
+      "path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+      "sha256": "41daf7836f7fce21a40ca63a00c5caf21b05a35a76ccc075d86f1716212cdf01"
+    },
+    {
+      "needed": "libaction_msgs__rosidl_typesupport_cpp.so",
+      "path": "/opt/ros/humble/lib/libaction_msgs__rosidl_typesupport_cpp.so",
+      "sha256": "fc8ab99472cfa75792fe88f364fa99c10132e6cc27bc5fdbbbe8896c5839b37b"
+    },
+    {
+      "needed": "libament_index_cpp.so",
+      "path": "/opt/ros/humble/lib/libament_index_cpp.so",
+      "sha256": "512d31ee3ace65980c2daefbf529289179b8324da00b5c3d89dc3e93998d95bf"
+    },
+    {
+      "needed": "libbuiltin_interfaces__rosidl_generator_c.so",
+      "path": "/opt/ros/humble/lib/libbuiltin_interfaces__rosidl_generator_c.so",
+      "sha256": "306fa173a0dc60c785f36d378accebe9d7eac045aeb2f17950bab28947ae9e2e"
+    },
+    {
+      "needed": "libc.so.6",
+      "path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "sha256": "b2cf6c33b74d2f22543b7a469a75b538911e690f769d0b238843a49465b83793"
+    },
+    {
+      "needed": "libconsole_bridge.so.1.0",
+      "path": "/usr/lib/x86_64-linux-gnu/libconsole_bridge.so.1.0",
+      "sha256": "e5c857beaaa32a74078a1192b37fba8e299fee1e893f2091f29ca246018517a7"
+    },
+    {
+      "needed": "libfmt.so.8",
+      "path": "/usr/lib/x86_64-linux-gnu/libfmt.so.8.1.1",
+      "sha256": "d463bedd51d449b2346d329fad8080e0900120ad0aeab8bf93e325b6cff4a587"
+    },
+    {
+      "needed": "libgcc_s.so.1",
+      "path": "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+      "sha256": "fc9d43b2f6c20e53b009238f767c5b949d202389e20de9e202ea684b4ba3729a"
+    },
+    {
+      "needed": "liblibstatistics_collector.so",
+      "path": "/opt/ros/humble/lib/liblibstatistics_collector.so",
+      "sha256": "462a23a53cc6404d3e6a57988cb222d3e798897dcade56b09fd74cc44620616d"
+    },
+    {
+      "needed": "libm.so.6",
+      "path": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+      "sha256": "3dd5511ae94785c9f921429b0f2b2f7aabb461b6f0e6de6dfdbef15f24bdfee6"
+    },
+    {
+      "needed": "librcl.so",
+      "path": "/opt/ros/humble/lib/librcl.so",
+      "sha256": "ef5a6dfdf39d5dd0e3d80eb4c43eb230a8be57ca12406b42977fe6c564582ade"
+    },
+    {
+      "needed": "librcl_action.so",
+      "path": "/opt/ros/humble/lib/librcl_action.so",
+      "sha256": "6e33d93aab6f5aea35fe81db75308a559f11084375c99aebd3090310ca2b4e17"
+    },
+    {
+      "needed": "librcl_interfaces__rosidl_generator_c.so",
+      "path": "/opt/ros/humble/lib/librcl_interfaces__rosidl_generator_c.so",
+      "sha256": "55812d4f9133861a56e4e068385a979ea09f8520880ca84e4241b1f4b0e25fb5"
+    },
+    {
+      "needed": "librcl_interfaces__rosidl_typesupport_c.so",
+      "path": "/opt/ros/humble/lib/librcl_interfaces__rosidl_typesupport_c.so",
+      "sha256": "1899b64c701d020e09ea062b3dc0f295e2341c2eecb8fc097a0efac93354c800"
+    },
+    {
+      "needed": "librcl_interfaces__rosidl_typesupport_cpp.so",
+      "path": "/opt/ros/humble/lib/librcl_interfaces__rosidl_typesupport_cpp.so",
+      "sha256": "d9818bd7b5bdd2a2bb0a3feca004bfcada12f40ea488def8717cf763e9affca1"
+    },
+    {
+      "needed": "librcl_logging_interface.so",
+      "path": "/opt/ros/humble/lib/librcl_logging_interface.so",
+      "sha256": "39ef13b9d92727835d9d37434be461868c80173970abe8000966a625d267de20"
+    },
+    {
+      "needed": "librcl_logging_spdlog.so",
+      "path": "/opt/ros/humble/lib/librcl_logging_spdlog.so",
+      "sha256": "054cb1535d4e3f6847f2085577cf473f5e803b48c968340d4b1992497b047ec2"
+    },
+    {
+      "needed": "librcl_yaml_param_parser.so",
+      "path": "/opt/ros/humble/lib/librcl_yaml_param_parser.so",
+      "sha256": "d4f121bb50e30372236df66ed3dd5147ddc18e2c4f4687c85db7c85891583778"
+    },
+    {
+      "needed": "librclcpp.so",
+      "path": "/opt/ros/humble/lib/librclcpp.so",
+      "sha256": "20640a059215a771eb2d3ededa04ba99a13b39256711b2cfae853777ac35b5ac"
+    },
+    {
+      "needed": "librclcpp_action.so",
+      "path": "/opt/ros/humble/lib/librclcpp_action.so",
+      "sha256": "1a799632e9b227abe598a5a0dbd7a9c81ba6750ad7129e80c3bc2d8a55ea5162"
+    },
+    {
+      "needed": "librcpputils.so",
+      "path": "/opt/ros/humble/lib/librcpputils.so",
+      "sha256": "92f1083af887460e44783905f31045ed4feacaedb9ab9d6b845044ecce797a7f"
+    },
+    {
+      "needed": "librcutils.so",
+      "path": "/opt/ros/humble/lib/librcutils.so",
+      "sha256": "7f204739601728084595837ddd9c728b2cdf2709453145f97644d31e94e8d595"
+    },
+    {
+      "needed": "librmw.so",
+      "path": "/opt/ros/humble/lib/librmw.so",
+      "sha256": "6301cef6523967fa4d04e10504ed688caaecabf085e1045f75f2676415cc06c6"
+    },
+    {
+      "needed": "librmw_implementation.so",
+      "path": "/opt/ros/humble/lib/librmw_implementation.so",
+      "sha256": "0ded14f25759e7bb5a389c1e04f006c833e98e2f28704f27a8301eb7ec7212b2"
+    },
+    {
+      "needed": "librosgraph_msgs__rosidl_typesupport_cpp.so",
+      "path": "/opt/ros/humble/lib/librosgraph_msgs__rosidl_typesupport_cpp.so",
+      "sha256": "4e4990e900d0debbbe9f8a51a9473062cc604e333d751a0d54f38f25bded05e6"
+    },
+    {
+      "needed": "librosidl_runtime_c.so",
+      "path": "/opt/ros/humble/lib/librosidl_runtime_c.so",
+      "sha256": "2dd9b20363ff871ec3b8dec54f81ba47072dc7c30597e8f500fd86b702d735b3"
+    },
+    {
+      "needed": "librosidl_typesupport_c.so",
+      "path": "/opt/ros/humble/lib/librosidl_typesupport_c.so",
+      "sha256": "77bf79cce29d27c0771f1d21122f868dd2b782bf7f6e00d2b0a883c80dae95d0"
+    },
+    {
+      "needed": "librosidl_typesupport_cpp.so",
+      "path": "/opt/ros/humble/lib/librosidl_typesupport_cpp.so",
+      "sha256": "2e874108f801d810853258f8b6b45927338cddc86ccf5868a4afe5362953e33c"
+    },
+    {
+      "needed": "libspdlog.so.1",
+      "path": "/usr/lib/x86_64-linux-gnu/libspdlog.so.1.9.2",
+      "sha256": "1de96ba8296808433bf3ad601f2410c179a3e422a05ad012b49e4ad364f72bc0"
+    },
+    {
+      "needed": "libstatistics_msgs__rosidl_typesupport_cpp.so",
+      "path": "/opt/ros/humble/lib/libstatistics_msgs__rosidl_typesupport_cpp.so",
+      "sha256": "7310ba40d5e8a3af61dd0482651818d01062cc9b2429302a21cba0cc752c6f95"
+    },
+    {
+      "needed": "libstdc++.so.6",
+      "path": "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.30",
+      "sha256": "ff0825e113603c3866680d5d52216bc6d8eedf3a59f52a0aef67ff01994db128"
+    },
+    {
+      "needed": "libtf2.so",
+      "path": "/opt/ros/humble/lib/libtf2.so",
+      "sha256": "ab97a943f3c12148b03724ff4d48533082f6780ce84f5022efab7970149c391e"
+    },
+    {
+      "needed": "libtf2_msgs__rosidl_typesupport_cpp.so",
+      "path": "/opt/ros/humble/lib/libtf2_msgs__rosidl_typesupport_cpp.so",
+      "sha256": "485ffe16aa53c99d86ccebd181b69ef2f6cd2a23f4d9090aae272d6189494a7e"
+    },
+    {
+      "needed": "libtracetools.so",
+      "path": "/opt/ros/humble/lib/libtracetools.so",
+      "sha256": "1bf5e82bedef882ea90fc4d2e9b72fb3ca9421734d3f3462e3b7936982d67851"
+    },
+    {
+      "needed": "libyaml.so",
+      "path": "/opt/ros/humble/lib/libyaml.so",
+      "sha256": "627ead721f568545018a0608ae514937255dc0304c8dec4bd1b98914102d6f5c"
+    }
+  ]
+}

@@ -422,7 +422,8 @@ def collect_resource_stability_window(sample_fn, *, duration=WAIVER_STABILITY_SE
 
 
 def memory_snapshot(*, cgroup_waiver=None, min_available_kib=MEM_AVAILABLE_MIN_KIB,
-                    min_cgroup_headroom_bytes=CGROUP_RUNTIME_MIN_HEADROOM_BYTES) -> dict:
+                    min_cgroup_headroom_bytes=CGROUP_RUNTIME_MIN_HEADROOM_BYTES,
+                    memavailable_warning_only=False) -> dict:
     values = read_meminfo()
     available = values.get("MemAvailable")
     swap_total = values.get("SwapTotal")
@@ -442,7 +443,7 @@ def memory_snapshot(*, cgroup_waiver=None, min_available_kib=MEM_AVAILABLE_MIN_K
     reasons = []
     if available is None or swap_used is None or psi is None:
         reasons.append("memory_or_psi_unavailable")
-    if available is not None and available < min_available_kib:
+    if available is not None and available < min_available_kib and not memavailable_warning_only:
         reasons.append(f"MemAvailable_below_{min_available_kib // (1024 * 1024)}GiB")
     if swap_used is not None and swap_used > SWAP_USED_MAX_KIB:
         reasons.append("swap_used_above_1GiB")
@@ -456,6 +457,8 @@ def memory_snapshot(*, cgroup_waiver=None, min_available_kib=MEM_AVAILABLE_MIN_K
     return {
         "ok": not reasons,
         "MemAvailable_kib": available,
+        "MemAvailable_warning": available is not None and available < min_available_kib,
+        "MemAvailable_warning_only": memavailable_warning_only,
         "SwapTotal_kib": swap_total,
         "SwapFree_kib": swap_free,
         "SwapUsed_kib": swap_used,

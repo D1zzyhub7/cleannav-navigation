@@ -1,0 +1,92 @@
+# R8-A4 实施结果
+
+**STATIC / OFFLINE PASS；DYNAMIC NOT RUN。候选已完成静态封存，等待用户审查，不自动运行。**
+
+候选：`cleannav-patrol-r8-a4-path-split-20261106T020914Z`。identity：`6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5`。直接父A2：`d705384e023a3c545f90d95fb7062c7bcedac7a47903507868128b56fc61e8f2`。仍为 `UNVERIFIED / approved=false`，最新实际动态基线仍是A2。
+
+## 唯一产品修改
+
+修改新安装副本中的 [install/cleannav_navigation/lib/cleannav_navigation/patrol_path_segments.py](install/cleannav_navigation/lib/cleannav_navigation/patrol_path_segments.py)，完整差异见 [product.patch](product.patch)。从A2实际使用的RC Navigation复制完整49文件包；不使用A3，不从过期worktree构建。
+
+- 新增私有 `_straight_before(points,index)`：向终点之前回溯累计至少1m，用最后一段方向作为终点切线；此前点到切线的垂距≤.01m，零长度末段不合格。
+- 在距离起点≥原 `minimum_far_m` 且进场合格的点中取最远点；无候选时回退原far。没有采用原A4的首尾弦线规则。
+- 公共签名、异常文本、开放路径单段、闭合容差和返回结构不变；两段共享原分段Pose，不插点，不改坐标/yaw。
+
+模块SHA：
+
+| 文件 | SHA256 |
+|---|---|
+| 父模块 | `d168e3a8199b7566d5c13cf63b1fc9b1b762cf099e2b83323682ec90a30bb587` |
+| 新模块 | `870e5de1e5e75facdfea3d901b872b7ed40e434422d68ba65e3969a3511803bd` |
+| 未改Facade | `c45132dbd5881a58df0087203418bb4b6b983d271436fd383a45da56ab12e948` |
+
+[包级比较](evidence/package-copy.json)和[最终保护核对](evidence/final-preservation.json)确认，只有该算法文件字节变化；无硬链接、无旧缓存。候选env、manifest、identity、测试及文档属于配套记录，不是额外产品算法变更。
+
+## 实际测试结果
+
+测试加载本候选install内模块，既有测试仅重绑fixture的绝对模块路径，保留原测试体。[pytest原始输出](evidence/algorithm-tests.stdout)、[JUnit](evidence/pytest.xml)、[实际cwd/argv/rc](evidence/algorithm-tests-execution.json)：**166 passed，0 failed，rc=0**。
+
+| 覆盖 | 结果 |
+|---|---|
+| 既有test_closed_loop_segments | 2项通过 |
+| 当前1649点路线 | `((0,933),(932,1649))`，far932 |
+| 反向路线 | `((0,752),(751,1649))`，far751，不落实际弧内 |
+| 66起点×正反方向 | 132项全部通过；保留原Pose，选点不在实际圆弧内部 |
+| R8九条优化路线 | 9项通过，选点局部曲率近0 |
+| minimum_far_m不足/相等、近处合格点错误替代far | 原约束与原异常语义保持 |
+| 没有合格近直进场、纯圆、连续椭圆 | 测试输入回退原far，未制造“成功到点”结论 |
+| 重复点、零长度末段 | 回归通过，私有helper拒绝零末段，无修改输入 |
+| 开放、短路径、闭环容差边界、异常文本 | 回归通过 |
+
+932和751均为新候选函数的实际计算结果；数字仅出现在验收断言，没有写进产品算法。
+
+## 实际加载和组件保持
+
+候选只用现有方式：`candidate-run/env.sh` source原A2环境，再前置新Navigation prefix；没有重写父env或runner。新prefix：
+
+`/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z/install/cleannav_navigation`
+
+全新Python进程在该环境下用ament index解析所选Facade绝对路径，再按Facade脚本目录优先的搜索顺序正常import分段模块，**不只依赖PYTHONPATH**。封存后又以新进程核验一次，见 [实际加载结果](evidence/installation-sealed.json)与[执行收据](evidence/sealed-installation-execution.json)：
+
+- `module.__file__` 和函数 `co_filename` 均指向新prefix内的 `patrol_path_segments.py`。
+- 源SHA匹配新manifest，实际返回932/751；Facade SHA与RC一致。
+- product manifest的392项及其identity绑定逐项通过；[product-sha256.json](product-sha256.json)、[changed-source-files.json](changed-source-files.json)、[runtime-candidate.json](candidate-run/runtime-candidate.json)、[identity摘要](candidate-run/runtime-candidate.sha256)已保存。
+- ament实际选择的其余包路径与A2真实 `prefixes.txt` 一致，包含MM、Simulation、Gateway、Safety、Planner、Executor、RTAB和Interfaces。
+
+| 组件 | 当前选择 |
+|---|---|
+| MPPI | R7-RC原prefix：`/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-rc-20261105T022949Z/install/nav2_mppi_controller` |
+| Costmap | R7-A2原prefix：`/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-a2-costmap-timestamp-20261105T104829Z/install/nav2_costmap_2d` |
+| Navigation | 新prefix，仅Python分段文件改变；RC Bounded/Boundary库原字节保持 |
+| Nav2参数、Registry、地图、route、Footprint、Keepout | 原A2/RC路径及内容不变 |
+
+[库SHA及包路径](evidence/installation-sealed.json)确认所有9个MPPI/Costmap/Navigation库哈希保持A2组件组合；[静态ELF解析](evidence/elf-resolution.json)验证9个库、12条关键依赖仍解析到RC MPPI/A2 Costmap，无A3 Bounded/MPPI ABI混入。没有执行Facade正文、初始化ROS节点或声称已观察到在线ELF映射。
+
+父/子环境stderr逐字相同，均保留8条历史setup hook缺失信息；实际选包、模块导入、manifest及ELF检查均通过。[比较记录](evidence/setup-warnings-comparison.json)。未隐藏或顺带修复旧环境问题。
+
+## 性能及其他路线
+
+[纯函数50次计时](evidence/splitter-performance.json)：
+
+| 版本 | P50 ms | P95 ms | max ms |
+|---|---:|---:|---:|
+| 原far | 0.229 | 0.421 | 0.458 |
+| 修正A4 | 11.483 | 12.107 | 12.982 |
+
+计时只含splitter，Facade在接纳/执行时调用，不属于MPPI实时优化回调；没有引入缓存、并行化或性能框架。
+
+其他闭环PATROL的分段点可能按新规则变化，这是预期作用；GOTO/普通FollowPath的调用链和业务逻辑不变，开放路径仍单段。1cm是近直容差，fallback和最终闭合端点问题仍保留；不能宣称任意连续曲线或未来路线已获通用终点可达性保证。没有新增ROS接口、参数、状态、APP前置条件、Gate、Probe、Observer、Preflight或启动包装器。
+
+## 动态条件与封存边界
+
+**本次要求的静态交付条件已满足，可以提交用户审查。** 新候选实际在线控制、两段收敛和当次资源/端口/锁/Domain就绪尚未运行；后续仍需用户对新身份及新session独立授权，沿用既有成熟启动/安全/清理流程。本轮未创建session或动态入口，不复用旧A2失败session。
+
+构建0、ROS/Gazebo启动0、runner调用0、POST/Lease/速度发布0；未改MPPI、路线、Registry、定位、安全、Launch、Facade业务逻辑或APP链。最后一次动态机会保持 **2/3已用、余1**。当前cgroup未做动态准入检查，不将历史UNKNOWN/WAIVED升级为PASS。
+
+保护核对：2407个历史/冻结文件不变，相关Git快照相同；按AGENTS只补充PROJECT_MASTER、Operations Runbook、决策日志及实验索引的本轮状态，完整文档diff见 [documentation.patch](documentation.patch)。[RUN_INDEX](RUN_INDEX.json)仅记录离线实施，runtime_session=null。
+
+终端：UI新建0、UI复用0，使用工具普通管道；所有受托管前台命令已退出，无后台任务或残留PID，无临时UI终端需要关闭。Agent没有启动/终止受保护ROS/Gazebo进程。
+
+Shared Memory updated: `cleannav_current_baseline`、`cleannav_next_actions`、`cleannav_session_20261106_r8_a4_implementation`；新候选未晋升动态基线。
+
+**完成后停止，等待用户审查；不执行动态巡航、下一轮路线优化或MPPI修改。**

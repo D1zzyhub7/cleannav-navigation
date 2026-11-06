@@ -1,0 +1,23 @@
+# R8-A4 三次授权动态验证结果
+
+**最终：VERIFIED SINGLE-LAP DYNAMIC PASS。首次成功，已停止；使用 1/3 次，第二、三次未执行。R8-A4 成为最新真实动态基线。**
+
+候选 `6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5`；父 A2 `d705384e023a3c545f90d95fb7062c7bcedac7a47903507868128b56fc61e8f2`。本授权覆盖 PREP 中旧的一次额度限制。候选产品、MPPI、Costmap、地图、路线、Safety、MM、正式 runner/Observer 均未修改；未开展 R9。
+
+| 次数 | 启动 / GOTO | 两段 / outer / MM / APP | MPPI / 定位 / Keepout | 单圈 / 清理 |
+|---|---|---|---|---|
+| 1 | SYSTEM READY，时钟通过；唯一 POST202；真实 Lease；GOTO SUCCEEDED | 两段均 SUCCEEDED；outer SUCCEEDED；MM/APP SUCCEEDED，2/2 | Optimizer0、LOST0、ESTOP0、核心253=0 | 完整单圈 PASS；停车确认、Lease释放、自有进程/端口/锁清理，地图SHA一致 |
+| 2 | NOT RUN | 首次成功后停止 | NOT RUN | NOT RUN |
+| 3 | NOT RUN | 首次成功后停止 | NOT RUN | NOT RUN |
+
+Session：`/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-dynamic-prep-20261106T025507Z/session-patrol-lap-1-r8-a4-20261106T025507Z`，Domain228 / Gazebo11844 / Gateway18144。实际入口仅在该 cwd 执行 `bash run_patrol_lap.sh`，rc=0；该 session 已消耗，不能重用。
+
+记录输入与原1649点路线相同；新 Facade 路径确认。新模块确定性重建 split=932；未记录原始 goal payload，不将重建说成直接观测。两段成功前位置/航向误差分别 0.09717m/0.14162rad、0.09079m/0.00966rad，均满足原0.10m/0.35rad条件（bag重建位姿，非checker内部遥测）。PATROL187.305s，实驶40.281m，原路线41.086m。Observer原始成功计数3包含延迟GOTO状态，完整UUID/accepted stamp确认实际PATROL两段。
+
+GOTO虽然业务成功，耗时193.528s/41.283m，停车距入口约0.5048m，不能声称瞬时0.30m精度通过；冻结stateful checker未修改。此观察与两个PATROL终点证据分开记录。MPPI max27ms、P95 16ms；本次无Optimizer故障。结果只证明本候选、原路线、本次模拟单圈，不外推全部路线或实车。
+
+保留资源边界：不可读进程环境仍UNKNOWN（PREP27，结束采样26），cgroup UNKNOWN/WAIVED。正常收尾SIGINT日志保留，不冒充任务错误或全日志无ERROR。冻结产品392项与候选manifest核验无差异；4个自动生成pyc单列。
+
+完整结果：[RESULT.md](session-patrol-lap-1-r8-a4-20261106T025507Z/RESULT.md)；机器收据：[dynamic-validation-receipt.json](session-patrol-lap-1-r8-a4-20261106T025507Z/dynamic-validation-receipt.json)；轨迹：[trajectory-and-velocity.png](session-patrol-lap-1-r8-a4-20261106T025507Z/trajectory-and-velocity.png)；文件清单：[RUNTIME_SHA256SUMS](session-patrol-lap-1-r8-a4-20261106T025507Z/RUNTIME_SHA256SUMS)。原PREP及旧SHA清单保持时间点证据。
+
+已更新 PROJECT_MASTER、OPERATIONS_RUNBOOK、DECISION_LOG、EXPERIMENT_INDEX 及 Shared Memory。完成后停止，等待用户审查，不自动执行更多动态或路线/MPPI优化。

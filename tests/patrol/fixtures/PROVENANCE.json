@@ -1,0 +1,86 @@
+[
+  {
+    "fixture": "tests/patrol/fixtures/legacy_patrol_path_segments.py",
+    "sha256": "d168e3a8199b7566d5c13cf63b1fc9b1b762cf099e2b83323682ec90a30bb587",
+    "source": "cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/install/cleannav_navigation/lib/cleannav_navigation/patrol_path_segments.py",
+    "source_sha256": "d168e3a8199b7566d5c13cf63b1fc9b1b762cf099e2b83323682ec90a30bb587",
+    "extraction": "verbatim"
+  },
+  {
+    "fixture": "tests/patrol/fixtures/route.json",
+    "sha256": "0b069ff9c59d51b4ff4e371608bae7108b88d493a0c5d08dfaea4e4aef363f68",
+    "source": "cleannav-experiments/cleannav-patrol-pillar-v1-route-20261102T163219Z/route.json",
+    "source_sha256": "6d48ad03ac3bfe3650e7c85e736f3389b453fe52a0ed341598c08f66d8255b73",
+    "extraction": "selected JSON keys, values and array order unchanged"
+  },
+  {
+    "fixture": "tests/patrol/fixtures/evidence/geometry.json",
+    "sha256": "cfba824efcc80dd4ac5836c1c3e6ae5ea2caa5e48e48942fc9e3684b2d285811",
+    "source": "cleannav-experiments/cleannav-r8-codex-independent-review-20261106T010347Z/evidence/geometry.json",
+    "source_sha256": "4afd5e3c8a412d5423d8100049739b65dd7cb4f380653f35272a6455d2dbfc7e",
+    "extraction": "selected JSON keys, values and array order unchanged"
+  },
+  {
+    "fixture": "tests/patrol/fixtures/candidates/B_smooth.json",
+    "sha256": "5f0611798f05a16b88c5889f6dbaa05353325dccac18956e1f381f9f644937c1",
+    "source": "cleannav-experiments/cleannav-r8-patrol-path-generation-audit-20261106T000418Z/candidates/B_smooth.json",
+    "source_sha256": "9ac65e2d992b19fcc08f0c98c0127f73e9456a8f4211aa81ce8f49f00e935dbb",
+    "extraction": "selected JSON keys, values and array order unchanged"
+  },
+  {
+    "fixture": "tests/patrol/fixtures/candidates/C_1232mm.json",
+    "sha256": "a90dc36e19a545c7012473bcf795e5665ea90625b77bbdc44422653529450350",
+    "source": "cleannav-experiments/cleannav-r8-patrol-path-generation-audit-20261106T000418Z/candidates/C_1232mm.json",
+    "source_sha256": "a71e36d03eeabb105a9a0353657bdafe6616968234199d1f2bd78af7d8ab4352",
+    "extraction": "selected JSON keys, values and array order unchanged"
+  },
+  {
+    "fixture": "tests/patrol/fixtures/candidates/C_1288mm.json",
+    "sha256": "c7fc4da41fa11b42ee0e7b9c171446ed45c911dcbf3c95e3bd592bf1d3561af9",
+    "source": "cleannav-experiments/cleannav-r8-patrol-path-generation-audit-20261106T000418Z/candidates/C_1288mm.json",
+    "source_sha256": "189fb3e839957520f3f2636bca7dfea912ebb5ce1c541d8f821e53c6a136a85c",
+    "extraction": "selected JSON keys, values and array order unchanged"
+  },
+  {
+    "fixture": "tests/patrol/fixtures/candidates/C_1344mm.json",
+    "sha256": "031d315c4fdf32ab05640e85e1518405d9fa0245ade9bf9facacd6d9980d67ca",
+    "source": "cleannav-experiments/cleannav-r8-patrol-path-generation-audit-20261106T000418Z/candidates/C_1344mm.json",
+    "source_sha256": "6e5ecfa41753230565627b130fa251f8c0ba9386c8fa0d621ca83d3b1e29a0f2",
+    "extraction": "selected JSON keys, values and array order unchanged"
+  },
+  {
+    "fixture": "tests/patrol/fixtures/candidates/D_1344_smooth.json",
+    "sha256": "b5f6570dfe6d40137c6b03ccc38f4f7c7e88ea7c33ec62002e022e3af3b07119",
+    "source": "cleannav-experiments/cleannav-r8-patrol-path-generation-audit-20261106T000418Z/candidates/D_1344_smooth.json",
+    "source_sha256": "343911c2f2dbb26c95d279105d9f767ef49966ca71de63744c31af81e539769b",
+    "extraction": "selected JSON keys, values and array order unchanged"
+  },
+  {
+    "fixture": "tests/patrol/fixtures/candidates/S_1500mm.json",
+    "sha256": "f60635c4d2a2b95d42397d4b67a0d044149c706f16c989085ae2f4e8d204023e",
+    "source": "cleannav-experiments/cleannav-r8-patrol-path-generation-audit-20261106T000418Z/candidates/S_1500mm.json",
+    "source_sha256": "18b4db639cdfedd0e89bac3241e4492bf67f5b7485c3e30bde9c115c0be957d6",
+    "extraction": "selected JSON keys, values and array order unchanged"
+  },
+  {
+    "fixture": "tests/patrol/fixtures/candidates/S_2000mm.json",
+    "sha256": "c5a899e17341a0f233f334bf101f8a6175f675922641b971a7e7cda99134d3f4",
+    "source": "cleannav-experiments/cleannav-r8-patrol-path-generation-audit-20261106T000418Z/candidates/S_2000mm.json",
+    "source_sha256": "725d48f3fed25e6e26cbca8ea1a13d9e9a01a88349e008271f1a65f27dddd30e",
+    "extraction": "selected JSON keys, values and array order unchanged"
+  },
+  {
+    "fixture": "tests/patrol/fixtures/candidates/S_2400mm.json",
+    "sha256": "0589d25ce029e995b036c3e35248390a90320bede0ef7384f4cf6c810ed5597f",
+    "source": "cleannav-experiments/cleannav-r8-patrol-path-generation-audit-20261106T000418Z/candidates/S_2400mm.json",
+    "source_sha256": "19e849eff2d5b0b1c2584a5f7ff4fc95f42ffa9fedeac10878d805b812dadfb8",
+    "extraction": "selected JSON keys, values and array order unchanged"
+  },
+  {
+    "fixture": "tests/patrol/fixtures/candidates/S_3000mm.json",
+    "sha256": "52673ff97989cab750d0f8865beadaaef1de276621020464ac04b35e6e347c73",
+    "source": "cleannav-experiments/cleannav-r8-patrol-path-generation-audit-20261106T000418Z/candidates/S_3000mm.json",
+    "source_sha256": "df3b524a1cbd4a607f57f2fb30d539901f4100dd9f9a427143f03723cedc206b",
+    "extraction": "selected JSON keys, values and array order unchanged"
+  }
+]

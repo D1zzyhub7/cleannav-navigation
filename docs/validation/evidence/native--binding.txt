@@ -1,0 +1,2 @@
+actual_PathHandler_tracking_m=1.48934 preview_m=2.4849 tracking_poses=61 preview_poses=101 prefix_unchanged PASS
+private_BoundedMPPIController_configure_setPlan_compute_cleanup PASS v=0.0470708 w=0.0420273 optimizer_size=2744 controller_size=3296

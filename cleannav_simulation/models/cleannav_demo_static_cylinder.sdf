@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<sdf version="1.6">
+  <model name="cleannav_demo_static_cylinder">
+    <static>true</static>
+    <link name="link">
+      <collision name="collision">
+        <geometry>
+          <cylinder>
+            <radius>0.45</radius>
+            <length>0.80</length>
+          </cylinder>
+        </geometry>
+      </collision>
+      <visual name="visual_bin">
+        <pose>0 0 -0.04 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.40</radius>
+            <length>0.72</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.03 0.20 0.12 1</ambient>
+          <diffuse>0.05 0.40 0.22 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_bin_rim">
+        <pose>0 0 0.31 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.42</radius>
+            <length>0.06</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.02 0.12 0.08 1</ambient>
+          <diffuse>0.03 0.25 0.14 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_bin_lid">
+        <pose>0 0 0.37 0 0 0</pose>
+        <geometry>
+          <cylinder>
+            <radius>0.43</radius>
+            <length>0.08</length>
+          </cylinder>
+        </geometry>
+        <material>
+          <ambient>0.04 0.14 0.18 1</ambient>
+          <diffuse>0.08 0.30 0.38 1</diffuse>
+        </material>
+      </visual>
+      <visual name="visual_bin_handle">
+        <pose>0 0 0.47 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.22 0.06 0.05</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.02 0.02 0.02 1</ambient>
+          <diffuse>0.08 0.08 0.08 1</diffuse>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>

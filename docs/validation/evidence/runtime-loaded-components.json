@@ -1,0 +1,116 @@
+[
+  {
+    "pid": 49031,
+    "argv": [
+      "/opt/ros/humble/lib/nav2_planner/planner_server",
+      "--ros-args",
+      "--log-level",
+      "info",
+      "--ros-args",
+      "-r",
+      "__node:=planner_server",
+      "-p",
+      "use_sim_time:=True",
+      "-p",
+      "simulation_motion_authorization:=True",
+      "-p",
+      "require_localization:=True",
+      "-p",
+      "is_rtabmap_paused:=True",
+      "-p",
+      "use_sim_time:=True",
+      "--params-file",
+      "/tmp/tmp3r4kjand"
+    ],
+    "libraries": [
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-a2-costmap-timestamp-20261105T104829Z/install/nav2_costmap_2d/lib/libfilters.so",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-a2-costmap-timestamp-20261105T104829Z/install/nav2_costmap_2d/lib/liblayers.so",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-a2-costmap-timestamp-20261105T104829Z/install/nav2_costmap_2d/lib/libnav2_costmap_2d_core.so"
+    ]
+  },
+  {
+    "pid": 49033,
+    "argv": [
+      "/opt/ros/humble/lib/nav2_controller/controller_server",
+      "--ros-args",
+      "--log-level",
+      "info",
+      "--ros-args",
+      "-r",
+      "__node:=controller_server",
+      "-p",
+      "use_sim_time:=True",
+      "-p",
+      "simulation_motion_authorization:=True",
+      "-p",
+      "require_localization:=True",
+      "-p",
+      "is_rtabmap_paused:=True",
+      "-p",
+      "use_sim_time:=True",
+      "--params-file",
+      "/tmp/tmpp2vn4vgc",
+      "-r",
+      "cmd_vel:=/cleannav/cmd_vel_candidate"
+    ],
+    "libraries": [
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-a2-costmap-timestamp-20261105T104829Z/install/nav2_costmap_2d/lib/libfilters.so",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-a2-costmap-timestamp-20261105T104829Z/install/nav2_costmap_2d/lib/liblayers.so",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-a2-costmap-timestamp-20261105T104829Z/install/nav2_costmap_2d/lib/libnav2_costmap_2d_core.so",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-rc-20261105T022949Z/install/nav2_mppi_controller/lib/libmppi_controller.so",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-rc-20261105T022949Z/install/nav2_mppi_controller/lib/libmppi_critics.so",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z/install/cleannav_navigation/lib/libcleannav_bounded_mppi_controller.so"
+    ]
+  },
+  {
+    "pid": 49035,
+    "argv": [
+      "python3",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z/install/cleannav_navigation/lib/cleannav_navigation/navigation_facade_node.py",
+      "--ros-args",
+      "--log-level",
+      "info",
+      "--ros-args",
+      "-r",
+      "__node:=cleannav_navigation_facade",
+      "-p",
+      "use_sim_time:=True",
+      "-p",
+      "simulation_motion_authorization:=True",
+      "-p",
+      "require_localization:=True",
+      "-p",
+      "is_rtabmap_paused:=True",
+      "-p",
+      "use_sim_time:=True",
+      "--params-file",
+      "/tmp/tmpim35xgz1",
+      "--params-file",
+      "/tmp/launch_params_lp_4i01k"
+    ],
+    "libraries": []
+  },
+  {
+    "pid": 49196,
+    "argv": [
+      "/usr/bin/python3",
+      "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/cleannav_mission_manager/cleannav_simulation_mission_manager",
+      "--ros-args",
+      "-r",
+      "__node:=mission_manager_node",
+      "-p",
+      "use_sim_time:=True",
+      "-p",
+      "simulation_motion_authorization:=True",
+      "-p",
+      "require_localization:=True",
+      "-p",
+      "is_rtabmap_paused:=True",
+      "-p",
+      "use_sim_time:=True",
+      "--params-file",
+      "/tmp/launch_params_zyvwiehr"
+    ],
+    "libraries": []
+  }
+]

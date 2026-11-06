@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "profile_id": "rviz_short_goal_015",
+  "status": "BOUNDED_SHORT_NAVIGATION_TEST_ONLY",
+  "vehicle": {
+    "wheelbase_m": 0.6,
+    "front_track_m": 0.48,
+    "steering_joint_limit_rad": 0.6,
+    "min_turning_radius_m": 1.12
+  },
+  "max_forward_linear_x": 0.15,
+  "max_reverse_linear_x": 0.0,
+  "reverse_allowed": false,
+  "max_curvature_inv_m": 0.8928571428571429,
+  "max_angular_z": 0.13392857142857142,
+  "acceleration_mps2": 0.12,
+  "curvature_rate_inv_mps": 1.0,
+  "safety": {
+    "max_forward_linear_x": 0.15,
+    "max_reverse_linear_x": 0.0,
+    "max_angular_z": 0.13392857142857142,
+    "candidate_timeout_sec": 0.5,
+    "publish_frequency_hz": 10.0,
+    "status_publish_frequency_hz": 2.0
+  },
+  "mppi": {
+    "motion_model": "Ackermann",
+    "vx_max": 0.15,
+    "vx_min": 0.0,
+    "wz_max": 0.13392857142857142,
+    "min_turning_r": 1.12
+  },
+  "notes": [
+    "Numbers preserved from Candidate 28 short-goal profile; this profile grants no motion authorization.",
+    "Forward only, low /scan Collision Monitor remains in series."
+  ]
+}

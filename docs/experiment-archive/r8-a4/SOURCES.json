@@ -1,0 +1,81 @@
+[
+  {
+    "archive": "R7_REVIEW_AND_NEXT_PLAN.txt",
+    "source_workspace_path": "cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/R7_REVIEW_AND_NEXT_PLAN.md",
+    "sha256": "6809afb13863170d9204b2038bc272b85d963407c97373b6426b8c36fdca29c7",
+    "scope": "Verbatim historical report; absolute paths and old PREPARED/latest wording are historical, not portable instructions."
+  },
+  {
+    "archive": "R7_OFFLINE_ROBUSTNESS.txt",
+    "source_workspace_path": "cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/R7_OFFLINE_ROBUSTNESS.md",
+    "sha256": "4b694aa84a2cff9bd8fd9e83a2b9790920fe53d322842bd801e2386377790247",
+    "scope": "Verbatim historical report; absolute paths and old PREPARED/latest wording are historical, not portable instructions."
+  },
+  {
+    "archive": "R8_PATROL_PATH_GENERATION_AUDIT.txt",
+    "source_workspace_path": "cleannav-experiments/cleannav-r8-patrol-path-generation-audit-20261106T000418Z/R8_PATROL_PATH_GENERATION_AUDIT.md",
+    "sha256": "b0615c281cc2184c93af0cf33c0d530a9d648a1dff3e44e94712abaab097606c",
+    "scope": "Verbatim historical report; absolute paths and old PREPARED/latest wording are historical, not portable instructions."
+  },
+  {
+    "archive": "R8_CODEX_INDEPENDENT_REVIEW.txt",
+    "source_workspace_path": "cleannav-experiments/cleannav-r8-codex-independent-review-20261106T010347Z/R8_CODEX_INDEPENDENT_REVIEW.md",
+    "sha256": "6e620cf67471a28af72594d1b5d05b0c3e6c294e25939538bb2610c3ad669215",
+    "scope": "Verbatim historical report; absolute paths and old PREPARED/latest wording are historical, not portable instructions."
+  },
+  {
+    "archive": "R8_A4_IMPLEMENTATION_RESULT.txt",
+    "source_workspace_path": "cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z/R8_A4_IMPLEMENTATION_RESULT.md",
+    "sha256": "182e6cfa3e260b0ed8fe2e73d71a4c5e454692a8cff747b526e3ef6930f87ed7",
+    "scope": "Verbatim historical report; absolute paths and old PREPARED/latest wording are historical, not portable instructions."
+  },
+  {
+    "archive": "R8_A4_DYNAMIC_PREP.txt",
+    "source_workspace_path": "cleannav-experiments/cleannav-patrol-r8-a4-dynamic-prep-20261106T025507Z/R8_A4_DYNAMIC_PREP.md",
+    "sha256": "35000f7544c71b92da488eff928c4f08ec410ac9806e478dcadecab8e45bbb14",
+    "scope": "Verbatim historical report; absolute paths and old PREPARED/latest wording are historical, not portable instructions."
+  },
+  {
+    "archive": "R8_A4_THREE_ATTEMPT_DYNAMIC_RESULT.txt",
+    "source_workspace_path": "cleannav-experiments/cleannav-patrol-r8-a4-dynamic-prep-20261106T025507Z/R8_A4_THREE_ATTEMPT_DYNAMIC_RESULT.md",
+    "sha256": "6a0ce0cfe6fab9af979e723de03d34bfb40b42d90591a9eb86c4625d2771dd3d",
+    "scope": "Verbatim historical report; absolute paths and old PREPARED/latest wording are historical, not portable instructions."
+  },
+  {
+    "archive": "ATTEMPT1_RESULT.txt",
+    "source_workspace_path": "cleannav-experiments/cleannav-patrol-r8-a4-dynamic-prep-20261106T025507Z/session-patrol-lap-1-r8-a4-20261106T025507Z/RESULT.md",
+    "sha256": "51a7ebd04eee45ed3ed40c94c65ffb76f625295d74bcbe7e61952e651947f535",
+    "scope": "Verbatim historical report; absolute paths and old PREPARED/latest wording are historical, not portable instructions."
+  },
+  {
+    "archive": "PROJECT_MASTER.txt",
+    "source_workspace_path": "PROJECT_MASTER.md",
+    "sha256": "38a1553691827c2984d8408902f54be459d37b1dc20bf2e229329101656b9e00",
+    "scope": "Verbatim historical report; absolute paths and old PREPARED/latest wording are historical, not portable instructions."
+  },
+  {
+    "archive": "WORKSPACE_OPERATIONS_RUNBOOK.txt",
+    "source_workspace_path": "docs/OPERATIONS_RUNBOOK.md",
+    "sha256": "8088ffb9b99438c071fcff3ab92c3a5a559daa278198ec88b80522272c819684",
+    "scope": "Verbatim historical report; absolute paths and old PREPARED/latest wording are historical, not portable instructions."
+  },
+  {
+    "archive": "DECISION_LOG.txt",
+    "source_workspace_path": "docs/DECISION_LOG.md",
+    "sha256": "a497abc111ce4c320b7fafccdf3a82c132b018b46a8e94294b46737e4f380645",
+    "scope": "Verbatim historical report; absolute paths and old PREPARED/latest wording are historical, not portable instructions."
+  },
+  {
+    "archive": "EXPERIMENT_INDEX.txt",
+    "source_workspace_path": "docs/experiment-archive/EXPERIMENT_INDEX.md",
+    "sha256": "b6b1adc76e91edc4348e4ba5a5ff4f0dad4a4da42bd68d9c0de9a113e0d85c5c",
+    "scope": "Verbatim historical report; absolute paths and old PREPARED/latest wording are historical, not portable instructions."
+  },
+  {
+    "archive": "NAVIGATION_README_PRE_R8_A4.txt",
+    "source_git_commit": "3c5b86bf8d07992df38b6b701fdcce79b58ffaf4",
+    "source_git_path": "README.md",
+    "sha256": "723ec8ff7c8f2f0d4f2b328bbb66e9ecfb9f1020cf94b981aba7565df564841d",
+    "scope": "Verbatim pre-release Navigation README, historical startup/Oracle instructions; not the current PATROL recipe."
+  }
+]

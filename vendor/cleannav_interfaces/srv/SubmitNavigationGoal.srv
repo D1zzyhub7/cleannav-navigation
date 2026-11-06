@@ -1,0 +1,16 @@
+# Atomic managed planar navigation; independent of TaskCommand V1.
+uint8 SOURCE_RVIZ=5
+uint8 REJECT_IF_BUSY=0
+string<=128 command_id
+uint8 source
+geometry_msgs/PoseStamped goal
+# Relative to goal.header.stamp; >0 and <=30 seconds.
+builtin_interfaces/Duration valid_for
+uint8 busy_policy
+---
+bool accepted
+uint16 reason_code
+string<=512 reason
+string<=128 command_id
+string<=64 execution_id
+uint16 task_id

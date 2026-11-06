@@ -1,0 +1,129 @@
+# R8-A4 Dynamic Validation Preparation
+
+**PREPARED / DYNAMIC NOT RUN / AWAITING USER AUTHORIZATION**
+
+本轮正式runner调用0、ROS/Gazebo启动0、POST/Lease/速度发布0；余下动态机会仍为 **1次（累计2/3已用）**。没有执行任何外层preflight-command.sh/preflight.py，没有source overlay或导出目标ROS_DOMAIN_ID。
+
+## 新session与候选绑定
+
+Session / 唯一未来cwd：
+
+`/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-dynamic-prep-20261106T025507Z/session-patrol-lap-1-r8-a4-20261106T025507Z`
+
+候选：`/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z`。
+
+完整identity：`6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5`。
+
+直接父A2：`d705384e023a3c545f90d95fb7062c7bcedac7a47903507868128b56fc61e8f2`。
+
+**最新实际动态基线仍是A2；A4只完成离线及安装加载验证，UNVERIFIED/approved=false，没有动态PASS。** 已重新核对候选identity、392项product manifest及封存SHA清单，未重复166项算法审计，未修改A4候选任何文件。
+
+| 独立绑定 | 值 |
+|---|---|
+| ROS Domain | 228 |
+| Gazebo / Gateway端口 | 11844 / 18144 |
+| sequence_id | `pillar-v1-e2e-lap1-r8-a4-20261106T025507Z` |
+| command_id | `pillar-v1-e2e-lap1-r8-a4-20261106T025507Z-cmd` |
+| 幂等数据库 | `/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-dynamic-prep-20261106T025507Z/session-patrol-lap-1-r8-a4-20261106T025507Z/gateway-idempotency.sqlite` |
+
+数据库目前不存在，未复制或打开历史幂等数据库。原Observer的 `SESSION=Path(__file__).resolve().parent` 自动写入新目录。只复制两个既有运行文件：run_patrol_lap.sh、lap_observer.py；没有新启动入口或运行时检查器。[绑定元数据](session-patrol-lap-1-r8-a4-20261106T025507Z/PREPARATION.json)。
+
+## 实际选包证据与资产
+
+下列路径来自封存A4的全新Python实际加载记录。本轮**没有再次source环境**，而是核对该冻结记录、env/安装SHA，并按新runner中同一Python AST路径表达式解析expected字典，10个固定包路径逐项一致；Interfaces保持原runner的“记录但不固定”语义。未来真实运行还会按runner原有身份块检查实际解析，不能把此准备记录当作新动态进程证据。
+
+| 组件 | 选择路径 |
+|---|---|
+| `cleannav_simulation` | `/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mask-lifecycle-freshness-fix-20261104T031832Z/install/cleannav_simulation` |
+| `cleannav_mission_manager` | `/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager` |
+| `nav2_costmap_2d` | `/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-a2-costmap-timestamp-20261105T104829Z/install/nav2_costmap_2d` |
+| `nav2_mppi_controller` | `/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-rc-20261105T022949Z/install/nav2_mppi_controller` |
+| `cleannav_navigation` | `/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z/install/cleannav_navigation` |
+| `cleannav_hmi_gateway` | `/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_hmi_gateway` |
+| `cleannav_safety_supervisor` | `/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_safety_supervisor` |
+| `cleannav_global_planner` | `/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_global_planner` |
+| `cleannav_path_executor` | `/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_path_executor` |
+| `cleannav_rtabmap` | `/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_rtabmap` |
+| `cleannav_interfaces` | `/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-patrol-goal-checker-interfaces-r1/install/cleannav_interfaces` |
+
+其中Navigation为A4副本，MPPI为R7-RC、Costmap为R7-A2，其余与A2保持一致。没有A3 Navigation/MPPI ABI组合。详细路径、13个原ELF检查输入的实际表达式结果及冻结加载来源见 [expected-prefixes.json](evidence/expected-prefixes.json)。已有运行时ELF身份核对逻辑保留，只将其中两份Navigation消费库路径改指新prefix。
+
+Nav2 YAML、Region Registry、Keepout profile仍使用R7-RC原config；world仍为pillar-localization-v1原world；地图仍为patrol_pillar_v1_mapping_v1，原route.json/entry/Footprint/Keepout/定位cadence不变。`assets_candidate`与 `sim_candidate` 原值不变。A4 env沿用A2后前置新Navigation，runner仍先source Humble，再source候选自己的env。
+
+## A2 runner差异与成功路径交叉核对
+
+主参考是A2已实际执行的session：
+
+`/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r7-a2-dynamic-prep-20261105T115737Z/session-patrol-lap-1-r7-a2-20261105T115737Z`
+
+其runtime-invocation.json记录的真实cwd就是该session、argv为 `bash run_patrol_lap.sh`。A2 launch.log:66有SYSTEM READY，真实POST202/Lease/GOTO通过，完整PATROL后来失败。R6-A3 launch.log:67也有SYSTEM READY，原RESULT确认同一正式入口、FD9/SID/锁、3秒时钟门、单POST/GOTO及清理；**R6-A3同样没有完整单圈成功**。[交叉核对](evidence/historical-startup-crosscheck.json)。
+
+新runner仅改变：
+
+1. session绝对路径，候选根与完整identity。
+2. Navigation expected-prefix及两份Navigation消费库路径；RC MPPI/A2 Costmap不动。
+3. domain/两个端口；候选名称说明文字。
+
+Observer仅改变SEQUENCE_ID与GATEWAY URL；command自动由新sequence加 `-cmd` 得到。任务body其余字段、单次POST、clock、安全/停止及记录逻辑不变。
+
+[runner.patch](runner.patch)、[observer.patch](observer.patch)保留完整差异。将上述替换逆向还原后，**runner与A2原文逐字一致，Observer与A2原文逐字一致**。[等价核对](evidence/runner-equivalence.json)。A2与R6-A3的8个清理函数也逐字一致。
+
+启动次序保持：原进程/端口/域检查 → unset原环境路径变量 → source Humble → source候选env → export目标Domain/localhost/Gazebo URI → 原安装身份/ELF、资源、地图检查 → FD9共享锁及SID导出 → 原launch → 原monitor/Gateway/bag/Observer → 原readiness及3秒时钟门 → 唯一一次POST → 原清理。
+
+本轮只执行 `bash -n`、Observer AST解析、绑定/顺序/路径核对和一次纯分段函数计算；没有执行runner正文或导入Observer。初次离线文本顺序检查误匹配cleanup内的“ros2 launch”字符串，已改为真实launch语句后通过；首错记录在evidence，未改运行逻辑。没有创建或运行新的Gate、Probe、Observer、Preflight、包装器。
+
+## 唯一正式启动命令（本轮未执行）
+
+**必须先取得用户对本session及完整候选identity的新明确动态授权。** 当前只授权准备。
+
+```bash
+cd /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-dynamic-prep-20261106T025507Z/session-patrol-lap-1-r8-a4-20261106T025507Z
+bash run_patrol_lap.sh
+```
+
+不得先在外层source/export，不从项目根调用其他入口，不执行evidence/preflight-command.sh或preflight.py，不复用旧A2 session。不要把以上计划命令写成已经执行。该次机会只能单POST、无重试。
+
+## 资源与清理策略
+
+一次性准备快照（不是新增runner Gate）：MemAvailable约 **5.417 GiB**，swap使用约 **0.000 GiB**，memory PSI some/full avg10均0；未发现保护ROS/Gazebo/编译进程，11844/18144无TCP监听，可读environ中Domain228持有者0。共享build.lock可取得且已释放。[快照](evidence/resources-and-ownership.json)。
+
+**27个进程environ不可读，全UID域空闲仍UNKNOWN。** 不忽略该证据边界，也不新增检查层、sudo、权限修改或进程终止。当前快照不预留端口/Domain，不保证未来仍空闲。
+
+未来执行仍使用runner自身原检查：MemAvailable≥2.5GiB、已用swap≤.5GiB，原进程/端口/可读Domain检查与锁不变；PSI记录和原监督机制保持。任何真实运行前提均需在获准启动时由既有流程核实。本轮没有动态资源准入PASS，cgroup保留UNKNOWN/WAIVED历史边界。
+
+清理仍由原trap完成：记录自有PID/PGID，Observer/bag先收尾，Gateway/aggregator等按原组清理；launch组SIGINT等待、必要时对已确认自有组成员升级TERM/KILL，wait回收；保存cleanup.json/group-teardown、地图前后SHA及端口/域/组终态。FD9随进程关闭释放。不用关闭终端代替进程清理，不终止其他项目或归属不明进程。实际安全停车/Lease清空必须看当次Safety与bag证据，不能只看进程消失。
+
+Observer原PREFLIGHT_SEC=420、MOTION_SEC=900、clock settle=3秒/250ms、外层Observer timeout1500秒及kill reserve60秒均保持；这不是新整栈总时限承诺。首错即保留现场，不追加第二次尝试或临时调整产品。
+
+## 唯一动态机会的证据关注点
+
+| 项目 | 沿用的证据 |
+|---|---|
+| SYSTEM READY、稳定时钟 | launch.log、clock-gate.json、MM/clock记录 |
+| 唯一POST202及真实Lease | submit.json/events、Gateway日志/新幂等DB、Safety/Task bag |
+| GOTO完成 | sequence步切换、Facade/Nav2、轨迹，不能当全圈完成 |
+| 分段点932 | 既有身份块固定新Navigation/模块SHA，实际admitted1649点与冻结route核对；确定性切片 `((0,933),(932,1649))` |
+| 两个PATROL内层FollowPath完成 | 原Observer的inner_follow事件/计数，加bag中完整UUID/status及PATROL执行时间线；逐一确认两段SUCCEEDED |
+| 完整PATROL与单圈 | outer_follow SUCCEEDED、MM/APP sequence SUCCEEDED和completed_steps=2/2、完整路线与终态；current_lap=1字段本身不是完成事件 |
+| Optimizer/LOST/ESTOP | controller/health/Security/Safety原日志与bag，按首错时间排序 |
+| 核心253异常 | 原Security nonlethal_core_cells/failure_latched、原raw Costmap与TF/mask bag；要求异常为0，判据不变 |
+| 停车/Lease释放/完整清理 | 六分量零控、真实Safety停车ack和owner空、组/端口/Domain/锁证据；Observer旧快照不能覆盖后来的真实终态 |
+
+当前新模块在原route上的932已重新计算并保存 [expected-path-splits.json](evidence/expected-path-splits.json)。**现有Observer不直接输出far index或记录FollowPath原始goal payload**；运行后应把“固定安装/完整输入的确定性重建”与“直接录制的action payload”区分。没有为了补遥测去改Facade或增加Observer。两段完成状态仍由既有action status bag和Observer记录。
+
+## 未解决问题与停点
+
+- 没有身份/安装绑定不一致，正式runner可按必要替换直接复用，无产品修复需求。
+- A2/A4环境已有8条相同的旧setup hook缺失信息，A4实施阶段的实际选包、导入、ELF验证已通过；本轮保留原环境，不借准备任务修复旧hook。
+- 全UID域空闲、真实运行时资源、安全状态和A4动态收敛尚未证明；不能用PREPARED称动态通过。
+- 不新增“MPPI P99必须≤22.19ms”的运行门槛，该数仅为A2历史比较基准。
+
+A4候选、A2/R6历史session、产品与地图/路线保持原样；本轮无构建/启动/POST/Lease/速度、无后台运行任务。准备完成后停止，等待用户审查及明确动态授权。
+
+## 最终核对与Memory Checkpoint
+
+[最终保护核对](evidence/final-preservation.json)：2504个历史/冻结文件未变，A4候选全目录封存内容和identity未变，相关Git快照相同；配套PROJECT_MASTER/Runbook/决策/实验索引仅追加准备状态，见documentation.patch。Session内没有launch/submit/clock-gate/cleanup/bag等真实运行产物。
+
+[执行汇总](EXECUTION_SUMMARY.json)：UI终端新建0、复用0，工具普通管道；自有受托管前台命令已退出，后台任务0、无残留PID，未终止受保护进程，无临时UI终端需清理。锁已释放。
+
+Shared Memory updated: `cleannav_current_baseline`、`cleannav_next_actions`、`cleannav_session_20261106_r8_a4_dynamic_prep`；没有将A4晋升为动态基线。

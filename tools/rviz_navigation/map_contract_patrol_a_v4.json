@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "profile_id": "patrol-a-v4",
+  "map_id": "patrol_A_closed_loop_rtab_v4",
+  "map_directory_relative": "cleannav-experiments/cleannav-final-simulation-runtime-20261016T030255Z/maps-root/patrol_A_closed_loop_rtab_v4",
+  "world_relative": "cleannav-experiments/cleannav-patrol-rtab-real-map-20261015T072721Z/run-source/cleannav_patrol_regions_v1.world",
+  "world_sha256": "00aef0cdb9a07d5e06e876105014f068db7bdd20a9790a050209748a0bf2919a",
+  "files": {
+    "manifest.json": "fbba10f1941462ada622afc507ecf024cf9514bc50f654094c3e5db3349e220a",
+    "map.yaml": "d11fd6fce3550263ad900f33ea548af63d5cdaa7be44ce603979897f4c94b020",
+    "map.pgm": "54ce76bf7c2eb2938cd42977140bc952908ea241591e0c0017f00d777a80a517",
+    "rtabmap_config.ini": "18bf8592dcdedf5c068406e2da6f86f90399af7ef162c6dbebb80fc9ac2680cd",
+    "map_saver_original.yaml": "3d952c73754f38627e1908c1577dbe7f31d75d5c8c0148b511267e990206f2f2",
+    "rtabmap_params.yaml": "fff2fb88cdad0c53dd1d359594c636a3105aa10f92deaae501fcf2cdcd6b017e",
+    "map_export.log": "787124d84120bb9465e5e14b261afddd0a4855865a5a9dd519c79d3a5e98baba",
+    "rtabmap.db": "c09e32a50c52e339d5681e3c2cc3ced28bd5503dcdfcd8b3cad4bcbeae2db382",
+    "occupancy_grid.json": "eb1e7c16c126c5f9d8512aa6f74be30be9998b841622710f27af377053ff1ce4"
+  },
+  "scan_topic": "/scan",
+  "scan_frame": "base_scan",
+  "frame_id": "base_footprint",
+  "odom_mode": "topic",
+  "odom_topic": "/odom",
+  "odom_frame_id": "",
+  "localization_initial_pose": "-2.033005714416504 -1.2857067584991455 0 0 0 0.8577181413",
+  "spawn": {
+    "x": "-15.0",
+    "y": "2.4",
+    "z": "0.02",
+    "yaw": "0.0"
+  },
+  "spawn_delay_sec": "10.0",
+  "safety_scan_topic": "/scan",
+  "roof_mapping_topics": [
+    "/mapping/scan_raw",
+    "/mapping/scan"
+  ],
+  "startup_order": [
+    "safety_blocked",
+    "gazebo_vehicle",
+    "collision_monitor_active",
+    "disk_map_and_rtabmap_localization",
+    "rviz_initialization_ui",
+    "nav2",
+    "mission_manager",
+    "goal_adapter"
+  ],
+  "source_bindings": {
+    "simulation_model_xacro": {
+      "path": "cleannav_simulation/urdf/cleannav_ackermann_startup_smoke.urdf.xacro",
+      "sha256": "59036f677ae1dd873157132583f41fd7ad0cd722bf7bc790734b379343287a3a"
+    },
+    "rviz_config": {
+      "path": "tools/rviz_navigation/navigation.rviz",
+      "sha256": "9a798040298f4b7fdcdae0669bc4ae9ce9bf9cc30bc941ca58a0b97ea81e5995"
+    },
+    "runtime_dependencies_sha256": "33c68e0f15a9e534732352b0865354e90bc643fa5bac2c890bbc81a017feaabf",
+    "expected_prefix_packages": [
+      "cleannav_global_planner",
+      "cleannav_interfaces",
+      "cleannav_mission_manager",
+      "cleannav_navigation",
+      "cleannav_path_executor",
+      "cleannav_rtabmap",
+      "cleannav_safety_supervisor",
+      "cleannav_simulation"
+    ],
+    "overlay_setup_env": "CLEANNAV_RVIZ_OVERLAY_SETUP",
+    "overlay_identity_config_env": "CLEANNAV_RVIZ_MACHINE_CONFIG"
+  },
+  "provenance": {
+    "source_candidate": "ae252a58136a71b931186b32f21783a1c1e8928f8ea8c491142e6e03f0c7c266",
+    "source": "retained A v4 sensor map, Candidate43 registry, historical stopped-pose localization prior; old cruise FAIL retained"
+  },
+  "activation_status": "STATIC_WIRING_NOT_DYNAMIC_VERIFIED",
+  "patrol": {
+    "registry_relative": "cleannav-experiments/cleannav-patrol-facade-grid-contract-candidate43-20261017T155201Z/candidate/region_registry_candidate.json",
+    "registry_sha256": "6c9acef8b922af476f88529425edb6d60e7f351e1ddfd8e85556c72198b61273",
+    "map_identity": {
+      "map_id": "patrol_A_closed_loop_rtab_v4",
+      "revision": "2026-10-16T03:28:12.018988+00:00",
+      "sha256": "eb1e7c16c126c5f9d8512aa6f74be30be9998b841622710f27af377053ff1ce4",
+      "frame_id": "map"
+    },
+    "region_id": "A",
+    "route_id": "A_loop_candidate42_p2xy075y025yaw010",
+    "laps": 1,
+    "max_odometry_m": 14.0,
+    "task_timeout_s": 300.0,
+    "world_from_map": [
+      -12.74930548251804,
+      1.77345689763271,
+      -0.8303321534484357
+    ],
+    "route_segments": 5,
+    "goal_checker_source_relative": "cleannav-experiments/cleannav-patrol-follow-replacement-race-20261019T022930Z/candidate-run/nav2_local_recovery.yaml",
+    "goal_checker_source_sha256": "5081fc16a52fafea449ac9b58b7ced7a650faca87fcec6a57e561c680d940d15"
+  }
+}

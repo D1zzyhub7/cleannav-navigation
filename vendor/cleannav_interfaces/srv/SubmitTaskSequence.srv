@@ -1,0 +1,20 @@
+# 整个序列是一个原子请求；有效期只约束提交，不会在前序执行期间耗尽。
+std_msgs/Header header
+string<=16 interface_version
+string<=64 sequence_id
+string<=128 command_id
+uint8 source
+builtin_interfaces/Duration valid_for
+bool user_confirmed
+string<=64 map_id
+string<=64 map_revision
+string<=64 map_sha256
+TaskSequenceStep[<=16] steps
+---
+bool accepted
+bool replayed
+uint16 reason_code
+string<=64 sequence_id
+string<=64 current_execution_id
+string<=32 state
+string<=512 message

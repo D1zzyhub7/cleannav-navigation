@@ -1,0 +1,1218 @@
+> **2026-11-05 R7-RC DDS替代审计：Graph原型验证通过，不能替代Domain Gate。** 实际RMW为rmw_fastrtps_cpp6.2.10 / Fast DDS2.6.11，localhost-only=1。安装版原生Participant轮询枚举返回UNSUPPORTED；rclpy仅Graph，不能证明DDS空域。独立目录`cleannav-experiments/cleannav-r7-dds-discovery-audit-20261105T043925Z`在临时域131/132/133完成12项离线单测及受限Graph正反测试：同域真实ROS节点/GID→OCCUPIED，SELF_ONLY/无效RMW/不可达Discovery Server→UNKNOWN；跨UID未测，原生Participant移除未直接观察。Domain223未使用，旧29个/proc UNKNOWN未解除，不接入/替换Gate、不创建巡航session。冻结375文件/205产品哈希不变，候选仍UNVERIFIED/approved=false；获准的最小ROS/DDS测试进程全部退出，fixture自然结束、0signal，无Gazebo/导航/MM/Gateway/POST/Lease/cmd_vel/构建。见[审计](R7_DDS_DOMAIN_DISCOVERY_AUDIT.md)、[结果](R7_DDS_DOMAIN_DISCOVERY_RESULT.md)。下一步仅独立审查，未来测试或巡航须新的明确范围/授权，本轮停止。
+
+> **2026-11-05 R7-RC启动检查修复：离线PASS，动态准备BLOCKED。** 详见[R7_PREFLIGHT_FIX_RESULT](R7_PREFLIGHT_FIX_RESULT.md)。Domain检查器不依赖继承环境，完整保存self/精确wrapper/外部/UNKNOWN；64条A路径必需、8条历史B缺失留WARNING，source顺序/stderr不变。82项离线检查通过，冻结375文件不变。实际域检查仍因29PID身份不可读而rc1；不得将“未找到可读外部holder”写为空域，不按系统进程名称/UID豁免。当前没有新动态session或可执行唯一入口；只有未分配session/domain/ports的模板。停止等待，不再sudo、不修改/proc、不启动动态。
+
+> **2026-11-05 R7-RC最新状态：授权尝试在preflight停止，唯一动态授权已结束。** domain223检查报PID886083，但检查器可能扫描到了自身；argv未留存，无法确认PID归属。端口检查通过，受保护ROS/Gazebo进程扫描为空；后续锁/资产/prefix/clock检查未到达。唯一runner调用0、Gazebo/Gateway/POST/任务/Lease/cmd_vel均0。按用户停止规则，不复查、不重试，失败session不得复用；候选仍UNVERIFIED/approved=false。详见下方本轮记录与session RESULT。
+
+> **2026-11-05 R7-RC READY（历史准备记录）：30组配对与私有构建/集成通过，真实巡航未运行。** 新候选`cleannav-patrol-r7-rc-20261105T022949Z`，identity `7262c8d7fcfa23e78fc17c417f1f904136e4862c5e2705db05de3c19f4ad6b67`，仍UNVERIFIED/approved=false。A21/30、D30/30；D0停滞/abort/理想车辆254接触，完整native回调P99=28.872ms/max29.011ms，无100ms超时。参考行权重中位.7792、ESS1.6439，收益主要来自曲率引导参考，不是严格无偏Gaussian MPPI；合成同种子直线对照证明提前减速，原A3无前直线/原RNG缺失，未精确复现原失败。算法与R7保持，本轮只增离线测量/已有计时宏及独立入口/资产hash绑定。47clock、26Facade、27MM定向、实际空launch所有权/清理与参数组合通过，父R7原417文件未变。R6额度3/3耗尽；本次授权尝试现已在preflight终止，不再增加准备Gate。
+
+> **2026-11-04 Patrol V1 单圈 r4 FAIL：唯一一次任务被 Mission Manager 的时钟校验拒绝，车没动，不要立刻再跑。** 会话 `cleannav-experiments/cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z/session-patrol-lap-1-r4-20261104T075017Z`（候选身份 `391e0842…`，域 192、Gazebo 端口 11752、Gateway 端口 18083，`enable_motion=true`、`auto_start_task=false`，只提交 1 次、无重试）。`POST /api/v1/task-sequences` 返回 **422 `reason_code 609` `"sequence timestamp is in the future"`**：Gateway 按自己的仿真时钟打戳（bag `/clock` 在提交时刻为 sim 42.0–42.1），而 Mission Manager 在提交时（节点构造后 **1.646 s**）还没收到 `/clock`，本机 ROS 时间 **< 41.85 s**，超出 `task_sequence.py:226` 的 250 ms 容差。`/plan`、`/cleannav/navigation/admitted_path`、`/cleannav/task_sequence_status` 全 **0 条**，`/cmd_vel` 501 条全零，未申请 Lease（`block_all=true`），无 ESTOP、无定位 `LOST`，守卫 ros 39.0 已 `READY`、`preflight` 全 true、`rtabmap.db` 未变、清理干净（`domain_192_holders=1` 是 `domain_holders()` 自计数，r3 同为 1）。同一脚本同一 launch 的 r3 在节点存活 **1.050 s** 时被接受（`TaskSequenceStatus.header.stamp=41.600`），所以这是“提交门没有时钟就绪条件”的启动竞态，**不是候选 3 个文件造成的**——Facade 的 follow 生命周期代码本轮一次都没加载，候选仍为 UNVERIFIED。不要放宽 250 ms 容差、不要重试提交、不要复用本会话目录或 idempotency 库。证据：该会话 `RESULT.md`。
+>
+
+> **2026-11-03 回调修复静止验证已经通过，不要据此发车。** 会话是 `cleannav-experiments/cleannav-patrol-pillar-v1-e2e-health-callback-fix-20261103T130146Z/session-stationary-callback-fix`。不要复用域 188 和端口 11748。`campus_keepout_ready` 这次没有变成 true。下一圈需要新的动态授权。证据：[CLEANNAV_PATROL_CALLBACK_FIX_DYNAMIC_VALIDATION.md](CLEANNAV_PATROL_CALLBACK_FIX_DYNAMIC_VALIDATION.md)。
+
+> **2026-11-03 定位时序已经查清，先改监视器再谈下一圈。** 不要放宽 2.5 秒或 3 秒窗口。下一处修改只在 health-fix 监视器源码的 `/rtabmap/info` 订阅和 `LocalizationMonitor._poll`：信息订阅使用独立回调组；只有 `motion_ok` 为 false 时才锁存 `LOST` 并取消导航。改动放进新候选，不要改已经记分的安装原件。静止复测通过之前不要提交 `laps=1`。证据：[CLEANNAV_PATROL_LOCALIZATION_TIMING_AUDIT_20261103.md](CLEANNAV_PATROL_LOCALIZATION_TIMING_AUDIT_20261103.md)。
+
+> **2026-11-03 八柱端到端单圈停在定位健康锁存，不要立刻再跑。** 会话 `cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/session-patrol-lap-20261103T122500Z`，域 187，端口 11747。定位在 ROS 39.1 s 锁存 `LOST` 后没有提交 `POST /api/v1/task-sequences`。下一次运动需要新的授权，并且先处理这个锁存；不要放宽 3 秒窗口，不要改 Safety。`cleannav-build/pc-sim-v2/build` 已不在，启动脚本必须把候选里补回的 safety、global planner、path executor 和 rtabmap 前缀放在 `AMENT_PREFIX_PATH` 前面。证据：[CLEANNAV_PATROL_V1_E2E_INTEGRATION_20261103.md](CLEANNAV_PATROL_V1_E2E_INTEGRATION_20261103.md)。
+
+> **2026-11-03 八柱完整单圈停在实时规划。** 不要用现有 `pillar_v1_short_goto` 剖面和 `nav2_local_recovery.yaml` 直接再跑 `GOTO_REGION + PATROL_REGION`。那次会话 `session-patrol-lap-20261103T030100Z` 里，Smac 对 16 段都没有路径，任务没有提交。下一次运动需要新的授权。证据：[CLEANNAV_PILLAR_PATROL_LAP_20261103.md](CLEANNAV_PILLAR_PATROL_LAP_20261103.md)。
+
+> **2026-11-03 八柱健康修复的静止验证已经完成，下一次运动没有授权。** 通过的会话是 `cleannav-experiments/cleannav-patrol-pillar-v1-health-fix-20261103T012522Z/session-stationary-20261103T015800Z`，域 185，端口 11745，`enable_motion:=false`。不要把这次静止通过当成 GOTO 或 `PATROL_REGION` 授权，也不要复用这次会话目录。短 GOTO 仍须新的会话、显式安全剖面和新的动态授权。证据：[CLEANNAV_PILLAR_HEALTH_FIX_DYNAMIC_VALIDATION_20261103.md](CLEANNAV_PILLAR_HEALTH_FIX_DYNAMIC_VALIDATION_20261103.md)。
+
+> **2026-11-03 八柱健康修复候选还没有动态授权。** 离线修复在 `cleannav-patrol-pillar-v1-health-fix-20261103T012522Z`。下一次只做长时间静止观察，source 它的 `candidate-run/env.sh`，域 185，端口 11745，`enable_motion:=false`，不要提交 GOTO。命令见 [CLEANNAV_PILLAR_LOCALIZATION_MINIMAL_FIX_20261103.md](CLEANNAV_PILLAR_LOCALIZATION_MINIMAL_FIX_20261103.md)。本文件不授权启动。
+
+> **2026-11-03 八柱短 GOTO 的安全剖面已经绑定，这一次运动没有完成。** 下一次必须使用新的会话目录，并继续传入 `campus_security_profile:=.../config/pillar_v1_short_goto/security-profile.json`。不要复用 `session-short-goto-20261102T234500Z`、`session-short-goto-20261103T082000Z` 或 `session-short-goto-20261103T083800Z`。定位健康锁存 `LOST` 后不要重置 ESTOP，也不要放宽 3 秒匹配窗口。本文件不授权下一次运动，也不授权 `PATROL_REGION`。
+
+> **2026-11-03 八柱短 GOTO 已授权一次，但现有 Guard 在 Gazebo 前拒绝。** 使用候选 `env.sh`、域 184、端口 11744 和指定的 `nav2_local_recovery.yaml` 与 `region_registry.yaml`。`motion_profile:=patrol_030_candidate` 加 `enable_motion:=true` 要求已绑定的正式 Guard/Keepout。八柱地图和 world 没有这条绑定，也没有传入 `campus_security_profile`。不要为了通过而改检查、套用旧 Campus profile 或放宽 Keepout。下一次运动需要新的授权，并且先有与这张地图和 world 绑定的正式安全剖面。证据在 `session-short-goto-20261102T234500Z/`。
+
+> **2026-11-03 八柱下一次短 GOTO 还没有授权。** 先清空四个前缀变量，再 source `cleannav-experiments/cleannav-patrol-pillar-v1-nav2-prep-20261102T174300Z/candidate-run/env.sh`。必须传 `nav2_params_file` 为双雷达候选的 `candidate/guard/nav2_local_recovery.yaml`，以及本候选 `config/region_registry.yaml`。不要用空的 `nav2_params_file`，那会落到默认 Ackermann 参数：足迹 0.45×0.29、`allow_unknown=true`、REEDS_SHEPP、`/scan`。域和端口不要复用 183/11743。本文件不授权启动。
+
+> **2026-11-03 八柱只完成静止定位，下一次运动仍要单独授权。** 不要用 `24adcd98…` 安装包直接跑 Oracle 定位：它的输入守卫仍要求后轴 x=0.30 m，30 秒超时后会关掉整栈。本轮通过的是已构建 V1.2 包 `review-fixes-patrol-dual-lidar-oracle-mapping-20261102`，守卫接受 `odom -> base_footprint`。八柱 world 没有状态插件，Oracle 需要现有参数 `enable_diagnostics:=true`。域 183，端口 11743。证据在 `cleannav-experiments/cleannav-patrol-pillar-v1-route-20261102T163219Z/session-stationary/`。
+
+> **2026-11-03 八柱路线候选未注册、未授权运动。** 目录 `cleannav-experiments/cleannav-patrol-pillar-v1-route-20261102T163219Z`。不要把 `route.json` 写进正式 Registry，不要复用 Run `patrol-A-single-lap-run43` 或 `run44`，也不要用轮式 `/odom` 代替 Oracle。RViz 配置是 `config/patrol_pillar_v1.rviz`，本轮没有启动它。
+
+> **2026-11-02 Patrol V1.2 停在 Mapping Survey 授权前。** 无运动观察使用 `cleannav-experiments/cleannav-patrol-dual-lidar-oracle-mapping-20261102T152400Z/session-nomotion/env.sh`，域 181，Gazebo 端口 11741，World 仍是 `cleannav_patrol_regions_v1.world`。不要把静止会话 `67fef2efd6164d94b72725170971bdd2` 的数据库当成巡航地图，也不要复用它做单圈。下一次只能在新的 Mapping Survey 授权后，用现有 manual lease 和 `mapping_conservative` 速度扫描。证据：[CLEANNAV_PATROL_V12_MAP_REBUILD_AND_ROUTE_GENERATION.md](CLEANNAV_PATROL_V12_MAP_REBUILD_AND_ROUTE_GENERATION.md)。
+
+> **2026-11-02 Patrol 双雷达 Oracle 候选尚未允许运动。** 干净 shell 先去掉 `AMENT_PREFIX_PATH`、`CMAKE_PREFIX_PATH`、`COLCON_PREFIX_PATH`、`COLCON_CURRENT_PREFIX`，再 source `cleannav-experiments/cleannav-patrol-dual-lidar-oracle-20261102T144300Z/candidate-run/env.sh`。check-only 用该目录 `tools/check_candidate.sh`，没有 `--execute`。当前结果是 `OFFLINE_REFERENCE_VALID`，因为 v4 地图与融合扫描加 Oracle 不兼容。不要 source mapping-050 的顶层 `local_setup.bash`。动态命令和停止方式见[本轮报告](CLEANNAV_PATROL_DUAL_LIDAR_ORACLE_INTEGRATION.md)。提议 Run `patrol-A-single-lap-dual-lidar-oracle-20261102` 未创建。
+
+> 当前A区wheel单圈接线及命令见[Navigation主Runbook](../cleannav-worktrees/navigation-startup-baseline-20261021/docs/operations/RVIZ_MANUAL_NAVIGATION.md#巡航验收与证据查看)。本轮唯一Run `rviz-nav-20261029T105303Z-9ac81bf4` rc1：资源软准入通过、cgroup UNKNOWN/WAIVED，首错为TF诊断回调接口；任务未触发。进程清理通过但Safety撤销验证UNKNOWN。回调已静态修复，未动态复验，1/1已用完，不自动重跑。证据navigation-a-cruise-20261029T103235Z。
+
+# CleanNav 启动操作手册
+
+项目全局状态见[PROJECT_MASTER.md](../PROJECT_MASTER.md)。启动流程唯一事实源为 Navigation Git 仓库 [`STARTUP_SMOKE.md`](../cleannav-worktrees/navigation-startup-baseline-20261021/docs/operations/STARTUP_SMOKE.md)；本页保留历史成功/失败证据和冻结流程，不复制当前可执行入口规范。旧A/B/C28命令仍仅供审计，禁止直接重跑。历史启动成功不等于定位/Nav2/巡航通过。
+
+
+## 完整车顶建图：正式操作与诊断模式
+
+> **当前完整候选已消费、暂停等待新任务**：两次受控尝试均已运动，最终因readiness软件阻断/驾驶截止停止；无正式保存地图，末帧四墙诊断FAIL。不得重放旧Run/Scope/Auth或自动再跑；先阅读[本任务结果](../cleannav-deliverables/roof-full-prefix-fix-20261025T183540Z/MASTER_REPORT.md)，未来动态调用必须重新审查身份并另获授权。
+
+建图使用独立候选内既有 `tools/run_mapping.sh`；不得使用下方冻结A/B命令、导航入口或第二套运动wrapper。操作前读取当前候选AGENTS/操作Skill，核对source/tools manifest、route/design、world、实际overlay/ament prefix和全部输入SHA。按候选现有重绑定工具生成新Run ID及输出路径，只有本次明确授权覆盖实际profile后，才创建对应Scope/Auth绑定。**已有运行的授权一律不得重放。**
+
+最近已使用的隔离候选位置：`cleannav-experiments/roof-full-ready-pause-20261026T010909Z/working_candidate`。下例表示唯一入口的调用结构；必须先完成新身份绑定、确认OUT不存在，不能直接重跑已消费身份。
+
+```bash
+cd /home/d1zzy/code/cleannav_modularization/cleannav-experiments/roof-full-ready-pause-20261026T010909Z
+bash working_candidate/tools/run_mapping.sh
+rc=$?
+# 前台持续托管，等待真实退出；保留rc及budget-result.json。
+```
+
+1. 在动态调用前，检查shell真实解析DEL/EXP/OUT/RUN_ID/MAP_NAME、候选/Scope/Auth逐字授权与SHA；核验安装依赖和环境。端口、Domain、资源、旧进程、build/runtime锁及独立输出必须通过。
+2. 原runner完成CM ACTIVE与参数读回、bag topic订阅、MappingRoute输入/反馈健康、Lease与零速握手后才允许运动；不手动直接发布非零cmd_vel。
+   当前完整候选复用短回访既有机制（prefix与库核验顺序已有两次运行证据，路线完成/正式地图未通过）：RTAB先保持paused，内置recorder使用 `--storage-preset-profile resilient --max-cache-size 0`，以WAL/NORMAL实时落盘供既有prefix检查只读核验。参数采集使用一次list和一次批量get，严格拒绝缺失响应/类型不完整；保存实际core/plugin进程映射SHA、初始空DB及SHA、物理link真值快照。只有scan/raw、odom、TF/static、clock已写入，空DB/paused/物理真值证据齐全且本次Run/session/PID/start-ticks/boot/T0/SHA与时效匹配，才由原input guard完成TF/输入/Safety prime、实际fix/trace/core进程库核验，并重查recorder后native resume；之后仍需MappingRoute原有健康、Lease和零速握手。receipt缺失仅在既有30s内等待；损坏/过期/身份不符、WAL读取异常、recorder退出或库核验失败均不resume、不运动。
+   运行后必须核对prefix monotonic早于首个core process，以及处理scan源时间在bag中可恢复；“topic订阅完成”不能替代此前缀凭证。WAL preset来自现有安装后端，不另建recorder或直接调用内层运动链。
+   当前隔离broker仅在readiness单项暂失时持续零控等待并保留owner；READY恢复且全部硬门禁通过才继续。Safety/CM/ESTOP/Lease/deadman/输入失效仍关闭owner，原驾驶/总期限约束等待。不得把readiness=false当作可继续非零驾驶；最终管线归零存在交接延迟，须保留三路证据。
+3. 正常默认`standard`模式保留600s总墙钟、140m累计车体odom及0.15m或0.03rad持续1s诊断停止。独立候选的`quality_diagnostic`仅把纯真值/odom残差改为持续记录告警；输入/真值时效、owner/Lease、Safety、CM、ESTOP、空间范围、0.30m/s与禁倒车等硬停止保留。不得用profile跳过整个guard。
+4. 诊断profile须专属授权：首个外部操作前建立唯一monotonic T0，总截止T0+630；驾驶取`min(驾驶开始+560,T0+575)`；停车、释放和有界map save不晚于T0+590；原cleanup至T0+625，剩余5s强制回收所属session和最终收据。累计车体odom硬上限145m。任何预算到期均为失败，不是地图成功。
+5. 路线成功后，runner调用已安装MapManager保存到独立map name，命令按剩余工作预算有界执行；路线失败不冒充完整地图。失败/信号使用原零控、Release及cleanup。不得仅凭数据库存在、父进程退出或rc0判断地图通过。
+6. 退出后检查`route.json`、`body-odom-comparison.jsonl`、`phase-times.jsonl`、`budget-result.json`、`map-save.json`、`session.json`、最终Safety/控制、`cleanup.json`及`process-group-after-cleanup.json`；核实Lease owner清空、最终零控、父回收、无running/zombie及锁释放。没有证据的项写UNKNOWN。
+   bag SQLite完整性不能证明全处理序列无丢帧；归档时须比对最后core输入源时间与bag扫描末时刻。当前cleanup先停bag再回收RTAB存在尾帧窗口，不能用首帧prefix通过替代末端完整性核验。
+7. 地图独立验收仍为固定初始锚点、每墙309样本、0.1m步长、墙向±0.18m、0.25m内覆盖>=95%和法向中位绝对误差<=0.10m；同时报告P95、目标区域free/occupied/unknown/outside、raw与optimized误差。不得填白unknown或以局部闭环替代验收。失败地图不能进入正式定位验收。
+
+原始证据/逐轮结果统一见[MAPPING_HISTORY](MAPPING_HISTORY.md)及[诊断交付索引](../cleannav-deliverables/roof-full-map-diagnostic-20261024T120919Z/RUN_INDEX.json)；复用流程不等于复用已消费授权。下一次动态运行仍需单独明确授权。
+
+## 使用边界与状态
+
+`HISTORICAL_RUNTIME_CORROBORATED` 表示源脚本和原始运行证据相互支持；`STATIC_ONLY` 表示只核验源码；`UNKNOWN` 表示缺直接证据。所有 A/B 命令均为冻结参考，原 Run ID、输出目录与已消费授权不得重用。当前无一条新导航命令具有成功动态证据；无运动startup_smoke已在独立工作副本通过，见本文末。
+
+## 工作目录、入口与环境
+
+管理操作统一从 `/home/d1zzy/code/cleannav_modularization` 进行。历史 A/B/C28 的**调用方真实 cwd 和完整外层终端 argv 均未保存，标为 UNKNOWN**；不能把脚本的 `ROOT`/`EXP` 或 preflight 的逻辑 `work_root` 当作 `os.getcwd()` 证据。以下是从源码恢复的外层调用形式，未在本轮执行，不能直接重跑旧身份：
+
+```bash
+# FROZEN_REFERENCE_ONLY：调用形式来自源码，外层原始终端命令 UNKNOWN
+bash /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-autonomous-patrol-20261019T052525Z/mapping-retry-20261019T080100Z/tools/run_mapping.sh
+bash /home/d1zzy/code/cleannav_modularization/cleannav-deliverables/roof-lidar-autonomy-20261020T021924Z/working_candidate/tools/run_mapping.sh
+# C28：要求两个位置参数；旧 RUN_ID/OUTPUT_DIR 不可重用
+# bash <candidate-28>/tools/run_short_navigation.sh <NEW_RUN_ID> <ABSOLUTE_OUTPUT_DIR>
+```
+
+A 为 Candidate 16 `37b51a7a3fde8c8217106fdbcdc824af413b82ba4d4f2cece0d184f8cefcb87e`；B 为车顶建图候选 `17effab2ee69b967789f1aa486f6e1224832053fbcfca19b2e4287f089765f96`。A/B runner 均写死 Run ID、world、maps root、overlay prefix，并拒绝已存在运行目录；没有可任意传入的新 Run ID 参数。C28 当前身份为 `5f3eb040ca130f0574177d12ce3e1b9daedd84ff60d41c70f0b556f4dfb40a0e`，父 C27 `14f3a1585ad7794505951c115a56b86b988b00ea51aaaaa4c494737ded47a18a`，修复后仅 STATIC_ONLY。
+
+新工作获相应授权后的安全 ROS setup 顺序如下（STATIC_ONLY，来自 B runner 115–123、C28 runner 28–37；本轮只解析语法）：
+
+```bash
+set -eo pipefail
+export AMENT_TRACE_SETUP_FILES="${AMENT_TRACE_SETUP_FILES:-}"
+source /opt/ros/humble/setup.bash
+command -v ros2
+command -v xacro
+# source 精确候选的 candidate-run/env.sh；禁止把此处当作任意 overlay 选择器
+```
+
+不得在 source setup 前启用 `set -u`。A 历史 runner 用 `set +u`，经候选 env → Candidate43 env → Candidate38 env 间接 source Humble；B 显式先 source Humble，再 source 候选 env。候选 env 会清除 AMENT/CMAKE/COLCON/LD_LIBRARY_PATH/PYTHONPATH 后重建旧 overlay 链，因此 package prefix 必须实际核对。链内曾临时设 Domain 179，候选 env 和 runner 最终改为 204；不能把中间值当最终值。B 原 preflight 记录 PID1=systemd、Domain 204、localhost only=1、端口11704，无冲突进程。历史原生提权路径的支持证据是原 preflight 进程视图，不伪造未归档的 tool-call 收据。
+
+本轮原生只读 Git 审计也确认根目录无 Git 元数据，具体见 [Git 规范](GIT_AND_CANDIDATE_POLICY.md)。这不要求更改 ROS/WSL 环境。
+
+## 参数、路径与实际加载来源
+
+| 流程 | 参数来源与路径规则 | 已核实范围 |
+|---|---|---|
+| A Candidate16 mapping | runner 5–11 定义 ROOT/EXP/RUN_ID/OUT/WORLD/MAPS/PREFIX；profile 来自已安装 simulation share/config/motion_profiles | 原 launch/route/bag/DB 证明可运行；低位雷达，不是车顶方案 |
+| B roof mapping | runner 5–13 定义 DEL/EXP/RUN_ID/MAP_NAME；mode override 显式 include 恢复副本的 simulation launch、roof Xacro、RTAB wrapper | `/mapping/scan` 建图、低位 `/scan` 安全链有原始 bag 和路程证据 |
+| C28 localization | wrapper 两位置参数，output 必须为 delivery/runs 下绝对路径；supervisor 拼 launch argv；profile 从候选根 candidate-run 读取；localization/map helpers 来自实际安装 prefix | 参数名和当前 profile AST 路径已离线核验；修复后动态 NOT RUN |
+
+B mode 30–33 的恢复副本 source path 与 installed overlay 并存。只改候选 Xacro 不会自动让其他 launch 分支加载它。当前 C28 localization 分支 include 的是旧 installed `ackermann_mcity_demo.launch.py`；该文件展开旧安装 Xacro，没有 mapping_lidar。定位 wrapper 当前输入为 `/scan`。这是与成功车顶分支的**静态选路差异**，仍需另行授权的最小运行代码修复；本轮未改。证据见 [current-source-audit.json](/home/d1zzy/code/cleannav_modularization/cleannav-deliverables/project-governance-20261021/evidence/current-source-audit.json)。
+
+历史 B 的单字段 `mapping_mode_override_sha256` 已过期：expected `4ad8f82e…882f3f`，现存脚本 `0b817b19…b9b41`；tools manifest 与现存脚本一致。该不一致保留为 FAIL，禁止用重写历史 manifest 消除。
+
+## 建图阶段的真实先后条件
+
+以下保留历史A/B时序。当前短回访诊断的录制→prefix→resume顺序以上方正式操作第2项为准，不套用历史先resume后录制顺序。
+
+1. runner 取得 build/runtime 独占锁，初始化正确 overlay，执行资源/进程/端口/Domain 与身份门；cgroup 保持 UNKNOWN/WAIVED。
+2. mapping compose 启动 Safety（block_all、mapping_manual）、Collision Monitor 进程、手控 broker、coverage/monitor、Gazebo、RSP、spawn/controller spawners 和 simulation probe。此时 CM 进程存在不代表 ACTIVE，路线尚未启动。
+3. simulation probe 验证 clock、controllers/joints、有效低位 scan、odom、rear-axle 与 scan 时间 TF、安全状态；退出0后才启动 CM lifecycle manager、暂停的 RTAB 与 input guard。
+4. CM manager configure→activate；runner 有界读取 state=3 ACTIVE，再验证 stop_pub_timeout=900。B 成功顺序是 lifecycle 先于参数读取；A 参数先于 lifecycle 也曾成功，不能据此断言所有参数读取都会失败。
+5. RTAB guard 核验 paused、鲜活输入/TF、至少3个推进的 scan stamp，调用 native resume，再回读 paused=false。原日志有 SIMULATION_READY、RTAB_INPUT_READY 和 READY missing=()；这些不是地图质量证书。安装 guard 当前监控的是低位 `/scan`，不能替代 `/mapping/scan` 的 bag/TF 验证。
+6. 录包订阅全部请求 topic 后，才创建 route node。route prerequisites/zero-speed handshake 通过并成功获取本运行 Lease 才能运动。
+7. route 单圈结束→save CLI→RTAB 请求正常退出 rc0→导出并 validate DB/grid→清理。历史 B 路线0.30m/s、约109.835m仅作参考，不自动成为当前授权。
+
+生命周期细节与原始行号见 [LIFECYCLE_AND_READINESS.md](LIFECYCLE_AND_READINESS.md)。
+
+## 从真实脚本恢复的完整内层命令
+
+这些片段是原脚本中的内层命令；变量必须来自对应原脚本，不能跨候选借用。A/B 的上层入口负责锁、授权、记录和清理，不能只摘 `ros2 launch` 绕过它们。
+
+下面是对应原 runner 的变量原文（A:5–11；B:5–13），补足内层命令的参数来源。验证状态均为历史参考；本轮只执行 `bash -n`。
+
+```bash
+# A / Candidate16 / mapping-demo-large-v1-20261019T080100Z
+ROOT=/home/d1zzy/code/cleannav_modularization
+EXP=$ROOT/cleannav-experiments/cleannav-autonomous-patrol-20261019T052525Z/mapping-retry-20261019T080100Z
+RUN_ID=mapping-demo-large-v1-20261019T080100Z
+OUT=$EXP/runs/$RUN_ID
+WORLD=$EXP/scene/cleannav_patrol_demo_large_v1.world
+MAPS=$EXP/maps
+PREFIX=$ROOT/cleannav-build/step3-2-f/review-fixes-20261019T041000Z-mapping-050
+```
+
+```bash
+# B / roof candidate17effab2 / roof-lidar-g3-20261020T030538Z
+ROOT=/home/d1zzy/code/cleannav_modularization
+DEL=$ROOT/cleannav-deliverables/roof-lidar-autonomy-20261020T021924Z
+EXP=$DEL/working_candidate
+RUN_ID=roof-lidar-g3-20261020T030538Z
+MAP_NAME=roof-lidar-360-map-20261020T030538Z
+OUT=$DEL/runs/$RUN_ID
+WORLD=$EXP/scene/cleannav_patrol_demo_large_v1.world
+MAPS=$DEL/maps
+PREFIX=$ROOT/cleannav-build/step3-2-f/review-fixes-20261019T041000Z-mapping-050
+```
+
+### A-LAUNCH — HISTORICAL_RUNTIME_CORROBORATED; FROZEN_REFERENCE_ONLY
+
+来源 Run `mapping-demo-large-v1-20261019T080100Z`；Candidate SHA `37b51a7a3fde8c8217106fdbcdc824af413b82ba4d4f2cece0d184f8cefcb87e`；源码 [run_mapping.sh](/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-autonomous-patrol-20261019T052525Z/mapping-retry-20261019T080100Z/tools/run_mapping.sh)，行 162–171。
+
+```bash
+ros2 launch "$EXP/tools/cleannav_full_sim_candidate.launch.py" \
+  operation_mode:=mapping motion_profile:=patrol_050_mapping_candidate \
+  gui:=false start_rviz:=false enable_rviz_goals:=false auto_start_task:=false \
+  enable_diagnostics:=false \
+  ros_domain_id:=204 gazebo_port:=11704 \
+  world:="$WORLD" \
+  spawn_x:=0.0 spawn_y:=-8.0 spawn_z:=0.02 spawn_yaw:=0.0 spawn_delay_sec:=10.0 \
+  maps_root:="$MAPS" \
+  simulation_timeout:=700.0 \
+  > "$OUT/launch.log" 2>&1 &
+```
+
+### B-LAUNCH — HISTORICAL_RUNTIME_CORROBORATED; FROZEN_REFERENCE_ONLY
+
+来源 Run `roof-lidar-g3-20261020T030538Z`；Candidate SHA `17effab2ee69b967789f1aa486f6e1224832053fbcfca19b2e4287f089765f96`；源码 [run_mapping.sh](/home/d1zzy/code/cleannav_modularization/cleannav-deliverables/roof-lidar-autonomy-20261020T021924Z/working_candidate/tools/run_mapping.sh)，行 216–225。
+
+```bash
+ros2 launch "$EXP/tools/cleannav_full_sim_candidate.launch.py" \
+  operation_mode:=mapping motion_profile:=patrol_030_candidate \
+  gui:=false start_rviz:=false enable_rviz_goals:=false auto_start_task:=false \
+  enable_diagnostics:=false \
+  ros_domain_id:=204 gazebo_port:=11704 \
+  world:="$WORLD" \
+  spawn_x:=0.0 spawn_y:=-8.0 spawn_z:=0.02 spawn_yaw:=0.0 spawn_delay_sec:=10.0 \
+  maps_root:="$MAPS" \
+  simulation_timeout:=700.0 \
+  > "$OUT/launch.log" 2>&1 &
+```
+
+### B-BAG — HISTORICAL_RUNTIME_CORROBORATED; FROZEN_REFERENCE_ONLY
+
+来源 Run `roof-lidar-g3-20261020T030538Z`；Candidate SHA `17effab2ee69b967789f1aa486f6e1224832053fbcfca19b2e4287f089765f96`；源码 [run_mapping.sh](/home/d1zzy/code/cleannav_modularization/cleannav-deliverables/roof-lidar-autonomy-20261020T021924Z/working_candidate/tools/run_mapping.sh)，行 305–310。
+
+```bash
+ros2 bag record -o "$OUT/bag" \
+  /scan /mapping/scan_raw /mapping/scan /clock /odom /tf /tf_static /rtabmap/map /rtabmap/info \
+  /cmd_vel /cleannav/safety_status /cleannav/mapping/readiness \
+  /cleannav/mapping/cmd_vel_raw /cleannav/cmd_vel_candidate \
+  /cleannav/mapping/manual_status \
+  > "$OUT/bag.log" 2>&1 &
+```
+
+### B-ROUTE — HISTORICAL_RUNTIME_CORROBORATED; FROZEN_REFERENCE_ONLY
+
+来源 Run `roof-lidar-g3-20261020T030538Z`；Candidate SHA `17effab2ee69b967789f1aa486f6e1224832053fbcfca19b2e4287f089765f96`；源码 [run_mapping.sh](/home/d1zzy/code/cleannav_modularization/cleannav-deliverables/roof-lidar-autonomy-20261020T021924Z/working_candidate/tools/run_mapping.sh)，行 335–339。
+
+```bash
+python3 "$EXP/tools/mapping_route_node.py" \
+  --centerline "$EXP/scene/mapping_centerline.json" \
+  --run-id "$RUN_ID" \
+  --output "$OUT/route.json" \
+  --max-laps 1 > "$OUT/route.log" 2>&1 &
+```
+
+### B-SAVE — HISTORICAL_RUNTIME_CORROBORATED; FROZEN_REFERENCE_ONLY
+
+来源 Run `roof-lidar-g3-20261020T030538Z`；Candidate SHA `17effab2ee69b967789f1aa486f6e1224832053fbcfca19b2e4287f089765f96`；源码 [run_mapping.sh](/home/d1zzy/code/cleannav_modularization/cleannav-deliverables/roof-lidar-autonomy-20261020T021924Z/working_candidate/tools/run_mapping.sh)，行 370–371。
+
+```bash
+timeout 90s ros2 run cleannav_simulation simulation_map_manager save \
+  --maps-root "$MAPS" --name "$MAP_NAME" > "$OUT/map-save.json" 2> "$OUT/map-save.err"
+```
+
+### B-VALIDATE — HISTORICAL_RUNTIME_CORROBORATED; FROZEN_REFERENCE_ONLY
+
+来源 Run `roof-lidar-g3-20261020T030538Z`；Candidate SHA `17effab2ee69b967789f1aa486f6e1224832053fbcfca19b2e4287f089765f96`；源码 [run_mapping.sh](/home/d1zzy/code/cleannav_modularization/cleannav-deliverables/roof-lidar-autonomy-20261020T021924Z/working_candidate/tools/run_mapping.sh)，行 377–378。
+
+```bash
+timeout 60s ros2 run cleannav_simulation simulation_map_manager validate \
+  --maps-root "$MAPS" --name "$MAP_NAME" > "$OUT/map-validate.json" 2> "$OUT/map-validate.err"
+```
+
+### C28-FAILED-LAUNCH — FAIL_BEFORE_GAZEBO
+
+来源 Run `nav-goal-candidate28-20261021T014743Z`；Candidate SHA `28e1d361cd78778f2b2a59d564218792436228fc310cba32745c269973dd2314`；源码 [result.json](/home/d1zzy/code/cleannav_modularization/cleannav-deliverables/nav-cruise-baseline-20261021T011142Z/runs/nav-goal-candidate28-20261021T014743Z/result.json)，行 JSON launch_command–JSON launch_command。
+
+```bash
+ros2 launch /home/d1zzy/code/cleannav_modularization/cleannav-deliverables/nav-cruise-baseline-20261021T011142Z/candidate-28/tools/cleannav_full_sim_candidate.launch.py operation_mode:=localization enable_motion:=true auto_start_task:=false motion_profile:=nav_goal_015_candidate gui:=false start_rviz:=false enable_rviz_goals:=true enable_diagnostics:=false ros_domain_id:=204 gazebo_port:=11704 world:=/home/d1zzy/code/cleannav_modularization/cleannav-deliverables/nav-cruise-baseline-20261021T011142Z/candidate-28/scene/cleannav_patrol_demo_large_v1.world spawn_x:=0.0 spawn_y:=-8.0 spawn_z:=0.02 spawn_yaw:=0.0 spawn_delay_sec:=10.0 maps_root:=/home/d1zzy/code/cleannav_modularization/cleannav-deliverables/map-quality-localization-patrol-20261020T034159Z/maps map_name:=roof-lidar-360-map-20261020T035612Z 'localization_initial_pose:=0.300588876 0.0 0 0 0 0.0' simulation_timeout:=120.0 collision_lifecycle_timeout:=40.0 slam_timeout:=60.0 navigation_timeout:=40.0 mission_timeout:=30.0
+```
+
+## 地图重载、Nav2、RViz 与巡航
+
+C28 源码意图：simulation probe→暂停 RTAB localization+input guard+MapServer/coordinator→localization probe→CM lifecycle/startup gate→Nav2 planner/controller/facade→navigation probe→Mission Manager→mission probe。`localization_mode.prepare()` 从磁盘验证 DB/参数并复制到私有 runtime，map YAML 指向正式图；这段源码尚无 C28 成功运行证据，不能写为已恢复可运行。
+
+RViz `/cleannav/rviz/goal_pose` → rviz_goal_adapter → `/cleannav/mission/submit_navigation_goal` → managed Mission/Lease → NavigateToPose facade → ComputePathToPose/FollowPath → Nav2 raw cmd → 低位 `/scan` CM → Safety Supervisor → `/cmd_vel`。巡航另有已安装的 `/cleannav/mission/submit_task_sequence` 接口，但当前正式Guard/Supervisor只绑定单RViz目标及ros-execution-1；不能在旁路提交序列代替受监督验收。
+
+2026-10-29本轮更正：当前正式Mission Manager默认从已核验interfaces prefix加载空campus_region_registry.yaml，不是75c78eec路线。75c78eec属于独立大场景几何参考图，不能与当前canonical MCity occupancy f43de786配对。已只读核验旧A区真实RTAB图patrol_A_closed_loop_rtab_v4与region_registry_candidate.json的occupancy eb1e7c16、revision、world一致；历史巡航仍FAIL。当前缺该profile、registry参数和多execution监督接入，具体路径及最小改法见主Runbook；不得改旧hash或调用冻结旧授权。
+
+本轮按用户明确授权维护overlay身份：保留旧配置和diff，仅将source_manifest_sha256由f5162656…b0a153e重绑到当前已审查的4782d6ae…fcfa3a1；setup/prefix/runtime依赖不变。现有check_overlay_identity.sh rc0，56个setup输入、六个CLI prefix、167个安装文件通过。首次资源快照MemAvailable=5,067,984KiB小于现有5,242,880KiB启动下限，故未调用动态runner、未创建Run ID；PSI=0，无编译/Gazebo冲突，不把该门槛拒绝描述为已发生OOM。未重采样、未放宽，cgroup本轮未验证。
+
+## 关闭、异常与归档
+
+正常建图先完成 save，确认 session rtabmap_returncode=0、DB integrity=ok，再停止资源监视和 bag，清理拥有的进程。异常先按既有 route/Safety STOP/ESTOP 协作停止，再回收；不杀其他项目。每次信号、子进程 wait rc、PID/start_ticks、pgid、单调 deadline 与最终完整进程组扫描必须来自当次 supervisor。A cleanup.ok=true 不含与新 runner 相同的最终组凭证，证据范围较窄。B 有 final group EMPTY；Gate2 静止测试曾 SIGKILL gzserver，不能把清理成功等同优雅退出。
+
+C28 最近失败的 cleanup 在 result.json 内嵌，状态PASS、组EMPTY；launch启动本身FAIL、无Gazebo/运动，ESTOP未确认。这三个结论不得合并成“运行通过”。save.json 可能混有 PRE_SAVE_QUALITY 和终端提示，不能仅凭 `.json` 后缀使用 json.load；机器验收优先使用纯结构化 map-validate/session/manifest。归档规则见 [GIT_AND_CANDIDATE_POLICY.md](GIT_AND_CANDIDATE_POLICY.md)。
+
+
+## 当前启动流程入口与版本状态
+
+唯一正式流程及参数合同见 Navigation 仓库 [`docs/operations/STARTUP_SMOKE.md`](../cleannav-worktrees/navigation-startup-baseline-20261021/docs/operations/STARTUP_SMOKE.md)；唯一代码入口是该仓库 `tools/startup_smoke/startup_smoke.sh`。不在根手册复制命令、环境初始化步骤、overlay 规则或就绪阈值，以免出现两个会分叉的操作手册。历史 `startup-and-git-recovery-20261021/workcopy` 入口 SHA 和真实无运动结果仍作为来源证据，不再作为当前正式路径。
+
+当前实现位于本机 Navigation Git 分支 `codex/navigation-startup-smoke-baseline-20261021`，基于 commit `403639cafbc5b19d8a7ffc0699c0677831ba0fc6`，当前 HEAD 为 `6815bb0edc818a0db22de56de69a03d354f7e319`，已形成三笔本地提交，尚未 push。仓库入口在 Step3B `startup-smoke-step3b-20261021-r1` 已完成自身无运动动态复验，结果 `PASS_WITH_EXCEPTION`、退出码0、30.000s观察、91.517s总耗时、清理PASS。cgroup仍是UNKNOWN/WAIVED，无独立180s watchdog。任何后续动态调用仍需单独授权，并使用手册要求的 overlay、资源、安全、端口、ROS Domain、锁和清理门禁。没有运行授权时保持 NOT RUN。
+
+本轮未启动 ROS/Gazebo/RTAB-Map，也未运行导航、建图、车辆或传感器。完整 Git 与静态验证结果见 `cleannav-deliverables/navigation-git-baseline-20261021/`。
+
+## 当前 RViz 规范与 Step3C-1 边界
+
+RViz 手动目标统一见 Navigation [RVIZ_MANUAL_NAVIGATION.md](../cleannav-worktrees/navigation-startup-baseline-20261021/docs/operations/RVIZ_MANUAL_NAVIGATION.md)，本页不复制启动命令。该规范区分当前源码 full-sim 的在线建图/旧模型/缺少 CM 编排与 smoke 的双雷达安全链；尚不能提供完整、获批的持续导航启动序列。初始化、地图重载与任务停止/清理均需进一步只读核对。Step3B 的 [实际运行证据](../cleannav-deliverables/startup-smoke-three-rounds-20261021/MASTER_REPORT.md) 只证明无运动启动；本次Step3C-1动态入口0，未启动任何ROS/仿真节点。
+
+### 当前状态更新：Step 3C-2 静态整合（2026-10-21）
+
+上述段落保留为 Step 3C-1 时间点记录。后续静态整合已在 [Navigation RViz 历史记录](../cleannav-worktrees/navigation-startup-baseline-20261021/docs/operations/RVIZ_MANUAL_NAVIGATION_HISTORY.md#11-dual-lidar-rviz-composition--static-integration-2026-10-21) 建立唯一双雷达/定位/Nav2/Mission/Safety/Collision Monitor composition 的源码说明。最终定向静态套件 36 项通过；没有启动 ROS/Gazebo/RViz/Nav2。地图 `/mapping/scan` 来源由原始 RTAB-Map 日志确认为实，地图几何验收问题仍保留。该 launch 还没有经验证的外层资源、Run 身份/授权和进程组清理 runner，不能当作可独立执行的导航命令；当前状态 `STATIC PASS / DYNAMIC NOT RUN / NAVIGATION BLOCKED`。详见 [本轮整合交付](../cleannav-deliverables/dual-lidar-rviz-integration-20261021T074122Z/MASTER_REPORT.md)。
+
+
+## 零运动接触诊断的候选身份绑定（静态合同；40秒动态未验证）
+
+接触诊断沿用获本任务授权的隔离候选 `tools/run_collision_nomotion_smoke.sh`；不以它替代Navigation仓库的通用startup_smoke入口，不运行mapping路线或运动任务。子候选必须使用自身路径和`candidate-run/mapping-candidate.json`的Run ID，不复制父Run字面量。冻结顺序为：direct parent真实SHA → source/tools manifest及其Run/父SHA → 独立no-motion Scope → mapping candidate SHA → 不授予运动的Auth → parent/candidate receipt；用既有`runner_identity.validate_run_files`核验全部绑定，之后正式入口仍核验真实PID/start-ticks/argv与锁FD。
+
+本合同只允许距离/速度为0、motion_authorized=false、route_node_start_allowed=false等无运动权限；Auth.approved=false表示没有运动授权，Scope.approved=true仅表示本次零运动观察获准。拒绝旧Run、已有输出、manifest/Scope/Auth/receipt不一致。资源、端口、Domain、唯一发布者、Safety/CM、零控和140/150/180秒停止/清理/总时限不豁免。身份变化必须新冻结，不复用已调用的Run或授权。上述绑定有静态与真实入口预检验证；高频数据、沉降及40秒观察须在未来获准运行中验证，不能继承历史PASS。
+
+
+## 2026-10-29 — V550 参考候选（静态准备，非启动入口）
+
+本轮状态和独立目录见 [V550审计](../cleannav-deliverables/ros2-ackermann-reference-audit-20261029/MASTER_REPORT.md)，静态空运行索引见 [RUN_INDEX](../cleannav-deliverables/ros2-ackermann-reference-audit-20261029/RUN_INDEX.json)。main固定commit `f9433483684a392c516aa2e96b2256338bbcd273`。不得直接执行其工业launch：custom drive停车写回整车世界位姿/清速度，Load改共享ODE friction_model；工业初始位姿同步还会SetEntityState传送车辆。
+
+A只固定两转向关节，保留四轮滚动、原惯量/碰撞/surface并删除所有插件；世界几何/physics保持CleanNav基线。模型名cleannav_v550_diagnostic、body_link=base_footprint，轮/关节名称已映射现有observer。参考现有post-physics库SHA `0f121de67be22ac48fada18e8663fa1d8b0c42063463ab6e42ccbff4d23fe5ec`，不得选旧B-effort库或复用其output路径。B只有无插件的六自由度物理种子与未加载的controller草案，尚无完整控制/导航接入。
+
+本轮71项结构检查和3项gz sdf离线文件校验通过，没有ROS/Gazebo服务器、构建、安装或运行身份。A现有runner的controller/odom/sensor假定仍需隔离适配，不能调用旧入口冒充READY。20mm建议间隙对应spawn_z≈.0200000042483m；间隙、观察窗口、独立实时停止条件（.5rad/1m/.4rad仍未批准）、cgroup/资源和精确候选新动态授权均待审核。cgroup UNAVAILABLE、waiver_accepted=false；不继承旧Run授权，不恢复Step3.2-F运动。详细静态方案在DIAGNOSTIC_MODEL_PLAN，B文件清单在FULL_ROS2_MIGRATION_PLAN。
+
+
+## 2026-10-29 — V550 A 条件授权后的资源停止
+
+用户允许A一次零命令动态验证，首个MemAvailable=4,634,816,512 B<5GiB，按用户要求立即停止动态准备；入口0/1，无Run/Scope/Auth/Lease，无仿真或编译。没有复核当前hash/observer/runner就绪，不沿用历史PASS。新要求为轮地相切、禁止20mm落下、sim25s/主窗2–22s、停止.2rad/.5m/.25rad；这些尚未实现或验证，不可直接执行旧计划。cgroup本轮未重新检查、历史UNAVAILABLE，不放宽waiver。没有自动等待/重试。完整状态见[资源阻断报告](../cleannav-deliverables/v550-a-resource-stop-20261029/MASTER_REPORT.md)。
+
+
+## 2026-10-29 — A单次资源判定例外及旧阻断重新分类
+
+旧阻断重新分类为`BLOCKED_BY_UNVALIDATED_MEMORY_THRESHOLD`。5GiB由前次用户指令引入，并无A实测最低需求；本轮用户撤销它对A这一次25s零命令实验的阻断，不替换为新数字、不改其他任务。监控MemAvailable/swap/PSI/OOM和进程异常保持；cgroup UNAVAILABLE不标PASS、不自动waiver，必须先验证原runner隔离/硬超时/完整清理。旧报告原样保留，上次未完成的模型hash、相切高度、观测器、runner仍需全部复核。见[重新分类说明](../cleannav-deliverables/v550-a-zero-command-review-20261029/MEMORY_THRESHOLD_RECLASSIFICATION.md)。
+
+
+## 2026-10-29 — V550 A 原runner完整树清理核验失败，未启动
+
+本轮不以5GiB为绝对门槛；hash134文件和A结构通过，相切高度4.2483318807e-9m（gap0，无20mm自由落体）。cgroup CONFIRMED_UNAVAILABLE，waiver_accepted=false。原select_owned只选launch PGID或特定Gazebo URI/world；良性实进程fixture确认同SID但不同PGID的直接后代漏选，普通和最终截止清理均复用该selector。因此无法证明用户要求的完整进程树清理，按指令停止，无新Run/Scope/Auth/Lease、动态入口0/1。不得把fixture清理成功当A物理cleanup PASS，不得直接调用旧全栈入口绕过。后续先最小修复既有清理路径并核验fixed转向observer与新A守卫。见[本轮报告](../cleannav-deliverables/v550-a-zero-command-review-20261029/MASTER_REPORT.md)。
+
+
+## 2026-10-29 — A清理修复候选的离线结果与边界
+
+隔离候选见[报告](../cleannav-deliverables/v550-a-runner-cleanup-fix-prep-20261029/MASTER_REPORT.md)：候选runner在原body前exec专用subreaper，Popen前prctl确认，PPID闭包覆盖setsid/setpgid/孤儿后代；pidfd与start-ticks防误信号，每阶段重复扫描/有界升级/waitpid回收，空树+ECHILD才可完成。原finish/组收据/140-150-180截止不改；整树收口须另看containment.json及外层rc，不只看旧PGID PASS。23项新增、11项原测试通过，正式入口/安装未接入，本轮无动态身份/ROS/Gazebo。
+
+外层存活是已验证保护的前提；自身SIGKILL/OOM、D态或宿主失效不保证自主清理。专门负向用例确认缺失完成收据不标PASS，独立测试驱动救援不算生产清理。cgroup UNAVAILABLE仍如实记录，不设置waiver=true；5GiB未重新引入。若考虑A动态，先审核这些边界、实际入口绑定和尚缺observer/guard条件，并按用户下一步决定；本轮完成即停止。
+
+
+## 2026-10-29 — A首次相切零命令实验已结束（只作历史，不可重放）
+
+Run `v550-a-zero-command-20261028T233059Z-ad5cca`唯一入口一次，sim25s完成、2–22s窗口20,001body真值连续，拟合-0.0007165966023150944rad/sim s，末yaw=-0.017890506512rad，未触发四项守卫，不能称无偏航。整体DATA_INVALID因fixed joint轴位置遥测无效，但有效body/四轮数据仍可量化趋势。Gazebo/入口rc0、原finish和subreaper清理EMPTY、独立归属复核无残留；cgroup仍UNAVAILABLE、waiver=false。相切生成Z4.2483318807e-9m，不用20mm。原有界guard只适配本次四项阈值及sim25完成，保留资源监测；无ROS控制/导航建图。实际argv/关键hash/原始数据见[报告](../cleannav-deliverables/v550-a-zero-command-20261028T233059Z-ad5cca/MASTER_REPORT.md)。本次已消费唯一物理额度，停止，不自动重试或迁移。
+
+
+## 2026-10-29 — 原车/V550 A跨模型偏航离线比较
+
+结论 **INSUFFICIENT_EVIDENCE**。六组原始JSONL独立复算：原A +0.0006479191112631384、B +0.00014003488057024225、B-effort +0.00014003275772881167、force +0.00014004051951630825、mu02 +0.0007527397840956708、V550 A -0.0007165966023150944 rad/sim s，各窗口单列、不混基线。V550 body/四轮有效，fixed轴无效不否定车体真值。原force首次负冲量下一毫秒反转；8.951s接触循环变化与平台下降相关，尚无求解行序/乘数因果证据。两模型接口wz均不等于四元数导数；底盘+四轮角动量子集缺转向节空间状态，不再当完整整车闭合。旧±4.343N为每点均值，不是每轮合力；有效接触内部参数与实际ODE加载哈希不足，均保留UNKNOWN。
+
+唯一优先补项是复用既有transition观测准备，取得8.940–8.970s同一步原生ODE状态/约束账本；安装源码/补丁身份仍是条件。没有定位具体模型文件或引擎缺陷，不改模型/控制/odom，不据跨模型现象宣称ODE有bug。本轮只离线，Gazebo/编译/安装/动态身份均0；不重跑、不扫描、不迁移，等待新的决定。报告：[跨模型比较](../cleannav-deliverables/cross-model-yaw-cause-comparison-20261029/MASTER_REPORT.md)。
+
+
+2026-10-30 本轮最终结果：正式 overlay identity PASS（54 setup、8包226安装文件、19系统包）；Path Executor 来源为正式 HEAD 的干净归档，独立安全构建 rc0；原 Navigation/Safety/Planner 以历史源码校验和与构建收据恢复来源，无需重建。定向静态81 passed/4 skipped。唯一运行 `startup-smoke-oracle-20261029T181836Z-100fd7c5` 已真实启动 Gazebo、Oracle 和 Map Server，但首个持续观测失败为TF exact-time查询：请求7.825s而最新7.801s，未来外推24ms。监督器在53.989s开始SIGINT清理，进程组EMPTY、launch0/entry1、无残留、锁释放；未达到10秒仿真观测窗。Oracle22对源时间精确匹配、10Hz，位置/航向数学误差约1.12e-19m/6.51e-19rad；这不是完整动态通过。时钟累计样本跨度7.8s，scan8Hz，地图逐格差异0。资源PSI0/swap2764KiB/OOM0；cgroup UNKNOWN/WAIVED。三轮额度耗尽，没有重跑。下一项最小修复是现有TF就绪检查对发布延迟采用有界等待/共同有效时间，并保留零控和截止时间；本轮未实施第四轮修改。完整证据见 `cleannav-deliverables/oracle-static-sim-autofix-20261030/MASTER_REPORT.md`。
+
+
+## 2026-10-30 Oracle 静止仿真 TF 恢复：STATIC_SIMULATION_RUNTIME_PASS
+
+本轮沿用既有 startup_smoke sensor-only Oracle 入口、已通过身份的安装链、四墙 world 与冻结地图。原即时扫描时间查询将短暂未来外推判为故障；改为在既有 spin_once 外层循环中轮询原始 LaserScan 的精确时间戳，最多等1秒墙钟，同时受T0+145秒清理起点约束。只允许类型为ExtrapolationException、请求确实晚于最新TF且错误描述为未来或单样本未来的情况等待；过去外推、断链、时间源不一致、陈旧TF/停滞时钟仍失败。没有用latest TF替代扫描时刻，也没有阻塞回调或新增线程/runner。
+
+窗口结束后冻结扫描截止时间并排空窗口内查询，再允许PASS。真实Run `startup-smoke-oracle-tf-20261029T185545Z-97d1977e` 完成22.3–32.3秒（10.0秒仿真）窗口，入口/launch均rc0；窗口内三路各80帧，240条扫描请求/480次精确TF查询全部成功；全程576条已入队请求全部完成，最大等待0.191068秒，小于原定1秒上限。62项定向回归通过（含12项新TF用例），正式identity gate/source56/Startup16通过。
+
+窗口内/odom100帧10Hz、真值精确匹配100对，位置/航向最大数值差约1.79e-18m/8.67e-18rad（同源Gazebo数据的坐标变换一致性）。窗口内原始真值样本跨度9.9秒：位移2.121mm、yaw变化0.006435rad；不假定物理运动严格为零。/map逐格差异0，全部命令零；清理组EMPTY、无残留、锁释放。cgroup根内存控制不可用，UNKNOWN/WAIVED如实保留；无新硬内存门槛。第二轮单样本TF措辞失败与清理证据完整保留；第三轮成功后停止，无后续实验。详见 `cleannav-deliverables/oracle-static-sim-tf-recovery-20261030/MASTER_REPORT.md`、RUNTIME_STATS.json及scan-time-tf.json。
+
+
+## 2026-10-30 简单四墙静止定位验收状态
+
+Navigation 的启动入口现有 `startup_smoke` 增加了可选 `--localization-mode amcl`，仅用于 `sensor_only + oracle + frozen map`；不改变 wheel 默认，不启动规划/控制。正式 overlay/source gate 通过。实际运行三次均在10秒观测窗口开始前因 scan-time TF 过去外推终止，且第三次观察到 AMCL 的 `/amcl_pose` 与 `map→odom` 相差1.0s。该路径目前是动态定位 `BLOCKED`，不得作为单目标导航入口。命令约束、三个 Run ID、误差样本和最小下一步见 [Navigation Startup Smoke 手册](../cleannav-worktrees/navigation-startup-baseline-20261021/docs/operations/STARTUP_SMOKE.md#2026-10-30-简单四墙静止定位尝试blocked) 与本次交付。
+
+
+## 2026-10-30 静止定位运行结果
+
+当前 simple-four-wall oracle/AMCL 运行不通过定位就绪：Map Server和AMCL lifecycle active，地图逐格一致、AMCL七项有效参数正确，但AMCL未输出 `/amcl_pose` 或 `map→odom`。监督器独立TF Buffer的精确Scan查询通过不等于AMCL内部TF路径通过。查看 `cleannav-deliverables/stationary-localization-20261030/MASTER_REPORT.md`；下次运行前须先补齐AMCL内部扫描过滤所需TF边的诊断。
+
+## 2026-10-30 AMCL Scan TF Round 2（失败后停止）
+
+Run startup-smoke-localization-20261030T045809Z-r2-a0092c27 使用正式 startup_smoke supervisor、Oracle、AMCL、Map Server 与冻结 simple_four_wall_nohit_v1 地图；entry rc1，launch rc0，cleanup EMPTY。Map 逐格一致，AMCL 参数读回匹配该轮临时候选（transform_tolerance=0.2），但 /amcl_pose 和 map→odom 均为0，ready 后10 s窗口未开始。独立 Observer Buffer 有1485组双 exact stamp 查询通过，不代表 AMCL 私有 Buffer。已恢复原 transform_tolerance=0.0、测试断言和身份绑定。不要继续增大 timeout/cache，也不要启动 Round 3；下一步先在隔离、版本匹配的 AMCL 诊断构建中记录私有 Buffer 的 Scan exact query、TF 逐边接收及底层异常。证据：`cleannav-deliverables/stationary-localization-amcl-scan-tf-r2-20261030/MASTER_REPORT.md`。
+
+
+## 2026-10-30 AMCL 私有 Buffer 隔离诊断已编译，未运行
+
+已从匹配本机版本的 ROS release 源码构建独立 tf2_ros/AMCL 诊断前缀 `cleannav-build/step3-2-f/review-fixes-amcl-private-buffer-20261030/install/`。日志接入实际 Listener、setTransform、Buffer wait future 与 MessageFilter，按 pid/Buffer 地址关联；没有新建影子 Buffer 或运行框架。10 项 native 夹具回归在日志开/关两种模式下通过，不能当作 AMCL 私有运行证据。
+
+原正式 overlay gate PASS；隔离候选仅完成构建/安装/链接静态检查，尚未被正式 profile/overlay 选用。根因和具体缺失边仍 UNKNOWN，本轮动态入口 0、Round 3 未运行。诊断启动前需通过既有身份维护路径显式绑定隔离 AMCL/tf2_ros；不得直接 source 新前缀绕过当前定位合同。交付与未满足的运行前提见 `cleannav-deliverables/amcl-private-buffer-recovery-20261030/MASTER_REPORT.md` 和 `ROUND3_RUN_PLAN.md`。
+
+### 2026-10-30 AMCL 私有 Buffer 诊断 Profile 静态身份已接入
+
+隔离版 `nav2_amcl 1.1.20-1`、`tf2_ros 0.25.20-2` 和系统 Lifecycle Manager 的独立多前缀 Profile 已通过正式基础 overlay gate 与 Profile 专属身份检查，`dynamic_entry_calls=0`。生产 profile 的默认 package prefixes、wheel odometry 和 `localization_mode=none` 未改变；基础 machine config 仅更新了受审阅 `SOURCE_MANIFEST.json` 的身份绑定。诊断 wrapper 将隔离库路径仅传给 AMCL 子进程，Lifecycle Manager 保持 `/opt/ros/humble`。
+
+这是静态链接和身份准备，不是动态 AMCL/ABI 运行验收，私有 Buffer 中具体缺失的 TF 边仍 `UNKNOWN`。下一项唯一建议：另行授权一次沿现有 startup_smoke 监督器的有界 AMCL 私有 Buffer 诊断，并按同 PID/Buffer ID 关联 Listener、逐边收数、精确 scan-time 查询与底层异常；没有这次授权前保持 `DYNAMIC_NOT_RUN`。交付见 [Profile 身份接入报告](../cleannav-deliverables/amcl-private-buffer-identity-20261030/MASTER_REPORT.md)。
+
+
+## 2026-10-30 AMCL 私有 Buffer 诊断结果
+
+复用startup_smoke及诊断wrapper完成本轮2次有界入口。已动态验证隔离AMCL/tf2_ros加载和日志作用域；运行时AMCL私有Buffer收数/插入正常，实际MessageFilter buffer_timeout=0ns，扫描请求晚于Oracle最新TF即超时，外部Observer等待后成功。修复仅为launch additional_env字典直传与仅AMCL开启日志；没有修改AMCL参数、TF时间戳或算法。定位窗口未就绪、0 pose/0 map→odom，不能启动单目标。停止后无所属残留且锁可用；cgroup UNKNOWN/WAIVED。 证据：`cleannav-deliverables/amcl-private-buffer-runtime-r3-20261030/MASTER_REPORT.md`。
+
+
+## 2026-10-30 AMCL零等待最小修复已静态就绪
+
+沿用既有startup_smoke和amcl-private-buffer-diagnostics wrapper；现在显式选择新AMCL review-fixes-amcl-scan-tf-wait-20261030，与原隔离tf2_ros及系统Lifecycle Manager组合。诊断Profile只向AMCL传scan_tf_wait_timeout=0.30，transform_tolerance仍0.0；新参数启动只读，变更需重启，范围有限(0,1]。68静态/17原生回放断言（两时间轴）/10既有Buffer回归通过，构建和双身份gate PASS；本轮没有动态入口。下一步仅是另行授权现有监督入口静止定位，并用既有参数读取机制确认0.30及0.0、Filter处理/首帧失败、实际AMCL位姿及就绪后10秒。 证据：`cleannav-deliverables/amcl-scan-tf-wait-fix-20261030/MASTER_REPORT.md`。
+
+## 2026-11-03 静止 Keepout 观察窗的实际时长
+
+`session-stationary-*/observe_keepout.py` 有两个独立计时，不要混用：
+
+| 名称 | 值 | 含义 |
+| --- | --- | --- |
+| `WAIT_S` | 240.0 s | **首条**定位健康到达前的最长等待（`main()` 第一段循环）；超时直接写 `observation.json` 并 `SystemExit('no localization health within timeout')` |
+| `SUSTAIN_S` | 60.0 s | 收到首条健康后的**观察时长**默认值 |
+
+`--seconds` 由 `main()` 里手写的 argv 循环解析（`--prefix` / `--seconds`），默认取 `SUSTAIN_S`；脚本没有 argparse。
+
+`run_stationary.sh` 里的调用是 `python3 -u observe_keepout.py >observe.log 2>&1`（本轮候选第 253 行、父候选第 252 行），**不传** `--seconds`，因此所有使用该脚本的静止会话 Keepout 观察窗都只有 **60 s**。（`session-stationary-callback-fix` 用的是另一个 observer，没有这条调用。）而 `session-stationary-keepout-fix` 的首个 `local_core` 失败样本出现在 ros 183.3 s、`[SAFETY] ESTOP` 出现在 ros ≈96 s，两者都落在默认 60 s 窗口之外，只靠 `observation.json` 无法看到。
+
+需要覆盖更晚时刻时必须显式放大窗口，例如 `python3 -u observe_keepout.py --seconds 300`（脚本只认 `--prefix` / `--seconds` 两个开关，`--seconds` 必须在 argv 里给出数值，不能只写在注释或环境变量里）。放大窗口不改变任何判据：`core_failure_latched` 仍是单向锁存，一旦出现首个 `not passed` 样本，后续样本全部通过也不会解除，因此长窗结果仍可能以 `passed=false` 结束。
+
+同一 `run_stationary.sh` 还守卫运行中监视器的 SHA256 `003e8b3b94fc86c1725f10895f39db3067ef211c49c85f2ca07b670e116f9caf`（本轮候选第 80 行、父候选第 79 行）；更换候选时该哈希必须与实际安装前缀一致，否则脚本在启动前就会退出。
+
+### 2026-11-04 补充：`--seconds` 不能传给 `run_stationary.sh`
+
+`run_stationary.sh` 全文没有任何位置参数处理（无 `$1`、`$@`、`getopts`、`shift`），
+所以 `./run_stationary.sh --seconds 300` 会被 bash **静默忽略**，观察窗仍是 60 s。
+`--seconds` 只能写在 `observe_keepout.py` 的调用行上。
+
+需要 300 s 窗口时使用独立会话副本（父会话脚本保持原样）：
+
+`cleannav-experiments/cleannav-patrol-pillar-v1-e2e-loc-time-window-fix-20261103T175251Z/session-stationary-loc-time-window-fix-300s/`
+
+与父会话脚本的差异只有三处：`session=` 路径、bag 名称、以及
+`python3 -u observe_keepout.py --seconds 300`。`observe_keepout.py` 只改 `SESSION`。
+启动命令（域 190、端口 11750、`enable_motion:=false`、`auto_start_task:=false`）：
+
+```bash
+cd /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-loc-time-window-fix-20261103T175251Z/session-stationary-loc-time-window-fix-300s
+./run_stationary.sh > runner.log 2>&1
+```
+
+预期墙钟 12–16 min（约 5–7 min 启动与就绪 + 300 s 观察 + 1–2 min 收尾）。
+`WAIT_S` 240 s 不叠加：它只是首条健康到达前的 deadline 轮询，健康一到立即退出。
+
+### 两个已知的会话脚本缺陷（与候选修复无关）
+
+1. **必需话题 gate 会硬失败**。`run_stationary.sh` 的 `required` 循环用
+   `timeout 8 ros2 topic list`，失败即 `exit 1`，整个会话不产生证据。
+   `session-stationary-keepout-fix/runner.log` 实测即 `BLOCKED: required topic
+   missing after timeout`，且 `topics.txt` / `topics.err` 均 0 字节——每次 CLI
+   都被 8 s 杀掉、从未打印，重试预算 48×(8+5)=624 s 与观测到的 ~10.2 min 吻合。
+   这是就绪不确定性终止整个会话，不是硬安全条件。
+
+2. **`observe_keepout.py` 的 costmap 订阅类型错误**。`/global_costmap/costmap_raw`
+   和 `/local_costmap/costmap_raw` 被声明为 `nav_msgs/msg/OccupancyGrid`，而 Nav2
+   实际发布 `nav2_msgs/msg/Costmap`（`campus_security_ros.py:182` 就是用 `Costmap`
+   订阅的）。类型不匹配导致无 DDS 匹配，`costmaps` 恒为 `{}`，
+   `global_costmap_raw` / `local_costmap_raw` 恒 false。证据：
+   `session-stationary-keepout-fix/evidence-manual-observation.json` 里
+   `costmaps: {}`，而同一 topic 被安装代码正常收到
+   （`localization-log/campus-local_core-first-failure.json`）。
+
+   同理，`mask_compare` 的逐索引比较与项目权威比较不一致：同一次运行的
+   `runtime-checks.json`（`tools/check_runtime_snapshot.py`）给出 `differing: 0`
+   / `differing_pgm_row_order: 121756`，而 observer 报 `differing: 121756`，
+   `mask_topic_matches_candidate` 为 false。
+
+   结论：**`observation.json` 的 `passed` 不能作为静止会话的判定依据**。
+   `local_core` 253、`campus_keepout_ready`、定位健康、ESTOP、`/cmd_vel`
+   必须从 `localization-log/campus-local_core-first-failure.json`、
+   `readiness-timeline.jsonl`、`health-timeline.jsonl` 和 `launch.log` 读取。
+
+
+## 2026-11-04 静止 300 s 定位窗口验证结果（loc-time-window-fix）
+
+会话 `session-stationary-loc-time-window-fix-300s`，域 190、端口 11750、
+`enable_motion:=false`、`auto_start_task:=false`、`--seconds 300`。完整报告见该会话
+`RESULT.md`。
+
+**定位窗口修复成立**：300 s 窗口内 601 条健康样本中有 **6 条负 `info_age`，全部
+保持 `localized=true`**（最小 -0.041580 s）；用安装代码全程时间线复核为 **16/2761**，
+同样全部 `localized=true`。窗口内 `localized` 恒 true，`motion_state` 恒 `STATIONARY`，
+`/cmd_vel` 3603 条 0 非零。
+
+**253 未在本轮复现**：601 条样本里 `nonlethal_core_cells` 恒为 0、
+`failure_latched=false`，也没有生成 `campus-local_core-first-failure.json`。
+上一轮的 253 出现在 ros 183.3 s，早于本轮观察窗起点 ros 660.1 s。要覆盖 253 必须让
+观察窗**起点更早**，单纯加长窗口末尾无效。
+
+**`ready=false` / `LOST` / ESTOP 与定位和 keepout 都无关**：`localization-log/first-guard-tf-loss.json`
+显示 ros 361.3 s 的守卫周期 `failed_predicates=["mask_server"]`，
+`authorization_latched=true`、`recovery="new fully validated session required"`。
+锁存之后 601 条样本里 19 个 gate fact 全为 true、`missing=[]`，但 `ready` 再也不会
+变回 true，ESTOP 由该锁存触发（601 条安全消息中 600 条 `emergency_stop_active=true`）。
+同一记录里 `map_to_odom.age_ns = -100000000`，即该周期的变换时间戳比 ros 现在晚 100 ms。
+
+**根因已定（2026-11-04 复核，推翻最初"启动竞态"的读法）**：这条记录里
+`evidence.mask_server` 就是 `"active"`，会话自 ros 34.6 s 起一直是 `READY`，所以
+**不是** Security 抢在 Mask Server 激活前评估。`facts.mask_server=false` 来自守卫
+自身的观测窗口：`keepout-lifecycle-state-timeline.jsonl` 里 `mask_server` 共 1702 次
+`get_state_response`，间隔中位数 1.000 s、**最大 3.002289 s**，超过 `fresh()` 默认
+2.5 s 的只有**这 1 次**，它由一条耗时 **2.07 s** 的 `GetState` 造成。
+`CampusEvidence.poll()` 对每个 key 只保留一个在途请求（`simulation_status_monitor._query`，
+2.0 s deadline），只有 future 完成时才更新 `times[key]`，于是一条慢响应就让观测年龄
+超过 2.5 s；此时 `had_ready` 已为 true，单向锁存随即触发。**上限比喂它的机制还小**：
+0.5 s poll timer + 2.0 s deadline 本身就是 2.5 s。ros 0–25.4 s 的 104 次
+`service_unavailable` 全发生在第一次 `READY` 之前，没有锁存任何东西 ——
+`Readiness.evaluate` 只在 `had_ready` 之后才置位 `latched`，因此**改 Launch 启动顺序
+不能解决这个失败**。
+
+### 本机 `ros2` CLI 的 daemon 会挂死
+
+`ros2 topic list` 与 `ros2 daemon status` 在本机一律超时（`timeout 8`/`20`/`30` 都被杀，
+`topics.txt` 与 `topics.err` 都是 0 字节），而 `ros2 topic list --no-daemon` **rc=0、
+一秒内返回 125 个话题**，`import ros2cli` 只用 0.15 s。这就是 2026-11-03 那次静止运行
+白等 10.2 min 并最终 `BLOCKED` 的真实原因。需要话题清单时用 `--no-daemon`；
+`ros2 param get` 没有等价开关，只能靠安装代码写出的 JSON 诊断代替。
+
+### 会话脚本的两个缺陷已在 300 s 副本中修好
+
+1. 话题 gate 原先 `timeout 8` + `exit 1`；300 s 副本先改成 `ros2 daemon stop` +
+   `timeout 20` + 600 s 墙钟上限（实测 `ready=0 after 620s`，仍完整产出证据）。
+   **2026-11-04 再次清理**：既然 daemon 在本机必挂，这条 gate 永远不可能通过，
+   它只是白等。新会话脚本
+   `session-stationary-mask-lifecycle-freshness-fix-300s/run_stationary.sh` 已删除
+   `ros2 daemon stop`、60×(timeout 20) 循环和 600 s 墙钟上限，只保留**一条**
+   `timeout 5 ros2 topic list --no-daemon` 诊断写入 `topics-gate.txt`，
+   非阻塞、非致命；同时删掉冗余的 `ros2 param get` 块（同样依赖 daemon，
+   上一轮只写出空的 `runtime-parameters.txt`），这些参数由守卫自己写在
+   `localization-log/campus-security.json` 的 `parameter_gate` 里。
+   真正的闸门是 observer 的 `WAIT_S=240` 首条健康消息超时加逐话题消息新鲜度。
+   **话题发现失败不是产品安全失败**。
+2. `observe_keepout.py` 把 `/global_costmap/costmap_raw`、`/local_costmap/costmap_raw`
+   声明成 `nav_msgs/msg/OccupancyGrid`，Nav2 实际发布 `nav2_msgs/msg/Costmap`。
+   改成 `Costmap` 后两个 raw gate 与 `mask_topic_matches_candidate` 全部变 true。
+
+### Mask Server 生命周期观测上限修复（候选 `…mask-lifecycle-freshness-fix-20261104T031832Z`）
+
+上面那个 `mask_server` 锁存的修复候选，身份 `64c14b48…`，父候选
+`loc-time-window-fix`（`24bc6cbc…`）。**只改两个 Python 文件，不改 Launch**：
+`campus_security.py` 新增 `LIFECYCLE_OBSERVATION_S = 6.0`、`LIFECYCLE_FACTS`、
+`observation_limit()`、`observation_fresh()`；`campus_security_ros.py` 把
+`poll()` 内的 `fresh()` 转调 `observation_fresh()`（`limit` 默认从 `2.5` 改为 `None`）。
+`mask`、`mask_rpc`、`raw_map`、`global_core`、`local_core`、参数、TF、定位仍用
+2.5 s；`fresh('assets', 5.5)`、`fresh('*_updates', 4.)` 的显式上限不变；
+`authorization_latched` 单向语义、`Readiness.REQUIRED`、ESTOP 发布路径、
+`core_failure_latched` 与 254 核心格规则全部逐字节未动。6.0 s = 观测到的最坏间隔
+3.002 s 的 1.998 倍、结构最坏值 2.5 s 的 2.4 倍；真正的失活仍在下一次成功
+`GetState`（通常 ≤1 s）立即置 `facts=False` 并锁存，与新鲜度上限无关。
+**故意未改**：`GetState` 超时/不可用仍走 `consume(None)` → `mark(False)`
+（把"未观测"当成"非 active"）。本轮失败不是它造成的（唯一的 `timeout` 事件在
+ros ≈1369 s，晚于锁存），把 fail-closed 观测改成"记住上次状态"属于语义变更，
+需另行决定；残余风险是 2.0 s deadline 只有实测 2.07 s 响应的 2.3 倍。
+
+**启动顺序事实（只读审计结论，不需要改）**：Mask Server 由
+`cleannav_full_sim.launch.py:296` 的 `Node(nav2_map_server, map_server,
+name='campus_keepout_mask_server')` 启动，它属于 `keepout_inputs`，只在
+`next_actions['simulation']`（`:309`）里发出，即 **simulation 阶段探针退出后**
+才与 `campus_keepout_info_server`、`campus_keepout_lifecycle`
+（`nav2_lifecycle_manager`、`autostart=True`、
+`node_names=['campus_keepout_mask_server','campus_keepout_info_server']`）一起拉起；
+本会话首次 `current_state.id=3` 在 ros ≈23.3 s。Security 侧 monitor 在 launch 初始
+动作表（`:430`）里就创建，`CampusEvidence` 在
+`LocalizationStatusMonitor.__init__`（`localization_status_monitor:222`）构造，
+`poll()` 由 0.5 s `_poll` timer 驱动，首个样本 `guard-000002` 在 ros 0.0 ——
+所以守卫确实会先评估、并在 ros 0–25.4 s 观测到 104 次 `service_unavailable`，
+但 `Readiness.evaluate` 只在 `had_ready` 之后才锁存，这段不会锁存任何东西，
+ros 34.6 s 正常进入 `READY`。**因此"调整 Launch 启动依赖"对本轮失败无效**，
+按 Karpathy 规则不引入。
+
+
+### 清理缺陷：`kill -TERM -- -"$launch_pid"` 无效
+
+`ros2 launch` 由非交互 shell 后台启动，**不是进程组长**（真实 PGID 是调用 shell 的），
+所以 `kill -TERM -- -"$launch_pid"` 打到一个不存在的进程组，信号从未送达，脚本卡在
+`wait`。同时后台作业的 **SIGINT 被设为 SIG_IGN**，`kill -INT "$launch_pid"` 也无效。
+
+可用的收尾顺序（都按精确 PID，不用宽泛 `pkill`）：
+
+```bash
+kill -TERM <launch_pid>            # ros2 launch 收到 SIGTERM 才会优雅关停并退出
+# 脚本的 trap 随即写 cleanup.json 并退出
+kill -INT <每个孤儿子进程 pid>      # gzserver / rtabmap / nav2 / 容器等
+```
+
+本次按此顺序清理：launch 与脚本退出后 `cleanup.json` 记录 `rc=1`、
+`gzserver_left=1`，再对 9 个孤儿 PID 发 SIGINT 全部退出。终态：0 个 gzserver /
+rtabmap / nav2 / ros2 launch / rosbag 进程，端口 11750 空闲，域 190 无持有者，
+`build.lock` 空闲，`rtabmap.db` 未变（`e16e672a...`），`MemAvailable` 4.83 GiB。
+
+
+## 2026-11-04 静止 300 s 生命周期新鲜度验证结果（mask-lifecycle-freshness-fix）
+
+会话 `session-stationary-mask-lifecycle-freshness-fix-300s`（候选
+`cleannav-patrol-pillar-v1-e2e-mask-lifecycle-freshness-fix-20261104T031832Z`，
+身份 `64c14b48…`，monitor `003e8b3b…`，地图 `e16e672a…`）。域 190、端口 11750、
+`enable_motion:=false`、`auto_start_task:=false`、`--seconds 300`。完整报告见该会话
+`RESULT.md`，证据副本在该会话 `localization-log/`。
+
+**生命周期上限修复成立，`mask_server` 不再进入任何 `failed_predicates`。**
+`mask_server` 633 次、`info_server` 634 次 `get_state_response`，间隔中位数 1.000 s、
+p99 1.134 s、**最大 2.496 s**，`>2.5 s` 与 `>6.0 s` **均为 0**。守卫自 ros 35.2 s
+（wall 12:17:03.502）起连续 `READY` 到 ros 605.2 s（wall 12:26:35.503），
+**1141 条 READY 记录 `missing=[]`，持续 572.0 s**，是授权 300 s 窗口的 1.9 倍。
+
+**末尾唯一那次 `LOST` 是操作者自己 `kill -TERM` 之后的 fail-closed，不是缺陷。**
+`kill -TERM 400462` 在 12:26:33，锁存记录在 ros 605.7 / wall 12:26:36.005，
+`failed_predicates=["raw_map","mask","global_core"]`；同一记录
+`raw_map_gate.rpc_age_monotonic_s = 2.5015`、`core_gate.global_core.age_s = 2.7033`，
+两个栅格本身 `verified: true`，`getmap_status: PENDING`、
+`pending_monitor_future_count: 13`。也就是成本图/GetMap 发布方在 SIGTERM 后停止，
+守卫在 2.7 s 后正确判定陈旧。**判读规则：这类 `LOST` 必须先对齐操作者动作时间，
+不得当成产品失败。**
+
+**253 本轮未复现**：1144 条 `global_core` + 1143 条 `local_core` 判定里
+`nonlethal_core_cells` **恒为 0**、`outside_mask = 0`、`failure_latched = false`。
+`campus-global_core-first-failure.json` 是上面那次 teardown 事件的快照，不是 253。
+本轮把观察窗起点提前到 ros 0.0，覆盖了历史 ros 183.3 s 所在的区间，仍未复现。
+
+**observer 自身 `passed=false` 属判据缺陷，不是产品失败**：
+`localized_all_true` 与 `motion_stationary` 对**全部**样本取全集，因此包含
+ros 0.0–25.7 的 58 条启动样本（`localized=false`、`motion_state=RESUMING`，
+两者是**同一批**样本）；ros 25.7 之后窗口内 559 条全部 `localized=true` 且
+`STATIONARY`。13 个 gate 中 11 个通过。**读 `observe.log` 时必须先分离启动段。**
+
+**定位与安全**：窗口内 5 条负 `info_age`（最小 -0.060465 s）**全部保持
+`localized=true`**，全程无定位健康通道 LOST；`/cleannav/safety_status` 594 条无 ESTOP；
+`/cmd_vel` 3014 条 0 非零，`evidence.final_cmd_vel=[0.0,0.0]`，无 lease owner、无任务。
+`first-guard-tf-loss.json` 存在但**不是 TF 丢失**（`failed_predicates` 里没有 TF 项）。
+
+**话题 Gate 清理确认有效**：`topics-gate.txt` =
+`topics_seen=45 missing=0`，秒级返回；父会话在同一位置花了 620 s 并记 `ready=0`，
+且因为卡在那里，观察窗起点被推到 ros 660，本轮起点是 ros 0.0。
+
+**残留风险（未处理，需另行决定）**：`raw_map`/`mask`/`global_core` 仍是 2.5 s 上限，
+而 `/global_costmap/costmap_raw` 在 301.4 s 的 bag 里只有 133 条（0.441 Hz →
+2.27 s 周期），窗口内峰值年龄已达 **2.392 s（上限的 96 %）**。这与最初
+`mask_server` 那个"上限比喂它的机制还小"的形态相同，只是尚未在系统正常运行时触发。
+不要再自行放宽；要动必须先拿到用户决策。
+
+**清理**：`cleanup.json` 记 `rc=1 gzserver_left=1 ros2_left=0 mask_server_left=2`，
+与上一节记录的 trap 缺陷完全一致；随后按精确 PID 收尾 9 个孤儿
+（`rtabmap` 先 SIGINT 以干净关闭数据库，再 `gzserver`），终态 0 个 gzserver、
+端口 11750 空闲、`build.lock` 空闲、域 190 无持有者、`rtabmap.db` 未变。
+
+**证据路径提示**：`ros2 launch` 把 `launch_config.log_dir` 解析到
+`~/.ros/log/<timestamp>-<host>-<launch_pid>/localization/`，**不是会话目录**；
+需要持久化时必须复制到会话 `localization-log/` 并写 `SOURCE.txt` 记源路径与哈希。
+
+## 2026-11-04 Patrol V1 单圈动态联调结果（Facade `NoneType.status`）
+
+会话 `session-patrol-lap-1-r3-20261104T051917Z`（候选
+`cleannav-patrol-pillar-v1-e2e-mask-lifecycle-freshness-fix-20261104T031832Z`，
+身份 `64c14b48…`，域 191 / Gazebo 11751 / Gateway 18082，
+`enable_motion=true`、`auto_start_task=false`）。**结果 FAIL，但这是本项目的
+第一条真实运动证据链，不是静止验证的替代。**
+
+**成立的部分**：APP Gateway → Mission Manager → Facade → FollowPath → MPPI →
+Safety 全链路真实接通。`POST /api/v1/task-sequences` 返回 202 `accepted=true`，
+`current_execution_id=ros-execution-1`；Safety 真实发放 Lease
+（`autonomous_enabled=true`、`message="Lease owner=ros-execution-1"`）；
+车辆真实行驶 **38.21 m**，`|v|max=0.300 m/s`（= `vx_max 0.3`）、
+`|ω|max=0.2603 rad/s`；138 条 `/plan` 全部通过 `PATH_VALIDATED`
+（823 矩形、`clearance_m 0.1`）；首条规划 0.047 s / 173 点。
+全程无 ESTOP、无定位 LOST、无 Keepout readiness 失效，
+`nonlethal_core_cells` 恒 0（253 未复现），`raw_map` 年龄峰值 1.2621 s
+（2.5 s 上限的 50 %，比静止会话的 96 % 更宽松）。
+
+**失败点（第一个可复现问题）**：GOTO 段第 137 次重规划后，Facade 抛
+`FACADE_INTERNAL_ERROR {"reason": "'NoneType' object has no attribute 'status'",
+"stage": "FOLLOWING"}`，随后 `OUTER_TERMINAL {"outcome":"abort"}`，GOTO 步骤失败，
+Mission Manager 报 `reason_code 223 = SEQUENCE_DEPENDENCY_FAILED`，PATROL 步骤被阻断。
+代码位置：`navigation_facade_node.py:849/851/852` 的 `wrapped.status`。
+触发场景是 1 Hz 的“规划成功 → 取消控制器目标 → 换新路径重发”循环
+（`REPLAN_STARTED` 137 / `PATH_REPLACED` 136 / `INNER_CANCEL_REQUEST` 137，
+`ComputePathToPose status=4` 276 次、`FollowPath status=5` 276 次）。
+
+> **2026-11-04 根因更正（离线审计，见下节「Facade 异步任务修复」）**：
+> 早先记的“`follow_future.result()` 在目标被取消回收后返回 `None`”**不准确**。
+> 真正机制是：`session.wake_future` 是共享单槽，done callback 永不移除，
+> 而 rclpy 把 done callback **投递到 executor 任务队列**（`rclpy/task.py`
+> `_schedule_or_invoke_done_callbacks` → `executor.create_task`），
+> 协程恢复却走 asyncio，于是**旧等待的回调落在新等待的槽上**；
+> `Future.result()` 对**未完成**的 future 直接 `return self._result`（`None`），不抛异常。
+> 也就是“读错了 Future”，不是“取消返回 None”。
+
+**GOTO 到点判据（2026-11-04 用 r3 bag 实测更正）**：`general_goal_checker`
+`xy_goal_tolerance=0.25 m`、`yaw_goal_tolerance=0.25 rad`、`stateful=true`。
+按 `/tf` 合成 map→base_footprint 后实测：最近接近 **0.2627 m**
+（Facade 自身 TF 距离最小 0.2704 m），**该时刻 yaw 误差只有 -0.1441 rad**，
+远在 0.25 rad 之内；同时满足 0.25/0.25 的样本数 **0**，满足 0.30/0.35 的 **90**。
+所以**阻塞条件是 XY，不是 yaw**；早先“航向偏差较大”的说法是错的，已更正。
+
+
+### 本轮新增的三条操作规则
+
+1. **`ros2 run` 会把节点作为子进程启动，只对 wrapper 发单 PID 信号会留下节点进程。**
+   必须用进程组信号（`kill -SIG -- -$pid`，失败再退回单 PID），并要求运行脚本
+   `set -m`，使每个后台任务的 pgid == pid。对照证据：
+   r2 会话 `cleanup.json gateway_left=2 gateway_port_18082_in_use=1`，
+   改进程组信号后 r3 为 `tracked_groups_alive=[] gateway_left=0`。
+2. **观测器从 `/proc` 找节点时不要只匹配 `argv[0]`。** 用“任一 argv 以可执行文件名
+   结尾”的写法（与已验证的 `run_stationary.sh` 一致），并把
+   `--enable-motion` 之类关键参数合并进同一次扫描。对照证据：13:05 会话因只匹配
+   `argv[0]` 而误判“监视器不存在”，fail-closed 退出，产品侧其实已
+   `[SAFETY] READY {"block_all": false}`。
+3. **新增观测字段后要立刻验证它真的被写入。** r2 会话因观测器 `on_runtime` 少一行
+   赋值，`real_adapters_ready` 恒为 `None`，把一次本来可以起跑的任务挡在
+   preflight；独立探针在同一 domain 6 s 内收到 10 条
+   `{"real_adapters_ready": true}` 才定位到是观测器自身缺陷。
+   另：`/cleannav/simulation/mission_runtime` 是产品自带的
+   “真实适配器就绪”信号，`[MISSION] READY actual messages / TF / interfaces verified`
+   已经是产品自己的同义断言，观测器不该再自造更强的门槛。
+
+**清理**：`tracked_groups_alive=[]`、`gzserver_left=0`、`rtabmap_left=0`、
+`ros2_launch_left=0`、`gateway_left=0`、`mission_left=0`、端口 11751/18082 空闲、
+域 191 无持有者（计数 1 是检查器自身）、`rtabmap.db` 保持 `e16e672a…`。
+
+**证据**：会话目录 `RESULT.md`、`ABORTED.md`（前两次脚本缺陷）、`events.jsonl`、
+`security-timeline.jsonl`、`bag-patrol-lap-1/`（39965 条 / 18 话题）、
+`ros-log/`（含 `navigation_facade_node.py-22-stderr.log` 3128 行）、
+`localization-log/`、`rviz-patrol-lap-1.png`、`group-teardown.txt`、`cleanup.json`。
+
+**状态**：未修改 Facade/Safety/Keepout/定位/MPPI/Launch/Registry/地图/参数，
+未重试，未跑第二圈，未冻结 Registry，`approved` 仍为 false。
+
+## 2026-11-04 Facade 异步任务修复 + GOTO 到点容差（离线候选）
+
+候选 `cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z`
+（父候选 `…-mask-lifecycle-freshness-fix-20261104T031832Z`，身份 `64c14b48…`）。
+**本轮 0 次 Gazebo、0 次 ROS 图、0 次 Gateway 提交、0 次 Lease、0 条 `/cmd_vel`。**
+
+**运行时基线**：r3 实际使用的 `cleannav_navigation` 前缀来自
+`cleannav-patrol-pillar-v1-e2e-20261103T044800Z`，`navigation_facade_node.py` 为
+2017 行 / `3ec3b8e9…`。磁盘上没有任何源码树与该文件一致（与
+`cleannav-worktrees/pc-sim-v2-mapping-localization` 差 901 行，与 candidate43-r2
+差 108 行）⇒ **安装文件是权威基线**，不得用旧源码覆盖。本候选复制该 install 前缀，
+只替换一个 Python 文件。
+
+**改动 3 个文件**（补丁在候选 `patches/`，均可对父文件 `patch -p1 --dry-run`）：
+
+1. `navigation_facade_node.py`（2017 → 2031 行）：follow 结果唤醒回调加
+   `expected_revision` 守卫；`wrapped = follow_future.result() if
+   self._future_done(follow_future) else None`；新增 `wrapped is None` 的
+   fail-closed 分支（未完成则重新武装等待，完成则 abort）；`_plan_while_following`
+   的 planner 结果判据加 `wrapped is None or …`。三处改动回植 2026-10-25
+   已验证版本的同型修复，未引入新状态机。
+2. `config/nav2_local_recovery.yaml`：`general_goal_checker`
+   `xy 0.25→0.30`、`yaw 0.25→0.35`。`patrol_goal_checker` 保持 0.10/0.35，
+   MPPI 参数全部不变。
+3. `config/pillar_v1_patrol/security-profile.json`：同步
+   `keepout_hashes["../nav2_local_recovery.yaml"]`（`campus_security.check_assets`
+   会校验该摘要）。掩膜本体、地图库、Registry 未动。
+
+**容差作用域**：Facade 对 `NavigateToPose`（GOTO）传 `general_goal_checker`，
+对 `NavigateWithinPolygon`（PATROL）传 `patrol_goal_checker`，所以放宽天然只落在 GOTO。
+
+**离线回归**：`test/test_facade_follow_lifecycle.py` 26 passed；
+同一文件对未修复的父安装 8 failed / 18 passed（三个 NoneType 竞态用例 + 全部 GOTO
+容差用例）。`campus_security.prepare_profile` + `check_assets` → `check_assets OK`
+（`keepout_cells 899822`、mask 1300×739 不变）。
+
+**新增操作规则（第 4 条）**：**不要假设 `Future.result()` 在未完成时会抛异常。**
+rclpy 的 `Future.result()` 直接返回 `self._result`，未完成时是 `None`；同时
+`Future.cancel()` 之后 `done()` 仍是 `False` 而 `cancelled()` 是 `True`，
+`_future_done()` 这类“done 或 cancelled”判定**不能**保证 `result()` 非 `None`。
+凡是“先等唤醒、再读结果”的代码，读之前必须用 `_future_done()` + `is not None`
+双重确认，且唤醒本身要带身份（generation / goal_id），不能只信共享单槽。
+
+**状态**：未启动 Gazebo/ROS，未提交任务，未取 Lease，未发布速度，未跑第二圈，
+未冻结 Registry，`approved` 仍为 false；Patrol V1 单圈运动仍未 PASS。
+证据：候选目录 `README.md`、`REPORT.md`、`SHA256SUMS`、`patches/`、`test/`。
+
+
+
+## 2026-11-04 Patrol V1 单圈 r4：任务被 Mission Manager 时钟校验拒绝（0 运动）
+
+会话 `cleannav-experiments/cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z/session-patrol-lap-1-r4-20261104T075017Z`
+（候选身份 `391e0842…`，父候选 `…-mask-lifecycle-freshness-fix-20261104T031832Z`，
+监视器 `003e8b3b…`，地图 `e16e672a…`，域 192 / Gazebo 11752 / Gateway 18083，
+`enable_motion=true`、`auto_start_task=false`，2026-11-04 15:52:19 → 15:53:22 +08:00）。
+
+**结果 FAIL，第一个失败点在提交入口，不在 Facade / Safety / 定位 / Keepout / 生命周期。**
+唯一一次 `POST /api/v1/task-sequences` → 422 `reason_code 609 (TIMESTAMP_INVALID)`、
+`message="sequence timestamp is in the future"`；`/plan` 0 条、`/admitted_path` 0 条、
+`/cleannav/task_sequence_status` 0 条、`/cmd_vel` 501 条非零 0 条、Lease 从未申请、
+`entry_min_m 15.313 m`。**GOTO / PATROL / FULL LAP 全部 NOT STARTED。**
+
+**根因（量化）**：
+
+1. `mission_bridge.py:229` 用 Gateway 自己的 `get_clock()` 打戳；`_clock_stamp()` 仅在
+   自己时钟恰为 0 时返回 `None`→503，不校验对端。bag `/clock` 在 15:53:12.574 = sim 42.0、
+   15:53:12.722 = sim 42.1，提交在 15:53:12.717 ⇒ Gateway 戳值 ∈ {42.0, 42.1}。
+2. `task_sequence.py:226` 的判据 `request.stamp_ns > now_ros_ns + 250 ms` 反推 ⇒
+   **Mission Manager 时钟 < 41.85 s**。
+3. Mission Manager 节点构造于 15:53:11.071（launch 第 25 个、最后一个关键节点），
+   提交时存活 **1.646 s**。`/clock` 全程 428 样本、步长恒 0.1 s、无跳变、最大 wall 间隔
+   0.665 s；落后 0.25 s 需连丢 3 个样本 ⇒ 它的 `/clock` 订阅当时**根本没生效**。
+4. 同一时刻定位监视器 `clock_status=VALID`、`clock_receipt_age_wall_s 0.054`、
+   `ros_now 41.7`，守卫 `ros_time` 与 bag 一致 ⇒ 只有新起的 Mission Manager 没同步。
+
+**r3 对照（同一脚本/launch/同一 Mission Manager 安装）**：r3 节点构造 13:20:52.793、
+提交 13:20:53.843（存活 **1.050 s**）→ 202 接受，`TaskSequenceStatus.header.stamp`
+= 41.600 @ 13:20:53.832、后续 178.100。**同一份代码两次结果不同 ⇒ 是 `/clock`
+订阅建立时延的抖动；该时延的成因无法从已录数据回算，标 UNKNOWN。**
+
+**提交门为什么没拦住**：`lap_observer.py:556-575` 的提交判据是 `preflight_ready()`
+（health / safety / costmap / keepout / follow_server / `real_adapters_ready` /
+`security_state==READY`）+ `mission.service_is_ready()`。本轮这些**全部为 true**
+（costmap 511×660 `frame=map`、keepout 1300×739/lethal 899822、`mission_service=true`、
+`security_state=READY`），但它们只证明“可被发现”，**不证明对端时钟已初始化**。
+单次授权 + gateway `_reserve` 已占用该 `command_id` 指纹（`events.jsonl` 只有 1 条
+`submit`，`replayed=false`）⇒ 这次竞态没有第二次机会。
+
+**新增操作规则（第 5 条）**：`use_sim_time` 节点的 ROS 时钟是启动后异步从 `/clock`
+获得的，**“服务可发现”不等于“对端时钟已初始化”**。凡是跨进程带时间戳的提交
+（`SubmitTaskSequence`、`TaskCommand`），不能只用 `service_is_ready()` 或
+`publisher.get_subscription_count()` 判定就绪；被拒时也不要把
+`TIMESTAMP_INVALID / in the future` 当成参数或地图问题——先比较双方时钟。
+
+**未验证（不得推断）**：序列体其余校验（`map_id/revision/sha256`、`steps`、
+`region_id`、`route_id`、`laps`）在时间戳检查之后，本轮从未执行；候选 3 个文件
+（Facade `wrapped is None` 守卫、GOTO 0.30/0.35 容差）的代码路径未加载，
+**候选仍为 UNVERIFIED，不是 FAILED**；Mission Manager 校验瞬间时钟的确切数值只能
+界定为 < 41.85 s（`/cleannav/task_status` 是事件驱动发布，本轮 0 条）。
+
+**清理**：`cleanup.json` `rc=2`、`tracked_groups_alive=[]`、gzserver/rtabmap/
+ros2 launch/gateway/mission left 全 0、11752 与 18083 空闲、`group_after=[]`；
+`domain_192_holders=1` 是自计数；`rtabmap.db` 运行前后摘要相同。事后复核无残留进程，
+`build.lock`/`runtime.lock` 已释放。
+
+**下一圈（未授权，本轮未改任何代码/参数/剖面）**：先解决“提交时对端时钟未就绪”，
+两条最小改法都需新候选或显式授权——(a) Mission Manager 在自身时钟为 0 时返回独立
+诊断码（只改诊断，不改通过/拒绝语义）；(b) `lap_observer.py` 在首次看到
+`mission_service` ready 后再加确定稳定窗口才提交（harness 变更）。
+**禁止**放宽 250 ms 容差、禁止重试提交、禁止复用本会话目录与 idempotency 库。
+
+
+
+
+## 2026-11-04 Patrol V1 单圈 r5 准备：仿真时钟交接的 harness 最小修复（0 次动态启动）
+
+会话 `cleannav-experiments/cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z/session-patrol-lap-1-r5-20261104T085901Z`
+（同一候选，身份 `391e0842…27b0102c` 未变；域 **193** / Gazebo **11753** /
+Gateway **18084**；`sequence_id=pillar-v1-e2e-lap1-r5`、
+`command_id=pillar-v1-e2e-lap1-r5-cmd`；全新 `gateway-idempotency.sqlite`；
+bag 19 话题，新增 `/cleannav/task_status`）。r4 会话与三个文件 SHA256 **逐字节未变**。
+
+**本轮只改 harness 两个文件**：`lap_observer.py`（新增提交前时钟门，9 hunk、
+删除 9 行、新增 300 行）与 `run_patrol_lap.sh`（会话路径、域/端口、
+bag 话题表 + `/cleannav/task_status`、注释，4 hunk）。产品代码、MM 的 250 ms 判据、
+Gateway 打戳算法、Facade、GOTO/PATROL 参数、Safety、定位、Keepout、MPPI、
+Registry、地图、launch 参数、teardown 契约**全部未改**。
+
+### 读 Mission Manager 自身 ROS 时钟的现有途径（更正 r4 结论）
+
+`cleannav_mission_manager/simulation_runner.py:31-53`（可执行
+`cleannav_simulation_mission_manager` 的入口）在 `main()` 里建了 **0.5 s
+steady-time 心跳**：先发 `/cleannav/simulation/mission_runtime`
+（`real_adapters_ready`），再在 `runtime.core.active_execution is None` 时
+把 `TaskStatus.header.stamp = node.get_clock().now().to_msg()` 发到
+`/cleannav/task_status`（`node.py:100`、`node.py:209-219`，
+RELIABLE + TRANSIENT_LOCAL + KEEP_LAST(10)）。
+
+- 定时器用 `STEADY_TIME`，与仿真时间无关 ⇒ **即使 MM 的 ROS 时钟为 0 也照发**，
+  `header.stamp` 如实暴露 0 或已就绪的仿真时刻。
+- 提交前 `active_execution` 恒为 `None` ⇒ 空闲期间稳定 2 Hz。
+- 这是 MM 校验时用的同一个 `node.get_clock()`，**不是**从全局 `/clock` 反推。
+
+**r4 `RESULT.md` 里“`/cleannav/task_status` 是事件驱动发布、本轮 0 条、无法回读”
+不成立**：该判断只看了 `node.py`（确实没有 timer），漏了 runner 的 timer；
+r4 bag 也没有录这个话题（18 话题里没有 `/cleannav/task_status`）。
+**运行时是否真的按 2 Hz 发布，仍以 r5 的 bag 为第一份运行时证据**；
+若不发，门会 fail-closed 中止并写 `no Mission Manager clock sample…`。
+
+**不能读的**（如实标注，不伪造）：Gateway 的**数值** ROS 时间
+（`/api/v1/health` 只给布尔 `ros_clock_ready`，`mission_bridge.py:385-395`），
+以及 Gateway 生成的 sequence timestamp（`build_sequence_request()` 塞进
+`request.header.stamp`，202/422 响应体 `mission_bridge.py:354-365` **不回显**）。
+`clock-gate.json` 因此记 `gateway.numeric_ros_time = "NOT_EXPOSED_BY_API"`，
+数值用同一 `/clock` 的代理值，并注明来源。
+
+### 提交门（`lap_observer.py`，替代“首次 ready 即提交”）
+
+| 常量 | 值 | 含义 |
+|---|---|---|
+| `CLOCK_SETTLE_SEC` | 3.0 | 条件需连续满足这么久才允许 POST |
+| `CLOCK_SETTLE_MAX_SEC` | 30.0 | 硬上限，超过即中止（不无限 sleep、不重试） |
+| `CLOCK_MAX_GAP_SEC` | 2.0 | `/clock` 相邻样本 wall 间隔上限（≈RTF 0.05） |
+| `PEER_CLOCK_MAX_LAG_SEC` | 0.25 | 直接复用 MM 自己的 250 ms 提交容差 |
+| `PEER_CLOCK_MIN_SAMPLES` | 3 | 窗口内至少 3 个**不同**的对端时钟样本 |
+
+流程：`preflight_ready() + mission.service_is_ready()` 首次为真 → `start_settle()`
+（写 `preflight.json`，**不提交**）→ 每 tick 评估门 → 无阻断且 `elapsed ≥ 3.0 s`
+才 `write_clock_gate(phase='passed')` + `submit()`。
+
+hard（立即中止，rc=2）：`/clock` 超过 2 s 无新样本、窗口内 `/clock` 倒退、
+窗口内 `/clock` 间隔 >2 s、已 ready 的 `mission_service` 掉线、窗口内 MM 时钟倒退。
+
+soft（继续等，30 s 不清则中止）：从未收到 `/clock`、`/clock` 仍为 0、
+从未收到 `/cleannav/task_status`、MM 时钟仍为 0、窗口内不同样本 <3、
+**MM 时钟滞后 >250 ms**（`/clock` 在收包瞬间插值/短时外推 − `TaskStatus.header.stamp`，
+取窗口最小值；外推消除“样本年龄”偏差，剩余误差只有单程传输时延）。
+
+全部通过现有 rclpy 订阅与一次 `/api/v1/health` GET 完成，**不调用 `ros2` CLI/daemon**。
+
+
+### 提交前记录（`clock-gate.json`）
+
+| 要求 | 字段 |
+|---|---|
+| Gateway 当前 ROS 时间 | `gateway.ros_clock_ready` + `gateway.numeric_ros_time=NOT_EXPOSED_BY_API` + `gateway.clock_proxy_sim_sec` |
+| 最新 `/clock` | `clock.latest_sim_sec`、`window_first_sim_sec`、`samples_*`、`gap_max_sec_*`、`backwards_*` |
+| Mission Manager Ready 时间 | `mission_ready_at_monotonic`（`start_settle()` 时刻） |
+| 稳定等待时长 | `settle_target_sec`、`settle_elapsed_sec` |
+| Gateway 生成的 sequence timestamp | `submit_plan.expected_sequence_timestamp_sim_sec` + `submit_plan.sequence_timestamp_source` |
+| `command_id` | `submit_plan.command_id` |
+| MM 自身时钟 | `mission_manager_clock.*`（含 `samples_in_window`、`lag_vs_clock_min/max`、`confirmed`） |
+| 中止原因 | `blocked_reason`、`phase`（`passed`/`aborted`/`timeout`） |
+
+同一快照同时写入 `lap-result.json` 的 `clock_gate` 字段与 `events.jsonl` 的 `clock_gate` 事件。
+
+### 离线验证（未启动 ROS）
+
+- `python3 test_clock_gate.py` → **23 checks / 0 failed**（`test-clock-gate-output.txt`）：
+  healthy 场景只在 `elapsed=3.0 s` 提交 1 次且 `confirmed=true`、`lag_min=0.0`；
+  r4 复现（MM stamp 恒 0）、对端落后 1.0 s、`/clock` 倒退、`/clock` 停摆、
+  MM 时钟倒退、完全没有 `/cleannav/task_status` —— **六种异常全部不提交**，
+  hard 场景立即中止、soft 场景 30 s 中止，理由与 `phase` 均正确落盘。
+- `python3 replay_r4_clock.py` → 用 r4 bag 真实 **428 个 `/clock` 样本**
+  （sim 0.200→42.900 s，CDR 解码 `<iI` at offset 4）按真实接收节奏回放：
+  窗口内 284 样本、**最大 wall 间隔 0.6 s、0 倒退** ⇒ 2 s 阈值有 3.3× 余量、
+  不会误触发；门拦下的原因是 `Mission Manager ROS clock is still 0`，正是 r4 根因。
+- `python3 -m py_compile lap_observer.py`、`bash -n run_patrol_lap.sh` 均通过。
+
+### 下一次运行的唯一命令（**本轮未执行，需用户显式授权**）
+
+```bash
+bash /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z/session-patrol-lap-1-r5-20261104T085901Z/run_patrol_lap.sh
+```
+
+脚本自带自检（无 gzserver、11753/18084 空闲、domain 193 无人占用、
+MemAvailable ≥2.5 GiB、swap 未使用、`rtabmap.db` 等于 pin、`build.lock` 可独占），
+不满足直接 `BLOCKED` 退出。
+
+### 未验证（UNKNOWN，不得推断）
+
+1. `/cleannav/task_status` 真实运行时是否 2 Hz（静态代码路径已确认；r5 bag 给运行时证据）。
+2. MM `/clock` 订阅时延的内部成因与分布（r3 1.050 s 成功 / r4 1.646 s 失败）。
+3. 候选 3 个文件的动态行为（Facade `wrapped is None` 守卫、GOTO 0.30/0.35 容差）
+   —— **仍是 UNVERIFIED，不是 FAILED**。
+4. GOTO 是否在首圈完成、`PATH_REPLACED` 是否在 GOTO 成功后停止、
+   `FACADE_INTERNAL_ERROR` 是否复现、`FOLLOW_RESULT_UNVERIFIED` 是否只对应真实 stale wake。
+
+### 明确不做
+
+不放宽 MM 的 250 ms 判据；不改 Gateway 打戳算法；不重试提交；不复用 r4 的
+`command_id`/idempotency 库/会话目录；不重建 `cleannav_simulation`/`cleannav_navigation`
+（不 `colcon build`）；不 freeze Registry；`approved` 仍为 false；不 commit/push；
+不因本轮 harness 改动而把候选状态从 UNVERIFIED 提升。
+
+证据：该会话 `PREP.md`、`clock-gate` 相关代码与 `SHA256SUMS`、
+`test-clock-gate-output.txt`、`replay-r4-clock-output.txt`、
+`diff-lap_observer.py.patch`、`diff-run_patrol_lap.sh.patch`。
+
+
+## 2026-11-04 Patrol V1 r5 clock-gate audit correction (static; no runtime)
+
+原 R5 会话 `session-patrol-lap-1-r5-20261104T085901Z` 的文件和 8 项 SHA 清单保持原样。本轮静态审计在新会话 `session-patrol-lap-1-r5-clock-gate-fix-20261104T092915Z` 修正现有 harness 时钟门；原 R5 的运行命令已被本节的新入口取代，**不要运行原 R5 脚本**。
+
+### 已确认并修正的实现问题
+
+- 原代码把 3 s 计时从 Mission Service 首次 ready 开始；如果对端时钟很晚才有效，条件清除后可能立刻提交。现在独立记录总 30 s 等待和连续有效 3 s，只有时钟条件与当前运行 preflight 均有效时才累计；软阻断或 preflight 丢失会重置 3 s 计时。
+- 原判断用窗口内最小 lag，早期的正常值会遮住后来超限的样本。现在每条 `/cleannav/task_status` 都重新计算最新 lag，重复 stamp 也会更新观测值。定义 `lag = /clock_at_status_receipt - TaskStatus.header.stamp`：正数表示 Mission Manager 落后 `/clock`；大于 0.25 s 软阻断。负数表示对端较快，不会造成 Gateway 提交时间戳在未来。
+- `TaskStatus` 的不同 stamp 才计入 3 个有效样本，但每次 heartbeat（包括重复 stamp）都会更新时间和 lag。已安装 Mission Manager 在 idle 状态用 0.5 s `STEADY_TIME` timer 发布该话题；Gate 将状态收件年龄超过 `0.5 + 0.25 = 0.75 s` 视为软阻断。这避免在只剩旧时间戳时把历史好样本当成当前证据，30 s 总等待上限不变。
+- Service 掉线现在在时钟样本判断前作为硬阻断检查；`/clock` 或 MM 时钟回退到零先按回退硬阻断，不会被“时钟仍为零”的软条件遮住。`/clock` 停摆仍按现有 2 s 判据硬阻断。
+- 新入口仅有一个 `submit()` 路径；健康离线场景只提交一次。没有重试，也没有第二次 POST。
+
+**QoS 与真实时钟来源已核实**：此次入口固定加载的安装副本是 `cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_mission_manager`。其中 `simulation_runner.py` 在 0.5 s steady-time timer 上，以 `node.get_clock().now()` 写 `TaskStatus.header.stamp`；idle 时才发布。`node.py` 的 `/cleannav/task_status` publisher 是 RELIABLE + TRANSIENT_LOCAL + KEEP_LAST(10)，新 Observer 使用 RELIABLE + TRANSIENT_LOCAL + depth 1，请求/提供兼容。故静态代码实际读取的是 MM 自身 ROS 时钟，而不是仅用 `/clock` 代理。
+
+### 独立 session 与离线验证
+
+- Candidate identity 仍为 `391e084244b5d5d8f0828e8c89833c87bb1d129f05229202947ba3b927b0102c`，候选父 identity 仍为 `64c14b48d45cba0a4bd6f3e9d82bd79f501a1ee9f553511b1b62cf8b7ba42add`；candidate manifest 的 `approved=false`、`runtime_ready=false`、`motion_validated=false` 不变。
+- 新 session 使用 ROS domain **194**、Gazebo **11754**、Gateway **18085**，`sequence_id=pillar-v1-e2e-lap1-r5-clock-gate-fix`、`command_id=pillar-v1-e2e-lap1-r5-clock-gate-fix-cmd`。Gateway 数据库路径是新 session 下的 `gateway-idempotency.sqlite`；文件目前不存在，R4 数据库未复用。
+- `bash -n` 和三个 Python 文件 AST 解析均 rc=0。隔离 stub/FakeTime 离线回归 **35 checks / 0 failed**；涵盖延迟就绪后的完整稳定窗、正负 lag 符号、先好后坏的 lag、旧/重复 TaskStatus、/clock 与 MM 回退到零、停摆、服务掉线、30 s 上限和单次提交。
+- 用 frozen R4 bag 做 SQLite `mode=ro` 回放：428 个 `/clock` 样本、窗口 284 个、最大接收间隔 0.6 s、无倒退；门因 MM 时间为 0 在 30.1 s 软超时前中止，没有提交。Bag SHA256 前后同为 `05a1ea8fc6144d4933ccef98632e0047a0944db8665f4adc6ed497bc107ae4a8`。R4 session 内容未改。
+- 第一次离线检查的原始输出保存在新 session 的 `*-attempt-01-output.txt`：测试夹具造成 peer timestamp 倒退后，Gate 正确硬中止；回放 helper 的路径类型错误发生在打开 bag 前。修正 fixture 为单调但落后的 peer clock、并把回放改成只读 URI 后，最终 35/35 与 R4 replay 均通过。
+
+**本轮 0 次动态启动**：未启动 ROS/Gazebo/RViz，未执行 Gateway POST、未申请 Lease、未发布速度、未构建、未冻结 Registry、未批准候选。R5 correction `RESULT.md` 不存在（因为没有运行）；候选产品行为仍 **UNVERIFIED**。
+
+### 静态准备时的入口（已执行一次；不得重用）
+
+```bash
+bash /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z/session-patrol-lap-1-r5-clock-gate-fix-20261104T092915Z/run_patrol_lap.sh
+```
+
+该入口已于 2026-11-04 执行一次，结果记录在本文件下方的动态首试小节。命令与 session 仅作为历史证据保留，不得再次运行或复用其幂等路径。
+
+## 2026-11-04 Patrol V1 R5 clock-gate 动态首试（提交前阻断）
+
+本节更新前一节的“动态未运行”时间点状态。用户授权的唯一一次入口已于 2026-11-04 18:51:35 +08:00 执行：
+
+    bash /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z/session-patrol-lap-1-r5-clock-gate-fix-20261104T092915Z/run_patrol_lap.sh
+
+Session 为 session-patrol-lap-1-r5-clock-gate-fix-20261104T092915Z，cwd 为该 session 目录，entry PID 714127，launch PID/PGID 714269。domain 194、Gazebo 11754、Gateway 18085；候选 identity 391e084244b5d5d8f0828e8c89833c87bb1d129f05229202947ba3b927b0102c，产品 SHA256SUMS 运行后仍全部通过。实际加载的是该 session 的 lap_observer.py（SHA256 893b748f…），不是原 R5 observer。
+
+实际 ROS argv 与产品身份记录在该 session 的 RESULT.md。launch.log 的首次 ERROR 是 spawn 前 GetEntityState 暂时找不到 vehicle entity；后续仿真、导航、Mission 与 Security 均 READY。env.sh 另有 pc-sim-v2/build hook not found 提示，但所有 pinned package prefix 与 monitor hash 检查通过。脚本触发 SIGINT 清理后，oracle_odometry exit=1、rtabmap exit=-2 出现在退出日志阶段；不是时钟门 timeout 的首错，最终 group_after=[]。
+
+### 结果与首个阻断
+
+clock gate 连续有效 3 s 的目标未满足；总等待达到 30 s 后以 rc=2 fail-closed。Observer 收到 /clock 0 个样本；但 rosbag 捕获到 698 条 /clock，Gateway health 的 ros_clock_ready=true。/clock publisher offered reliability 是 BEST_EFFORT，而 lap_observer.py 第 178 行通过默认可靠性订阅请求 RELIABLE；observer.log 报 RELIABILITY QoS 不兼容，说明该 publisher 的消息不会送达 Observer。
+
+Mission Manager TaskStatus 有 61 个时钟样本，latest=68.6 s，但没有 Observer 的 /clock 参考，MM 与 /clock lag 是 UNKNOWN。clock-gate.json 的 stable_elapsed_sec=null、blocked_reason=no /clock sample has been received yet。没有调用 submit()：submit.json 不存在，Gateway app_idempotency 表 0 行，没有 POST / HTTP 202。
+
+任务、Lease、路径和运动均未开始：TaskSequenceStatus=0、/plan=0、admitted_path=0、FollowPath=0，/cmd_vel 732 条且非零 0 条；estop_seen=false，Lease owner 为空。定位在启动期进入 READY 后保持 localized，最终 STATIONARY；Keepout READY 样本的 outside_mask、unknown_to_traversable、nonlethal_core_cells 均为 0，failure_latched 未置位。GOTO、PATROL STARTED/COMPLETED、FULL LAP 均 NOT STARTED，不能据此判产品候选动态成功或失败。
+
+### 清理与证据
+
+RESULT.md、clock-gate.json、lap-result.json、runtime-entrypoint.log、rosbag、cleanup.json 和 localization-log 均保留在上述 session。cleanup rc=2（门超时），tracked groups 为空、launch group_after=[]、受控进程 left=0、11754/18085 空闲、build.lock 已释放；domain_194_holders=1 是脚本自计数，事后独立检查无 holder。rtabmap.db 前后 SHA256 一致。
+
+本次一次性授权已使用。不得复用该 session/幂等库，不重试，不自动修复。本轮没有改产品或 harness。后续若继续，只建议在独立 harness session 修正该 Observer 订阅的 QoS 兼容性；新的动态尝试需新的明确授权。产品候选保持 UNVERIFIED、approved=false；不要放宽 250 ms 时钟判据。
+
+## 2026-11-04 Patrol V1 R5 Observer QoS 修复与静止入口准备（未动态运行）
+
+上一节的 R5 失败根因已由 rosbag 和 Observer 日志确认：Gazebo `/clock` publisher 提供 BEST_EFFORT/VOLATILE，R5 Observer 用整数 depth 创建默认 RELIABLE subscriber，因此中间件报告 RELIABILITY 不兼容，Observer 收到 0 条时钟消息。R5 `RESULT.md`、`clock-gate.json`、日志及 rosbag 保留在原 session，未改写。
+
+独立 session：
+
+    cleannav-experiments/cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z/session-patrol-lap-1-r5-clock-qos-observe-only-20261104T113800Z
+
+R5 实际运行的 Observer SHA256 是 `893b748f17596e3faa831b2e93eecce7391650726c90019177b68d8950dc7450`；R5 原始入口 `run_patrol_lap.sh` SHA256 是 `83381602ba17d614091fcc0831fd4c96fd397ef6c1fe7317ed230facf52e555c`。新副本 `lap_observer.py` SHA256 是 `bd262fd79e357b9e841083b1ab72f79692e24d552cd69741158485c19ad1cef2`。`changes.patch` 给出相对 R5 harness 的完整差异。
+
+### Harness 修改与验证
+
+- `/clock` 单独使用显式 `QoSProfile(KEEP_LAST, depth=10, BEST_EFFORT, VOLATILE)`。其他 R5 Observer subscription QoS 未动。TaskStatus 的最新有符号 lag、3 个不同非零样本、0.25 s 判据和连续稳定窗保持原样。
+- 按本轮明确列出的“Clock 停摆”用例，Observer 也会在非零仿真时钟时间戳连续 2 s 不前进时硬阻断；沿用既有 2 s 常量，没有新增其他阈值或产品 Gate。回退和接收间隔超过 2 s 仍阻断。
+- 原生 `rclpy.qos.qos_check_compatible` 对 rosbag `/clock` BEST_EFFORT/VOLATILE 和 TaskStatus RELIABLE/TRANSIENT_LOCAL 均检查为兼容；报告的 WARNING 只涉及双方 SYSTEM_DEFAULT liveliness。用旧 RELIABLE `/clock` subscriber 做负对照时，ROS API 返回 RELIABILITY ERROR。
+- `test_clock_gate.py`：**47 checks / 0 failed**，包括 QoS、回调样本数/戳、连续 3 s、时钟停摆/回退/大于 2 s 间隔、MM lag 超过 250 ms、TaskStatus 陈旧、少于 3 个不同非零样本、最新 lag 不被历史最小值遮盖及既有 R4 gate cases。
+- `test_clock_observe_only.py`：**9 checks / 0 failed**。AST 和 pinned launch 检查确认该路径只有 `/clock` 与 TaskStatus 订阅和定时输出；不创建 client/publisher，不导入旧 `lap_observer.py`，不包含 Gateway、Lease 或任务提交调用路径。
+- R4 frozen bag 只读回放：428 条 `/clock`，窗口 284 条，最大接收间隔 0.6 s，无倒退；gate 按预期在 MM 时钟为零时阻断，无提交。R4 bag SHA256 前后均为 `05a1ea8fc6144d4933ccef98632e0047a0944db8665f4adc6ed497bc107ae4a8`。
+- 原 R5 RESULT、clock-gate、runtime-entrypoint、observer 日志和 rosbag metadata 的保护校验全部 OK。R5 rosbag 的 db3 当前 SHA256 为 `20fa6b089c93fb700387ca522b0d99430dc798a6074f56abbe9e27b25bdad2fc`，metadata 为 `884a5baf4c8535c1df21f7c3c67e1ed20089c33136b1571ff758bbc16bebb5fd`。
+
+### 后续唯一静止验证入口（本轮未执行）
+
+    bash /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z/session-patrol-lap-1-r5-clock-qos-observe-only-20261104T113800Z/run_clock_observe_only.sh
+
+入口固定使用 `enable_motion:=false`、`auto_start_task:=false`、`start_rviz:=false`、`enable_rviz_goals:=false`；只启动 pinned `cleannav_full_sim.launch.py` 与独立 `observe_clock_only.py`。launch 源码包含 Mission Manager，不含 Gateway 节点；Observer 不包含 Gateway client、submit、Lease、publisher 或 Twist 路径。它每秒输出 `/clock` 样本数/最新仿真戳、TaskStatus 样本数/最新戳、最新有符号 lag、连续稳定秒数和状态。domain 为 **195**、Gazebo 端口 **11755**，没有 Gateway 端口或幂等数据库路径，未复用 R5 的 194/11754/18085。
+
+本轮只做了 bash 语法、Python AST、离线 stub/FakeTime、只读 bag replay 和原生 QoS API 检查。没有启动 ROS/Gazebo/RViz，没有 Gateway POST、Lease、速度发布或导航；静止入口等待新的动态授权。QoS 修复目前是 **静态 PASS、运行时未验证**；MM 与 `/clock` 的实际 lag、实际 3 s 连续门和 TaskStatus QoS 仍需静止运行确认。GOTO、Facade、FollowPath、Patrol 和完整单圈均未运行，候选仍 UNVERIFIED / `approved=false`。
+
+
+## 2026-11-04 R5 observe-only ownership 第一轮只读审计
+
+上次独立 observe-only session `session-patrol-lap-1-r5-clock-qos-observe-only-20261104T113800Z` 已运行一次，在 launch 组合定位配置时即报 ownership 错误，clock/TaskStatus 均0；其原 RESULT.md 仍是静态准备快照，历史证据不回写。此次源码与成功运行对比确认：`campus_security.require_runtime_lock` 要求 FD/inode一致及 `CLEANNAV_CAMPUS_SID == os.getsid(0)`；新入口漏掉已验证 stationary:143 / R3:155 的真实SID导出。原日志无异常链，不能声称历史具体异常或FD丢失已被实测。
+
+所用 profile 的 runtime_lock_path 就是 build.lock。成功 stationary 与 R3 直接实现 safe_runtime 的FD/SID协议，没有调用旧safe_runtime.py，也没有获取独立runtime.lock。Navigation既有acquire_locks实现双锁，但其launch默认close_fds/new session，不能原样套成Campus所有权包装器；不得外层预占锁后再让内层重复获取。第二轮应在一个独立新harness session内恢复实际SID绑定和单一双锁owner，离线验证继承、失败收尾和释放后才使用已授权最多2次静止尝试。本轮0/2，无新动态；不触及QoS、MM250ms、定位/Safety/Keepout判据或安装前缀。
+
+逐行阶段对比、源码位置、历史READY原始计数、清理限制、SHA与Git事实见[独立审计报告](../cleannav-experiments/cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z/session-patrol-r5-ownership-audit-20261104T124847Z/RESULT.md)。本轮产品/harness diff为空；离线执行测试NOT RUN。
+
+
+## 2026-11-04 R5 Campus ownership 恢复与首次 observe-only PASS
+
+新session `session-patrol-r5-ownership-fix-20261104T130518Z`，domain208/11808，以当前profile的build.lock/FD9协议运行；成功stationary与R3的实际SID初始化已恢复。Navigation独立runtime.lock不属于这条Campus入口的现有合同，按用户澄清不增加第二锁。入口wait-n处理已观测launch失败悬挂；Observer仅补被动验收取证，QoS及250ms/3s不变。
+
+真实launch FD9同inode/SID已从/proc读取并保存，安装检查通过；clock最后报告943、MM115/114非零戳。首条MM0戳被BLOCKED，非零时钟57报告lag最大100.7ms、最终30ms；稳定门55s、53READY报告。定位首次健康后138条全健康，Security120条/59.5s持续READY；998条cmd_vel六分量全零，190安全样本0ESTOP/无Lease。Safety终止日志确认停车可靠确认/Lease清空/block_all=true。
+
+正常观察完成后SIGINT，runner130；observer/Oracle重复shutdown警告仅在停止阶段，保留未修。自有进程组空、最终domain无人、11808空闲、build.lock重新取锁释放PASS；runtime.lock未参与运行且最终可用，地图及12项候选清单不变。离线实际空ros2launch子进程+安装guard正/负例/锁释放/中途失败/外部进程保护均通过，47+9回归PASS。新静止额度1/2已用，成功后第二次不执行。详见[RESULT](../cleannav-experiments/cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z/session-patrol-r5-ownership-fix-20261104T130518Z/RESULT.md)、changes.patch、code-sha256.json和cleanup-final.json。
+
+下一步直接新R6单圈会话及明确运动授权，复用已验证启动与现有clock gate；不继续增加Gate，不把静止PASS写成GOTO/PATROL PASS。候选391e0842…27b0102c仍UNVERIFIED/approved=false。
+
+
+## 2026-11-04 R6 attempt1：GOTO成功，PATROL适配器日志异常
+
+原候选391e0842…单次POST202，时钟门3.027s/latest84.8ms；GOTO真实SUCCEEDED，151.025s、odom41.7468m，map/base_link终点误差0.279607m/yaw0.220853rad。149次重规划/148替换/1未变，Facade内部错误0，Future保护处理一次旧唤醒。PATROL第2执行在send_goal_async之后日志访问FollowPath.Goal不存在的pose字段，回调注册被中断，外层误报READINESS_CHECK_EXCEPTION，最终223为下游依赖失败。没有PATROL_COMPLETED/FULL_LAP。
+
+新候选cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z（identity d228f51dc3a4cdef7f57e42f92e290a2dc5f5a48cb88a6ec7f8b941572fecfb5）仅改新MM安装副本的一处Goal类型日志；1649点路径父版本负例失败、Pose通过，新候选27定向回归通过，其他配置/旧前缀不动。六项旧测试在父/新安装同样不适配（旧transport语义和复制后的仓库布局），不改产品迁就旧断言。
+
+本次bag未创建/bag.log0字节，明确记取证缺口；原始236MB诊断样本、轨迹、MM/Facade/Nav2/Safety/Gateway和事件均保存。后台TTY操作在离线fixture复现T态，/dev/null stdin通过；第二次录包显式headless，原recorder历史状态未捕获不能补造。安全无ESTOP/健康Security持续，命令速度<=.3/角速度<=.26581；独立物理速度峰值.302198单列保留。最终停车/Lease释放，最终域/端口/锁清理通过。报告[RESULT](../cleannav-experiments/cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z/session-patrol-lap-1-r6-a1-20261104T144229Z/RESULT.md)。已用1/3；下一步为已授权新候选/新session的第二次单POST，不重跑首场。
+
+
+## 2026-11-04 R6 attempt2：PATROL真实启动后定位LOST，准备最后一次最小cadence修复
+
+新MM日志候选d228f51d…单POST202，GOTO57.504s/15.549m成功；1649点FollowPath已接受/执行，PATROL exec2/Lease2正常。约11.066s/0.805m后，首错是原生Small_movement1持续而match_age3.380s超过原有3s；期间仅移动0.08585m/0.07327rad，低于native更新0.1m/0.1rad。info_age0.412s、TF/传感器/协方差有效，故是更新触发量与低速运行匹配证据时限不协调。保护ESTOP1样本、Lease释放、任务中止为后续安全响应，不能写成全程无ESTOP。无Facade内部错误/NoneType/253核心格违例。bag36.6MB、轨迹/状态/原始日志完整；清理无残留。详见[RESULT](../cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/session-patrol-lap-1-r6-a2-20261104T145733Z/RESULT.md)。
+
+最后候选d58f95d0…43aeb6只使用既有localization_linear_update=.02/localization_angular_update=.03正式参数改本次私有INI；不改产品/原安装/冻结地图/Registry/Nav2/MPPI/Safety/3sLOST/时钟门。实际安装helper回归和观测运动eligibility回放通过（新机会1.078s），不伪称已回放ICP成功。47clock回归通过后，使用最后第3次授权新domain176/11829/18129；失败后无第四次。
+
+
+## 2026-11-04 R6最终：三次已用尽，阻塞于PATROL首弯MPPI优化
+
+R6-A3 历史实际启动记录（启动成功不等于完整巡航成功）：
+
+- 实际执行命令：`bash run_patrol_lap.sh`。原始[RESULT.md](../cleannav-experiments/cleannav-patrol-pillar-v1-e2e-localization-cadence-fix-20261104T151050Z/session-patrol-lap-1-r6-a3-20261104T151050Z/RESULT.md)第26行记录该实际命令；静态收据中的绝对路径argv是解析后的计划入口，不替代实际命令记录。
+- 实际工作目录：`/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-localization-cadence-fix-20261104T151050Z/session-patrol-lap-1-r6-a3-20261104T151050Z`。
+- SYSTEM READY证据：[launch.log](../cleannav-experiments/cleannav-patrol-pillar-v1-e2e-localization-cadence-fix-20261104T151050Z/session-patrol-lap-1-r6-a3-20261104T151050Z/launch.log)第67行：`[CLEANNAV] READY SYSTEM READY; Waiting for TaskCommand; motion explicitly enabled, Lease required`。实际启动输出保存在同目录`runtime-entrypoint.log`。
+- GOTO成功：原始RESULT第28行记录耗时57.154s、实际距离15.3481m，随后进入PATROL。
+- PATROL未完成：运行24.095s、实际行驶1.64768m后，`ros-log/controller_server-21.log`第282行于`1793805517.768686638`首先报`Optimizer fail to compute path`，随后FollowPath中止。没有PATROL_COMPLETED或FULL_LAP；不能将本次启动成功或GOTO成功写成整圈成功。
+
+三次各一POST202，GOTO均成功；最后一次PATROL24.095s/1.648m后首错`Optimizer fail to compute path`，随后FollowPath/外层/MM失败。此时定位/Security持续正常，无ESTOP，速度命令<=.3/.221015；最终零速/Lease释放/停车可靠确认，进程域端口锁清理PASS。最后候选d58f95d0…仅使用已存在localization_linear_update=.02/angular=.03修改私有INI；旧3sLOST和所有安全判据、Nav2/MPPI/地图/Registry不变。MM日志修复及该观测窗口定位cadence效果已有真实证据；完整PATROL仍FAIL/候选UNVERIFIED/approved=false。当前预算3/3，无第四次；不再增加准备Gate。
+
+详见[三次正式汇总](CLEANNAV_PATROL_R6_DYNAMIC_RESULT_20261104.md)与[最后一次RESULT](../cleannav-experiments/cleannav-patrol-pillar-v1-e2e-localization-cadence-fix-20261104T151050Z/session-patrol-lap-1-r6-a3-20261104T151050Z/RESULT.md)。首次bag缺失与第二次保护ESTOP1均如实保留，不覆盖历史；后两次bag完整。下一步只读回放第三次首弯MPPI/path/costmap/footprint，查明具体可行性/critic拒绝条件，再决定修复与新的动态授权。
+
+
+## 2026-11-05 R6-A3首弯MPPI专项离线审计完成（无新增动态）
+
+第三次原bag+同次诊断确认：1649点Registry与记录全路径坐标一致，首弯最小半径1.15358m >1.12m，不能归因为路线违反物理半径。实际PATROL持续欠转，失败前约99ms航向落后路径44.4°、最近距离.1827m；实际1.12×.70m带padding Footprint的前进扫掠命中东侧边界附近254格，不能误写成Keepout核心碰撞（该处mask为unknown）。当前pose本身253，停车仍可安全，不宣称所有控制不可行。
+
+安装Nav2 MPPI1.1.20、启用CostCritic/未启用ObstaclesCritic；源码/ELF确认首批fail_flag来自全候选碰撞，另有fallback reset未清除fail_flag、CriticManager跳过重评分的恢复缺陷，两次reset不代表两批真实评分。原生噪声采样不硬裁剪Ackermann，只有软Constraint罚与加权后/输出裁剪；不得将原生无碰撞候选当物理可行解。原RNG/暖启动/内部局部路径未录，离线Monte Carlo不是原始候选复现。
+
+8seed物理投影对比：提前8.10s状态，A原参数13/6000(.217%)，仅加wz_std至.24为12/6000(.200%)，低速.15反事实2116/6000(35.267%)；错误时六方案均0，无证明靠增大噪声/batch能恢复。优先建议未来独立候选做提前低速入弯单因素离线闭环验证（副本FollowPath.vx_max .30→.15，其余不改），明确会影响GOTO/时间与缩短预瞄；当前没有实施该修改，也不承诺闭环成功。fallback标志缺陷作为独立源码问题处理，不能代替真实避碰。
+
+480个实际grid scalar/向量Footprint检查通过；原始输入/安装库哈希保持不变。未修改产品/MPPI/路径/地图/Safety，未构建、未起ROS/Gazebo/任务；R6额度3/3、无第四次。候选仍UNVERIFIED/approved=false。详见[MPPI_FIRST_TURN_AUDIT](MPPI_FIRST_TURN_AUDIT.md)及独立审计目录`cleannav-experiments/cleannav-patrol-r6-a3-mppi-first-turn-offline-audit-20261104T154141Z`。
+
+
+## 2026-11-05 R7：曲率感知MPPI离线候选已验证（非动态巡航）
+
+用户明确否定固定PATROL限速/外部SpeedLimit。R7目录`cleannav-experiments/cleannav-patrol-r7-curvature-mppi-20261104T164213Z`，identity`8e55e598ec25bc4940e6a219612f1f24a24c8883c54bd95985ca536acbcfc354`，UNVERIFIED/approved=false。正式[结果](CLEANNAV_PATROL_R7_OFFLINE_RESULT_20261105.md)与[DECISION](../cleannav-experiments/cleannav-patrol-r7-curvature-mppi-20261104T164213Z/DECISION.md)。
+
+新增内部CurvatureSpeedCritic；速度预算由A3运动学代理|vx*wz| P95=.0376055523及既有profile .25参考传播预算给出，不是物理安全认证。原tracking prune_distance=1.5，额外curvature_lookahead_distance=2.5；实测PathHandler1.48934m/61点与2.48490m/101点，tracking前缀不变。不能用延长tracking改变GoalCritic启用条件代替独立预瞄。
+
+fallback reset清旧fail_flag；实际CostCritic全碰撞→自由单元夹具与全Critic执行/持续失败abort/跨周期/噪声状态通过。Ackermann样本在predict前投影，SG后与原Bounded输出继续约束。只投影F导致欠转/停滞0/4，因此保留749Gaussian并加入1条同批统一评分的物理可行参考候选；749行逐元素一致，原std不改。原生采样单元37500步29777违规→0，真实首个外生测量初态不伪造。Facade入口动作不实施：D已有4/4，E只为理想入口反事实。
+
+最终24个原生C++反事实：A4/4，B2/4，C2/4，F0/4，D4/4，E4/4。D0停滞/abort/plant254；平均绝对航向误差.1280rad（A.1907/F.5385），横向RMS .1268m（A.1284/F.2584）；最差seed求解P95=25.496ms。所有方案plant254均0，不宣称接触次数降低。A自身可通过，原RNG/真实反馈缺失，绝非R6失败精确重演。错误前最新已录状态+原rawgrid的额外快照，F/D/E仍750/750拒绝，不强行前进。
+
+新内部preview改变私有ABI；重新编译未改逻辑的Bounded包装器，在独立Navigation副本只替换该.so。真正插件configure/setPlan/compute/cleanup通过。`/opt`、原父前缀与历史原始会话未改。safe_colcon_build.sh仍唯一构建入口，只扩展已有mppi目标的隔离source/root选项，全部并发/资源/共享锁保护保持；最大编译器1。
+
+仅复现离线：实际argv在候选evidence/*-command.sh，只读查看；**不得直接执行其中固定输出路径以覆盖本次结果**。复现用新输出目录，source Humble+候选env后，以同一共享build.lock运行私有`r7_offline_regression input fresh_output .03760555233740373 [--units|--binding|--snapshots-only]`。这些是进程内rclcpp Costmap/插件夹具，不启动Gazebo/Gateway/MM/Lease/速度发布。full-benchmark旧fixture源码/可执行文件已归档；最终snapshot-only只改变测试夹具模式，产品库SHA不变。
+
+本机离线Optimizer P95不包含ROS executor/TF等待/costmap更新，不能保证真实完整10Hz。a_lat/a_dec物理适用性、实际弯前制动、执行器/滑移/定位回馈/全圈与安全链仍需新授权动态验证。R6三次已耗尽；本轮未建运动入口、未发任务、未改Registry approved。离线通过后停止增加准备工作，下一步仅审阅该候选并等待明确R7动态授权。
+
+
+## 2026-11-05 R7-RC：授权动态尝试在preflight前置检查停止
+
+详见[R7_RC_PREP](R7_RC_PREP.md)、[算法审查](R7_REVIEW_AND_NEXT_PLAN.md)及[强化结果](R7_OFFLINE_ROBUSTNESS.md)。新session `/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/session-patrol-lap-1-r7-rc-20261105T022949Z`；domain223/Gazebo11839/Gateway18139，新幂等DB不存在，sequence/command ID独立。继承实际FD9/inode/SID、单一build.lock、clock BEST_EFFORT/VOLATILE、最新有符号250ms/3s/3不同戳、set-m/wait-n/精确进程组清理。
+
+正式启动只能直接调用下方`run_patrol_lap.sh`。不得将`evidence/preflight-command.sh`或`evidence/preflight.py`作为前置启动入口或替代入口；正式runner不依赖这两个辅助文件。
+
+保留正式runner内部已有检查逻辑与顺序：进程/端口/Domain检查 → source Humble及候选env → export目标Domain → 安装prefix/身份/资源/地图检查 → FD9/SID → ros2 launch → 运行时健康/Security/clock门 → 单次POST。不得在外层先source/export目标Domain再执行辅助检查，以改变该启动顺序。
+
+下方命令用于固定唯一正式入口，不构成新的动态授权，也不授权复用已封存的历史session。下一次运行仍须用户明确批准并确认会话处置，沿用原有运行前检查与安全条件；本次文档修改不代表当前Domain、端口或其他准入状态已通过。
+
+未来获得明确授权后，唯一命令：
+
+```bash
+bash /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/session-patrol-lap-1-r7-rc-20261105T022949Z/run_patrol_lap.sh
+```
+
+本轮未执行入口、无POST/Lease/非零速度发布。运行前沿用原预检重查域/端口/锁/进程/资源/完整205文件身份，真实定位/Security/时钟通过才单POST。首错立即按既有Safety停止并保留，不自动重试。序列成功后还须核实全圈、最终停车/Lease、命令频率/真实deadline、完整日志及清理；Observer rc0和native10Hz不独立代表动态通过。实际Gazebo/完整ROS清理、live感知、GOTO与新控制器组合仍NOT RUN。
+
+
+## 2026-11-05 R7-RC授权动态尝试：PRE-FLIGHT FAIL，未启动
+
+**2026-11-05 R7-RC授权单圈：C. DYNAMIC FAIL（preflight停在Gazebo/任务提交前）。** 固定候选身份`7262c8d7fcfa23e78fc17c417f1f904136e4862c5e2705db05de3c19f4ad6b67`未变。外部检查器rc=1，断言domain223无holder失败并报PID886083；检查器自己先export domain223后再扫`/proc`，故可能把自己识别为holder，PID argv未保存，所有权不独立确认。端口bind/listener检查通过、保护ROS/Gazebo进程扫描为空；失败发生在本轮fresh共享锁/地图/prefix/时钟断言前。按用户停机要求，唯一`run_patrol_lap.sh`调用0次；Gazebo/Gateway/POST/MM任务/Lease/cmd_vel均0。未GOTO、未到PATROL，动态能力没有结论。诊断与原准备RESULT保留于[session](../cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/session-patrol-lap-1-r7-rc-20261105T022949Z/RESULT.md)。本轮不再重查/重跑；原session含preflight第一现场，不得复用。候选UNVERIFIED/approved=false。
+
+
+
+## 2026-11-05 R7-RC preflight修复与进程可见性阻断
+
+以原R7-RC runner为基础，在冻结候选外`cleannav-experiments/cleannav-patrol-r7-preflight-fix-20261105T040536Z`替换入口与cleanup的Domain扫描；原FD9/inode/SID、共享build.lock、clock250ms/3s、wait-n/已登记PGID清理和真实一次POST任务链原样保留。没有把旧helper另建成第二套全量启动流程。原候选和失败session375文件完全未变。
+
+读写限制按用户本轮明确要求：读取失败记录PID/PPID/真实及有效UID/argv/exe/start_ticks/UTC/cgroup/ROS_DOMAIN_ID，env/exe不可读保留UNKNOWN并阻断。当前53PID中29UNKNOWN，包括同UID445与28其他UID；可读进程中没有外部223 holder并不能证明空域。已只读核对现有工具，未找到验证过的跨UID只读environ入口。禁止继续sudo探测或改/proc权限。
+
+离线18 Domain/overlay +47clock +7所有权/清理 +9observe +1被动证据全部通过。空LaunchDescription fixture未启动任何节点；正常及启动失败均释放临时锁，外部fixture在清理期间保留，所有自有测试PID最终已回收。A类source/resource64项均存在，旧pc-sim-v2的8个B类hook仍向stderr输出警告，实际11包prefix、5个native typesupport、3个库ldd通过。
+
+**第五阶段未准入：不得创建session，也不存在本轮新的动态唯一入口。** 仅保留未分配身份的`run_patrol_lap.template.sh`，不可执行为动态。旧session永不复用，RC仍UNVERIFIED/approved=false。没有新的动态额度；后续只在用户决定如何解决只读身份可见性后继续准备。当前就此停止。详见[审计](R7_PREFLIGHT_AUDIT.md)、[结果](R7_PREFLIGHT_FIX_RESULT.md)。
+
+
+## 2026-11-05 R7-RC DDS Discovery审计：受限诊断，不替代Domain准入
+
+当前R7-RC环境实际RMW rmw_fastrtps_cpp6.2.10 / FastDDS2.6.11，ROS_LOCALHOST_ONLY=1；Discovery Server/security/XML环境覆盖未设置。现有check_domain_isolated只累计ROS节点，且按name过滤自身，不枚举Participant。安装回调过滤缺少ROS enclave的原生Participant；原生get_discovered_participants/get_discovered_participant_data在本版本实际ELF返回UNSUPPORTED。Native listener可供未来独立研究，当前没有完整native枚举原型。
+
+本轮独立Python原型使用完整既有overlay，在临时131/132/133域测试；使用显式Context、唯一enclave/节点、C API本地publisher GID识别自身，不使用daemon，不发布应用消息。Graph发现外部节点/不同Participant prefix是正向占用证据；SELF_ONLY、发现错误、worker原生exit、坏结果或timeout一律不授予空域PASS。返回OCCUPIED/rc1或UNKNOWN/rc2，admit=false，没有生产接线。
+
+12离线单测及受限Graph集成通过，但跨UIDD为NOT RUN，G仅Graph node/endpoint退出可见，原生Participant移除仍UNKNOWN；localhost模式不能覆盖远程。额外raw DDS fixture存活却Graph自见，不声称已直接观察其FastDDS discovery回调。原29个不可读PID归属不因此清除，UID/PID/PGID/start_ticks清理合同继续保留。不得使用这个原型取消UNKNOWN、复用旧session或开启巡航。测试fixture均自然退出、无signals，自己创建的进程已清理，锁释放；产品375文件/205项未变，无构建/完整ROS/Gazebo/POST/Lease/cmd_vel。正式[AUDIT](R7_DDS_DOMAIN_DISCOVERY_AUDIT.md)、[RESULT](R7_DDS_DOMAIN_DISCOVERY_RESULT.md)。本轮结束，只等独立审查，不继续执行原型或运动。
+
+
+## 2026-11-05 R7-RC 新三次授权：Attempt 1 实际启动与安全停止
+
+**2026-11-05 R7-RC新授权 Attempt1/3：C. DYNAMIC FAIL，停在GOTO的Keepout核心格验证。** 冻结identity7262c8d7…4ad6b67未变、UNVERIFIED/approved=false。直接正式runner的新session `cleannav-experiments/cleannav-patrol-r7-rc-dynamic-20261105T083318Z/session-patrol-lap-1-r7-rc-a1-20261105T083318Z`，domain226/Gazebo11842/Gateway18142，未调用外层preflight或DDS。SYSTEM READY、原3s/250ms时钟门、一次POST202及真实Lease均通过。GOTO72.868s/15.7365m后仍未完成；8个局部Keepout核心格为253而非254→Security LOST→MM reason223失败→保护ESTOP/Lease释放。定位233样本健康；PATROL未开始、无Optimizer failure，不得称成圈。712条真实MPPI计时P50/P95/P99/max=6/9/11/39ms（非完整节点回调）；最大命令0.2783m/s、0.1841rad/s，最终零速/stop_confirmed。原安装policy离线复现8×253，产生机制未确定，不能放宽判据。自有进程组/端口/锁清理，375文件/205产品哈希及地图库不变；跨UID不可读进程归属仍UNKNOWN。剩余2次未用；没有允许范围内已证实修复前不盲跑，下一步仅定位该快照的mask/costmap/TF不一致，Keepout/Safety实现修改仍越界。完整[RESULT](../cleannav-experiments/cleannav-patrol-r7-rc-dynamic-20261105T083318Z/session-patrol-lap-1-r7-rc-a1-20261105T083318Z/RESULT.md)。
+
+实际cwd：`/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r7-rc-dynamic-20261105T083318Z/session-patrol-lap-1-r7-rc-a1-20261105T083318Z`。实际命令：`bash run_patrol_lap.sh`。只复制原正式runner/Observer到新session并替换session/domain/ports/sequence身份；启动检查和source/export/锁顺序未变，不使用`evidence/preflight-command.sh`或外层`preflight.py`。原RC/历史失败session不可复用。该已结束session不得再次执行。
+
+实测首错不是Domain自检或MPPI：ROS110.1局部raw costmap2144核心格中8格253，原policy严格要求254，110.5锁存Security LOST。原Safety正确ESTOP并释放Lease；任务FAILED而非COMPLETED。不要把Observer结束前的旧lease/estop快照当最终状态；最终以bag及Safety shutdown/guard stop_confirmed交叉核对。不要改checker接受253；原因尚未闭合，不以剩余额度为由重复运行。实际运行证据、BENCHMARK范围、完整bag和后处理字段以RESULT为准。
+
+
+## 2026-11-05 — R7-A1 Keepout253：离线时间基准定位，修复尚未准入
+
+**2026-11-05 R7-A1 Keepout专项离线定位：时基差集精确解释8格，未修产品。** R7-A1自己的bag与失败Master逐元素一致；原stamp110.1TF投影2144核心/8×253，发布前5.995ms收到的新stamp110.2TF投影2136核心/0异常，旧减新恰好8格，Mask100→-1，位移约3.04–3.10mm。安装Nav2 1.1.20 Filter用latest，Publisher用发布clock打戳，Security严格按header查TF；高置信时基错配，但实际Filter TF/逐层输出未录，253首次写入者仍UNKNOWN。R6/R7 Mask数据及局部参数相同；146张R6回放无异常，R7仅110.1异常，GOTO轨迹/窗口/TF相位不同。3图、八格中心/四角表、14/14审计回归通过；不能把换latest或人工填254反事实当修复。按无法唯一闭合写入链则停止修改的要求，无product.patch/新候选/构建/ROS/Gazebo/Probe/POST；原候选与第一现场未改，原动态额度1/3、余2，本轮不消耗且等待新明确动态授权。下一步仅独立审查精确TF差集与最小写入链取证范围。[专项报告](../cleannav-experiments/cleannav-r7-a1-keepout-253-audit-20261105T101143Z/KEEP_OUT_253_ROOT_CAUSE.md)。
+
+
+## 2026-11-05 — R7-A2 单包Costmap时间修复验收（启动链不改）
+
+**2026-11-05 R7-A2 Costmap快照时间修复：STATIC/BUILD/OFFLINE REPLAY PASS，DYNAMIC UNVERIFIED。** 新候选`cleannav-patrol-r7-a2-costmap-timestamp-20261105T104829Z`，identity`d705384e023a3c545f90d95fb7062c7bcedac7a47903507868128b56fc61e8f2`，父7262c8d7…4ad6b67，approved=false。仅Costmap更新链显式传snapshot_stamp，Keepout精确TF、Publisher同锁提交与raw/grid/GetCostmap同stamp；TF缺失回滚网格/origin、拒绝发布/服务，无latest/identity回退。原生修复输出仅A1八格253→254，原安装Security确认2144/2144；同步110.2及R6146/146通过，核心253/255/252/0仍拒绝，1000周期并发和11插件加载通过。CostmapFilter虚槽及Publisher私有布局变化已评估，同包库重编，9外部消费库/实际prefix验证；MPPI/安全/资产/正式runner未改。safe_colcon_build仅新增单包目标，maxcompiler1；原候选375/A1211/R6304文件未变，进程及锁清理。原动态仍1/3已用、余2，本轮0；没有新巡航session，旧runner尚未绑定新候选，下一轮明确授权后在新session保持原流程绑定验证。[修复报告](../cleannav-experiments/cleannav-patrol-r7-a2-costmap-timestamp-20261105T104829Z/R7_A2_KEEPOUT_TIMESTAMP_FIX.md)。
+
+## 2026-11-05 — R7-A2 独立动态 session 准备（未执行）
+
+> **2026-11-05 R7-A2 动态准备：PREPARED / DYNAMIC NOT RUN / AWAITING USER AUTHORIZATION。** 新独立 session `cleannav-experiments/cleannav-patrol-r7-a2-dynamic-prep-20261105T115737Z/session-patrol-lap-1-r7-a2-20261105T115737Z`；候选identity `d705384e023a3c545f90d95fb7062c7bcedac7a47903507868128b56fc61e8f2`、父RC不变，UNVERIFIED/approved=false。未来唯一执行方式：进入该session后 `bash run_patrol_lap.sh`。原正式启动顺序保留，仅候选/env/Costmap安装身份与独立资源绑定：227/11843/18143、新sequence/command及独立幂等DB。4个Costmap库+9消费库静态ELF解析均A2前缀，18项语法/结构检查通过；真实运行解析未验证。可读进程域占用/端口/保护进程无匹配、现有锁检查后释放；29个environ不可读，全UID域空闲UNKNOWN，未引入Probe或改变正式runner。A2/RC/A1/R6历史文件及389产品哈希未变；本轮未source环境、未构建、未执行runner/ROS/Gazebo/POST/Lease/速度，原动态1/3已用、余2不变。下一步仅用户独立审查与新的明确动态授权。[PREP](../cleannav-experiments/cleannav-patrol-r7-a2-dynamic-prep-20261105T115737Z/session-patrol-lap-1-r7-a2-20261105T115737Z/PREP.md)。
+
+唯一未来启动方式（须另行明确授权；本轮禁止执行）：
+
+```bash
+cd /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r7-a2-dynamic-prep-20261105T115737Z/session-patrol-lap-1-r7-a2-20261105T115737Z
+bash run_patrol_lap.sh
+```
+
+不得外层提前 source/export Domain，不得执行 preflight-command.sh、preflight.py 或 Probe。保留正式runner内部进程/端口/Domain → source Humble/候选env → export Domain → 安装身份/资源/地图 → FD9/SID → launch → 运行健康/Security/clock → 单次POST → Lease/任务 → 精确清理顺序。资源检查为时间点证据，不替代真实启动检查；不将静态PREP写成动态PASS。CPU与内部Costmap完整周期尚无本次数据，见PREP证据边界。
+
+## 2026-11-05 — R7-A2 已执行一次（session封存，不可复跑）
+
+> **2026-11-05 R7-A2 单次动态：DYNAMIC FAIL，GOTO及原首弯通过，完整单圈未完成。** identity d705384e…1e8f2未改、UNVERIFIED/approved=false。指定session直接 `bash run_patrol_lap.sh`，Domain227/11843/18143，无外层检查或Probe。READY、3.014s时钟门、一次POST202、真实Lease、GOTO73.089s/15.412m/误差0.258m通过；PATROL119.222s/22.241m（路线弧长约55%）后左侧后续弯道Optimizer failure首错1793882787.442964342，MM FAILED223。A2核心253未复现：bag329局部+102全局快照原Security严格回放全PASS/核心均254，header/update stamp不一致0；实时判据337/105快照全PASS。任务期无LOST/ESTOP，关闭后localization停止引发LOST为后果。MPPI1882条P50/P95/P99/max10/19/22.19/36ms，cmd_vel10.005Hz，无missed日志；末尾零速、Lease清空、stop_confirmed、Safety可靠停车ack，组/端口/锁释放，可读Domain持有者0，其他UID不可读仍UNKNOWN。产品/历史/地图哈希不变。额度累计2/3、余1，本轮只授权并执行这一次，停止不重试。下一步仅本次左弯失败窗口离线根因分析，未定位前不消耗最后机会。[RESULT](../cleannav-experiments/cleannav-patrol-r7-a2-dynamic-prep-20261105T115737Z/session-patrol-lap-1-r7-a2-20261105T115737Z/RESULT.md)。
+
+实际cwd为上述RESULT所在session，实际argv `bash run_patrol_lap.sh`，正式顺序未变。已结束session不得再次执行或POST；不得用Observer旧lease_final覆盖bag/Safety最终清空证据。全圈未完成，下一步以本次左弯原始bag定位首错，不新增Gate/Probe或盲目重跑。
+
+## 2026-11-05 — R7-A2左弯离线审计（不改变启动流程）
+
+> **2026-11-05 R7-A2 左弯只读审计：OFFLINE AUDIT COMPLETE，修复未应用。** 三个实测弯均CCW正曲率、R≈1.154m满足1.12m，无镜像/±2π符号缺陷。实际Facade第一段终点index876在C弯内，goalXY最小0.018m但yaw差0.544rad，未同时满足0.10/.35；重建预瞄退化单点时R7跳过参考行、速度参考回到vmax，随后离轨，最终1793882787.443由CostCritic全批碰撞触发。主导机制为有限终点位姿处理缺口（高置信推断，原RNG/权重未录）；不是路线半径、Keepout253或计算超时。172500条MC为源对齐估计，非原随机/全Critic/闭环；增std损害首弯，增N不救末态，停车候选可无碰撞但不代表任务完成。建议仅未来MPPI内部真实goal朝向参考+终点制动/保持覆盖，原接口/半径/安全判据不变，补丁未应用、未build/运行。原session与产品不变，预算仍2/3用余1；停止等待审查。[审计](../cleannav-experiments/cleannav-r7-a2-left-turn-mppi-audit-20261105T130730Z/R7_A2_LEFT_TURN_MPPI_AUDIT.md)。
+
+
+## 2026-11-05 — R7-A3实验构建与离线部分失败（无启动流程变更）
+
+> **2026-11-05 R7-A3 实验实现：BUILD PASS / OFFLINE PARTIAL FAIL / DYNAMIC NOT RUN。** 新候选`cleannav-patrol-r7-a3-terminal-pose-20261105T140353Z`，identity `e4b8b1b3e7ba3965f6c3f78ed1ada5c88c8d4adfa107b03c4089d67e66d1c62a`，父A2 d705384e…1e8f2/MPPI父7262c8d7…4ad6b67，UNVERIFIED/approved=false、不准入动态。真实FollowPath末端/原GoalChecker容差传递、OMPL有界参考/终点制动/原fallback保持、联合参考评分与终点输出一致性；750×50、噪声/速度/半径/接口/安全/地图/正式runner不变，A2 Costmap保留。原生6单元+7旧回归+2插件/PathHandler检查通过；16场景13通过（11联合终点+2弯道组件），记录全局网格上的理想plant连续两段174.2s/误差0.08924m与0.02447rad通过，**不是动态巡航**。原始近XY/yaw错恢复、已失败状态恢复、自由空间近XY错yaw仍FAIL，不能把停车/GoalChecker当前XY外返回true算成功。固定状态原生时延与8ELF/加载证明已保存，终点恢复计算量有显著增幅。最后动态仍2/3已用余1，本轮0；没有新巡航session。下一步仅审查失败恢复机制并继续MPPI内原生证明，不自动动态/放宽判据。[报告](../cleannav-experiments/cleannav-patrol-r7-a3-terminal-pose-20261105T140353Z/R7_A3_TERMINAL_POSE_FIX.md)。
+
+
+
+## 2026-11-06 — R8-A4 分段候选封存（启动流程不变）
+
+2026-11-06 R8-A4：STATIC/OFFLINE PASS，DYNAMIC NOT RUN。独立候选 `cleannav-patrol-r8-a4-path-split-20261106T020914Z`，identity `6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5`，直接父 A2 `d705384e…1e8f2`。仅新 Navigation 副本的分段模块变化；终点切线近直进场、原距离下限与fallback，当前932/反向751；166项回归含132起点/方向通过，实际新进程导入及9库静态ELF解析通过。RC MPPI+A2 Costmap及其余A2组件/资产保持，无构建、无动态入口/session；UNVERIFIED/approved=false，余1次动态机会未动。仅待用户审查和另行授权，非动态PASS。
+
+候选自身 `candidate-run/env.sh` 只source原A2再按原机制前置新Navigation；没有新runner、Gate、Probe、Observer或APP前置条件。旧A2 session已结束，不得复用。此次没有准备新session/domain/端口；后续单次动态必须独立授权并绑定新身份，原就绪/锁/安全/清理合同不变。P99 22.19ms仅是历史比较值，不增加新的运行门槛。
+
+[结果](../cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z/R8_A4_IMPLEMENTATION_RESULT.md)。
+
+
+## 2026-11-06 — R8-A4 独立动态session准备
+
+2026-11-06 R8-A4 动态准备：PREPARED / DYNAMIC NOT RUN / AWAITING USER AUTHORIZATION。新session `/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-dynamic-prep-20261106T025507Z/session-patrol-lap-1-r8-a4-20261106T025507Z`，绑定候选identity `6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5`，父A2不变；228/11844/18144，新sequence/command及不存在的独立幂等DB。A2 runner/Observer只作身份、Navigation prefix、路径和资源替换，逆向还原逐字一致，R6-A3八清理函数交叉一致。未source/export、未执行runner/ROS/Gazebo/POST/Lease/速度，余1次动态机会保留。实际动态基线仍A2，A4未动态通过。
+
+未来唯一入口：进入上述新session执行 `bash run_patrol_lap.sh`，本轮未执行，先等新明确授权；不得外层source/export或调用辅助preflight，旧A2 session不得复用。27个environ不可读仍UNKNOWN；不新增Gate或修复产品。
+
+[准备报告](../cleannav-experiments/cleannav-patrol-r8-a4-dynamic-prep-20261106T025507Z/R8_A4_DYNAMIC_PREP.md)。
+
+
+## 2026-11-06 R8-A4 首次完整单圈动态 PASS（最新动态基线）
+
+候选 `6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5`，父 A2 `d705384e023a3c545f90d95fb7062c7bcedac7a47903507868128b56fc61e8f2`。本次授权最多3次，实际首次即完整单圈成功，使用1/3；第2/3次未执行，立即停止，无R9。正式报告：`cleannav-experiments/cleannav-patrol-r8-a4-dynamic-prep-20261106T025507Z/R8_A4_THREE_ATTEMPT_DYNAMIC_RESULT.md`；session RESULT、bag、action UUID、Safety/cleanup、运行库路径和摘要完整保留。原正式session cwd执行 `bash run_patrol_lap.sh`（已执行，不可复用），Domain228/11844/18144，rc0；SYSTEM READY/clockPASS、唯一POST202、真实Lease、GOTO成功、两段和outer成功、MM/APP SUCCEEDED completed_steps2/2，Optimizer/LOST/ESTOP/核心253均0。新Facade+记录1649点输入确定性重建932，未记录原始goal payload；两段联合终点误差0.09717m/0.14162rad及0.09079m/0.00966rad。GOTO停车入口误差约0.5048m不能标成瞬时0.30m精度PASS；原Observer计数3包含延迟GOTO，真实PATROL为2段。可靠停车确认、Lease清空、自有进程/端口/锁清理和地图SHA一致。不可读环境/cgroup仍UNKNOWN；候选冻结元数据保持旧时间点，用外部动态收据证明PASS。产品/配置/runner/Observer未修改，MPPI为R7-RC、Costmap为A2，其余沿用A2。后续仅等待用户审查，不自动重跑或优化。此前PREP/NOT RUN/A2最新基线描述均为历史记录。

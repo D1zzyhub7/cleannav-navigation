@@ -1,0 +1,12 @@
+[
+  {
+    "historical_manifest": "cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/SHA256SUMS",
+    "source_entries": 0,
+    "mismatches": []
+  },
+  {
+    "historical_manifest": "cleannav-experiments/cleannav-patrol-r7-a2-costmap-timestamp-20261105T104829Z/SHA256SUMS",
+    "source_entries": 108,
+    "mismatches": []
+  }
+]

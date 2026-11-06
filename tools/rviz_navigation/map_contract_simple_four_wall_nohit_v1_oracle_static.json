@@ -1,0 +1,120 @@
+{
+  "files": {
+    "MAP_SEMANTICS.md": "b0378476b23f31f2ff0f4cbd91ae56ef9bbbf792383220e4e56e9d13f88f7a7f",
+    "manifest.json": "32c73435487565d3131c383f8ee899a368e2b777a15fd537d87067a2e5e111b5",
+    "map.pgm": "23c12d8e089e7321a8a1eb2be505d881ed01ad468aaf0fc6c91faf9ec129cf04",
+    "map.yaml": "401b5ed60ce3e946af8b013845ede4feff8aa15f0b6f3312d6b1ece2177407c4",
+    "occupancy_grid.json": "0dff5745c92f615c9ad9e96d9235a3ae0fdf85aa4c7fd3d125e0ec750d1e5f4b",
+    "rtabmap.db": "7293bc6cff42cfca37ec7a053d0e4b7ffcf841ba2de1c9daaf85f69985a72a22",
+    "rtabmap_config.ini": "c8d7c68a6476fbd44b5fb7c53d5f28cd643a93075ac605e7efc38145e9cdaf21",
+    "rtabmap_params.yaml": "81ed83c31c9e94033854a505b25c50be2496277da807829ad4aca9d8776596e9"
+  },
+  "frame_id": "base_footprint",
+  "localization_initial_pose": "0.0015082397731021 -7.99616241455078 0 0 0 0.0131529364734888",
+  "localization_initial_pose_source": {
+    "node_id": 1,
+    "path": "cleannav-experiments/odom-truth-replay-B-truth-odometry-20261027/work/dump-b/optimized_poses.csv",
+    "pose_semantics": "map -> base_footprint initialization prior; not dynamic localization evidence",
+    "sha256": "448ccbfa8bf443b74f78a63db18222b939c24bb3dc6af3556851811361245e01",
+    "stamp_s": 20.002
+  },
+  "map_directory_relative": "cleannav-maps/simple_four_wall_nohit_v1",
+  "map_geometry": {
+    "bounds": [
+      -16.34930992126465,
+      -16.33588218688965,
+      16.300690565258265,
+      16.314118299633265
+    ],
+    "coordinate_convention": "map x/y axes aligned with the paired Gazebo world x/y axes; no transform is baked into YAML",
+    "frame_id": "map",
+    "height": 653,
+    "origin": [
+      -16.34930992126465,
+      -16.33588218688965,
+      0.0
+    ],
+    "resolution": 0.05000000074505806,
+    "width": 653,
+    "yaw": 0.0
+  },
+  "map_id": "simple_four_wall_nohit_v1",
+  "odom_frame_id": "odom",
+  "odom_mode": "tf",
+  "odom_topic": "/odom",
+  "profile_id": "simple-four-wall-nohit-v1-oracle-static",
+  "provenance": {
+    "activation_status": "STATIC_IDENTITY_READY_DYNAMIC_NOT_RUN",
+    "bundle_manifest_sha256": "32c73435487565d3131c383f8ee899a368e2b777a15fd537d87067a2e5e111b5",
+    "database_scope": "B replay database; integrity and graph structure statically validated; source replay receipt says 859 nodes, scan_fidelity_max=0, RTAB-Map 0.22.1; 831 truth-matched plus 28 relative odometry propagation",
+    "frozen_candidate": "cleannav-deliverables/simple-map-nohit-ray-fix-20261029",
+    "initial_pose_truth": {
+      "frame_id": "world",
+      "optimized_pose_stamp_s": 20.002,
+      "pose_xy_yaw": [
+        0.0013401169897599313,
+        -7.997579323380257,
+        0.00826558249698904
+      ],
+      "scope": "same stopped starting pose across the initial truth sample and first optimized scan pose; prior only",
+      "stamp_s": 18.546
+    },
+    "no_route_registry": "This profile is static map/localization preparation only; no patrol route is bound.",
+    "nohit_scope": "814 final optimized poses: 808 truth-matched and 6 relative-odometry propagated",
+    "world_axis_source": "cleannav-deliverables/simple-map-nohit-ray-fix-20261029/map_candidate/MAP_SEMANTICS.md"
+  },
+  "required_odometry_mode": "oracle",
+  "safety_scan_topic": "/scan",
+  "scan_frame": "mapping_lidar_link",
+  "scan_topic": "/mapping/scan",
+  "schema_version": 1,
+  "source_bindings": {
+    "expected_prefix_packages": [
+      "cleannav_global_planner",
+      "cleannav_interfaces",
+      "cleannav_mission_manager",
+      "cleannav_navigation",
+      "cleannav_path_executor",
+      "cleannav_rtabmap",
+      "cleannav_safety_supervisor",
+      "cleannav_simulation"
+    ],
+    "initial_physical_truth": {
+      "frame_id": "world",
+      "path": "cleannav-experiments/roof-full-ready-pause-20261026T010909Z/runs/roof-full-ready-pause-20261026T010909Z/initial-physical-truth.json",
+      "root": "workspace",
+      "sha256": "054d50df7ffb5778c3258eb19808d513f817e599af82751fee8271ea81ab7a88",
+      "stamp_s": 18.546
+    },
+    "optimized_pose_source": {
+      "path": "cleannav-experiments/odom-truth-replay-B-truth-odometry-20261027/work/dump-b/optimized_poses.csv",
+      "root": "workspace",
+      "sha256": "448ccbfa8bf443b74f78a63db18222b939c24bb3dc6af3556851811361245e01"
+    },
+    "overlay_identity_config_env": "CLEANNAV_RVIZ_MACHINE_CONFIG",
+    "overlay_setup_env": "CLEANNAV_RVIZ_OVERLAY_SETUP",
+    "rtabmap_localization_launch": {
+      "path": "cleannav_rtabmap/launch/cleannav_rtabmap_localization.launch.py",
+      "sha256": "2a33f5e352a6b5c92926be8f409b8faa8bffd54bcc15e1aa3496020ce567f85f"
+    },
+    "runtime_dependencies_sha256": "33c68e0f15a9e534732352b0865354e90bc643fa5bac2c890bbc81a017feaabf",
+    "rviz_config": {
+      "path": "tools/rviz_navigation/navigation.rviz",
+      "sha256": "9a798040298f4b7fdcdae0669bc4ae9ce9bf9cc30bc941ca58a0b97ea81e5995"
+    },
+    "simulation_model_xacro": {
+      "path": "cleannav_simulation/urdf/cleannav_ackermann_startup_smoke.urdf.xacro",
+      "sha256": "59036f677ae1dd873157132583f41fd7ad0cd722bf7bc790734b379343287a3a"
+    }
+  },
+  "spawn": {
+    "x": "0.0",
+    "y": "-8.0",
+    "yaw": "0.0",
+    "z": "0.02"
+  },
+  "spawn_delay_sec": "10.0",
+  "world_relative": "cleannav-experiments/roof-full-ready-pause-20261026T010909Z/working_candidate/scene/cleannav_patrol_demo_large_v1.world",
+  "world_sha256": "c7c38234503b91c06a4f743c714b3448b22d21ebd65732f2b75beae0e3862637",
+  "profile_scope": "sensor-only Oracle static simulation; no localization/map-to-odom publisher; original wheel profile unchanged"
+}

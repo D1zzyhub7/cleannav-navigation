@@ -1,0 +1,303 @@
+# CleanNav 实验摘要索引
+
+本索引只保留结论和正式资产。完整日志与 rosbag 不在这里复制。已有 Markdown 报告的实验，以报告路径为准。
+
+更早的 Step 3.2-A 到 F、屋顶建图、接触力和 Route A 动态轮都已经有各自目录里的报告。它们的录包和采样流在 2026-11-03 清理中删除。F1 收尾的结论见 `cleannav-experiments/step3-2-f1-closeout-20261011/REPORT.md`：PARTIAL，不是 F1 PASS，生产 MCity 未修复。
+
+## 1. Mapping V1 建图
+
+| 项 | 内容 |
+| --- | --- |
+| 日期 | 2026-11-02 |
+| Session | `8eb277f599194f49b9bb56e6014c6fb0` |
+| 目的 | 用八柱 world、双雷达融合和 `ProximityMaxGraphDepth=0` 建立可验收地图 |
+| 结果 | PASS（地图库验收）。当时尚未接入旧 Patrol 定位链 |
+| 结论 | 验收库与后来的八柱地图包是同一 SHA。旧 Patrol 仍绑定 `cleannav_patrol_regions_v1.world` 和 `patrol_A_closed_loop_rtab_v4`，两套资产不能互换 |
+| 数据库 | `e16e672a46ebd237a607bf8c34fb968f3f0479ea00fd0de6b40ed5a1d5df9bbd`，18825216 字节 |
+| 替代关系 | 八柱巡航路线直接使用这份库。旧 A 区 v4 图仍被 Candidate43 绑定，没有被这份库替换 |
+| 保留资产 | `cleannav-maps/.sessions/8eb277f599194f49b9bb56e6014c6fb0/rtabmap.db`；路线包中的同 SHA 副本 |
+| 报告 | `docs/CLEANNAV_PATROL_MAPPING_INTEGRATION_RESULT.md` |
+
+## 2. 双雷达与 Oracle 接入
+
+| 项 | 内容 |
+| --- | --- |
+| 名称 | Patrol dual-lidar oracle |
+| 日期 | 2026-11-02 |
+| 身份 | `24adcd98c0981fb3ea9762ea68adabcf90f67f808df02788b214399c63c7c6f9` |
+| 目的 | 把 Mapping V1 的双雷达、`scan_2d_merger` 2.1.0 和 Gazebo Oracle 接到新 Patrol 候选 |
+| 结果 | 静态接线完成。Gazebo 发布、融合消息和 TF 图是 NOT RUN |
+| 结论 | Oracle 模式把 RTAB 和代价地图指到 `/mapping/scan_fused`。Collision Monitor 仍用前向 `/scan`。Candidate43 的 v4 地图没有 `mapping_lidar_link`，不能和这套输入混用 |
+| 替代关系 | 被后续八柱 nav2-prep / health-fix / E2E 链路 source。安装前缀仍在运行链上 |
+| 保留资产 | 候选目录；`cleannav-build/step3-2-f/review-fixes-patrol-dual-lidar-oracle-20261102/install/cleannav_simulation`；mapping-050 的 `scan_2d_merger` |
+| 报告 | `docs/CLEANNAV_PATROL_DUAL_LIDAR_ORACLE_INTEGRATION.md` |
+
+## 3. 八柱地图导出
+
+| 项 | 内容 |
+| --- | --- |
+| 名称 | 双雷达 Oracle 静止观察，以及后来的 Mapping V1 地图包 |
+| 日期 | 2026-11-02 |
+| Session | 静止观察 `67fef2efd6164d94b72725170971bdd2`。空会话 `cbda185518fa4a3fbd562c1a0bcee47f` 不是正式结果 |
+| 目的 | 在区域 world 上做无运动传感器观察，并准备导出巡航图 |
+| 结果 | 静止观察 PASS（传感器、融合、Oracle、RViz）。该静止库本身 NOT TESTED 为巡航图 |
+| 结论 | 静止图 known ratio 0.202，明确不能进入路线生成。后来八柱巡航使用的是 Mapping V1 验收库导出的 `patrol_pillar_v1_mapping_v1`，不是这次静止库 |
+| 替代关系 | 静止库被 Mapping V1 正式包替代 |
+| 保留资产 | 正式包 `cleannav-experiments/cleannav-patrol-pillar-v1-route-20261102T163219Z/maps/patrol_pillar_v1_mapping_v1/`；world `cleannav-experiments/pillar-localization-v1/scene/cleannav_patrol_pillar_v1.world` |
+| 报告 | `docs/CLEANNAV_PATROL_V12_MAP_REBUILD_AND_ROUTE_GENERATION.md` |
+
+## 4. 自动巡航路线生成
+
+| 项 | 内容 |
+| --- | --- |
+| 名称 | `patrol_pillar_v1` 外环路线 |
+| 日期 | 2026-11-02 |
+| 路线 | `route.json`，SHA256 `6d48ad03ac3bfe3650e7c85e736f3389b453fe52a0ed341598c08f66d8255b73` |
+| 目的 | 在八柱地图上生成可离线校验的闭环路线 |
+| 结果 | 路线资产已生成，并被后续实验加载。单独的“路线生成动态 PASS”没有一份独立运行报告 |
+| 结论 | 后续短 GOTO 和单圈都引用这份 `route.json` 和 Registry `f690727138ee4d1941464b7210eae5089c0c60f74f111ebfab55354e1b2130ec`。短距离 Keepout 只覆盖出生点附近走廊，不能当作整圈剖面 |
+| 替代关系 | 仍是当前 E2E 使用的路线，没有被替代 |
+| 保留资产 | `cleannav-experiments/cleannav-patrol-pillar-v1-route-20261102T163219Z/route.json` 与同目录地图包；nav2-prep 的 `pillar_v1_short_goto` 剖面 |
+| 报告 | 路线身份记录在 `docs/CLEANNAV_PILLAR_PATROL_LAP_20261103.md` 和 `docs/CLEANNAV_PATROL_V1_E2E_INTEGRATION_20261103.md` |
+
+## 5. 静止定位验证
+
+| 项 | 内容 |
+| --- | --- |
+| 名称 | 八柱静止定位，以及 health-fix 后的长时间静止验证 |
+| 日期 | 2026-11-03 |
+| Session | 早期成功观察在 route 候选 `session-stationary/`。修复后的通过会话是 `session-stationary-20261103T015800Z` |
+| 目的 | 确认 Oracle + RTAB 在零速度下保持 `localized=true` |
+| 结果 | 30 秒级早期观察能保持定位。health-fix 后的 3.8–255 秒观察 PASS |
+| 结论 | 修复后，偏航超过 0.1 rad 并再次邻近匹配时，后续 5.5 秒仍是 `STATIONARY`，没有 LOST，没有 ESTOP，`/cmd_vel` 全零。这次 PASS 不授权 GOTO 或巡航 |
+| 替代关系 | `session-stationary-20261103T015000Z` 因观察脚本字段错误提前退出，不是本结论 |
+| 保留资产 | health-fix 候选与 simulation 安装。原始 bag 不保留 |
+| 报告 | `docs/CLEANNAV_PILLAR_HEALTH_FIX_DYNAMIC_VALIDATION_20261103.md` |
+
+## 6. 定位健康问题及修复
+
+| 项 | 内容 |
+| --- | --- |
+| 日期 | 2026-11-03 |
+| 失败会话 | `session-short-goto-20261103T082000Z`、`session-short-goto-20261103T083800Z` |
+| 修复候选 | `cleannav-patrol-pillar-v1-health-fix-20261103T012522Z`，身份 `5e639a40356a8044dfdc311eeafe0f4120d4bd4c854a1da2e821e2d3aeef3712` |
+| 目的 | 解释静止车辆被锁存为 LOST 的原因，并做最小修复 |
+| 结果 | 根因审计完成。修复后的静止动态验证 PASS。运动中的 3 秒失配分支只做了离线测试 |
+| 结论 | 根因是 Localization Health 把一次静止邻近匹配当成车辆开始运动。Gazebo 真值约 0.0006 rad/s 偏航，越过 `AngularUpdate=0.1` 后 `Small_movement=0`，3 秒计时不能被后续静止取消。修复只把传给 `MotionEvidence.update()` 的 holding 改为里程计静止且接近匹配锚点 |
+| 替代关系 | 修复候选取代 nav2-prep 的 simulation 前缀，成为当前 E2E 实际加载的 simulation |
+| 保留资产 | health-fix 源码与 `review-fixes-patrol-pillar-v1-health-fix-20261103/install/cleannav_simulation` |
+| 报告 | `docs/CLEANNAV_PILLAR_LOCALIZATION_HEALTH_ROOT_CAUSE_20261103.md`，`docs/CLEANNAV_PILLAR_LOCALIZATION_MINIMAL_FIX_20261103.md` |
+
+## 7. 短距离 GOTO 失败
+
+| 项 | 内容 |
+| --- | --- |
+| 日期 | 2026-11-03 |
+| Session | `session-short-goto-20261103T082000Z`（187.2 秒）；`session-short-goto-20261103T083800Z`（246.3 秒，覆盖 LOST） |
+| 目的 | 在八柱场景做短距离 GOTO |
+| 结果 | FAIL |
+| 结论 | 车辆没有被命令移动。`/cleannav/cmd_vel_candidate` 为 0。失败点是静止定位被锁存为 LOST，随后 Safety ESTOP。082000Z 的 bag 没有录到 LOST 时刻；083800Z 的 bag 录到了。根因和修复见上一节 |
+| 替代关系 | 被 health-fix 的静止 PASS 解释并在静止条件下替代。短 GOTO 本身没有重测，仍是 FAIL |
+| 保留资产 | 报告中的结论。rosbag 不保留 |
+| 报告 | `docs/CLEANNAV_PILLAR_LOCALIZATION_HEALTH_ROOT_CAUSE_20261103.md` |
+
+## 8. Patrol 单圈规划失败
+
+| 项 | 内容 |
+| --- | --- |
+| 日期 | 2026-11-03 |
+| Session | `session-patrol-lap-20261103T030100Z` |
+| Run ID | `pillar-v1-lap-20261103T030100Z` |
+| 目的 | 在真实代价地图上规划八柱接入段和 15 个巡航段 |
+| 结果 | FAIL。不是 PATROL PASS |
+| 结论 | 任务没有提交，车辆没有被命令移动。SmacPlannerHybrid 对接入段和 15 个巡航段全部返回空路径。直接原因是全局代价地图为 40 m × 10 m 滚动窗口，南边路点在窗外，同时加载的是短距离 Keepout |
+| 替代关系 | 失败配置被 E2E 候选的整圈 Keepout 和固定全局窗口接替。动态单圈仍未通过 |
+| 保留资产 | 地图、路线、短距离剖面都没有在这次失败里被修改 |
+| 报告 | `docs/CLEANNAV_PILLAR_PATROL_LAP_20261103.md`，`docs/CLEANNAV_PATROL_EXECUTION_ARCHITECTURE_AUDIT_20261103.md` |
+
+更早的 A 区单圈 `patrol-A-single-lap-preflight-20261018T234800Z` 也是 FAIL：p1 走过，p2 近目标时航向进不了门，Mission 停在 lap 1 segment 2。报告是 `docs/CLEANNAV_PATROL_MAPPING_INTEGRATION_RESULT.md` 第 4–5 节，以及 `docs/CLEANNAV_PATROL_DEVELOPMENT_AUDIT_20261102.md`。
+
+## 9. Patrol V1 E2E 离线闭环接入
+
+| 项 | 内容 |
+| --- | --- |
+| 名称 | `cleannav-patrol-pillar-v1-e2e-20261103T044800Z` |
+| 日期 | 2026-11-03 |
+| 身份 | `9629ec3210fea0deeefdc7bbfeb4369d120bb1bb63e1f21d0f988e32359245f1` |
+| 目的 | 把整圈 Keepout、固定全局代价地图和 FollowPath 闭环接到 Mission / Navigation |
+| 结果 | 离线接入和静态测试完成。动态巡航 NOT TESTED |
+| 结论 | 1 圈展开为 GOTO 加一条 1649 点 PATROL。Facade 把闭环拆成两段 FollowPath，避免起点终点相同。`approved=false`，`runtime_ready=false`，`motion_validated=false`。没有启动 Gazebo |
+| 替代关系 | 这是当前候选，没有被后续实验替代 |
+| 保留资产 | 整个候选目录；health-fix simulation；Candidate43 r2 与 segment-corridor 的来源 install；Mapping V1 库；`route.json`；八柱 world；Registry 与 `pillar_v1_patrol` Keepout |
+| 报告 | `docs/CLEANNAV_PATROL_V1_E2E_INTEGRATION_20261103.md` |
+
+## 10. Patrol V1 R5 时钟门静态审计修正
+
+| 项 | 内容 |
+| --- | --- |
+| 日期 | 2026-11-04 |
+| Session | `session-patrol-lap-1-r5-clock-gate-fix-20261104T092915Z` |
+| Candidate | `cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z`，identity `391e0842…27b0102c` |
+| 目的 | 修正 R5 harness 时钟门静态审计发现的连续稳定计时、最新对端滞后、TaskStatus 新鲜度和硬阻断优先级问题 |
+| 结果 | bash/AST 检查通过；离线 **35 checks / 0 failed**；R4 bag 只读 replay 通过 |
+| 结论 | 仅修 harness 新 session；R5 原 session 和 R4 第一现场保留。未启动 ROS/Gazebo、未 POST、未取 Lease、未发布速度；产品 candidate 仍 **UNVERIFIED**、`approved=false` |
+| 保留资产 | R4 bag SHA 前后相同；R4 idempotency DB 未复用；新 session 有独立 domain/ports/idempotency 路径 |
+| 后续入口 | 新 session 的 `run_patrol_lap.sh`，需单独明确动态授权；详见 `docs/OPERATIONS_RUNBOOK.md` 同名小节和 session `PREP.md` |
+
+## 11. Patrol V1 R5 clock-gate 动态首试
+
+| 项 | 内容 |
+| --- | --- |
+| 日期 | 2026-11-04 |
+| Session | session-patrol-lap-1-r5-clock-gate-fix-20261104T092915Z |
+| Candidate | cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z，identity 391e0842…27b0102c |
+| 入口 | 该 session 的 run_patrol_lap.sh；domain 194、Gazebo 11754、Gateway 18085 |
+| 目的 | 唯一一次 GOTO_REGION → PATROL_REGION(laps=1) 动态验证 |
+| 结果 | FAIL，时钟门 30 s 超时，runner rc=2，Gateway POST=0 |
+| 结论 | Observer 的 /clock RELIABILITY QoS 与模拟器 publisher 不兼容：Observer 样本为 0，rosbag 捕获 698 条。没有 task、Lease、plan 或非零 /cmd_vel；Facade/GOTO/PATROL 产品路径未运行，candidate 仍 UNVERIFIED |
+| 安全与清理 | 定位进入 READY 后保持 localized/STATIONARY；Keepout READY 样本 outside_mask、unknown_to_traversable、nonlethal_core_cells 均为 0；ESTOP false、cmd_vel 全零；group_after=[]，端口空闲 |
+| 保留资产 | RESULT.md、clock-gate.json、lap-result.json、runtime-entrypoint.log、bag 和 cleanup.json；地图数据库前后哈希相同 |
+| 后续 | 本次授权已用，不重试。只建议另开 harness session 修正订阅 QoS，后续动态尝试需新授权 |
+
+## 12. Patrol V1 R5 Observer QoS 修复与静止入口准备
+
+| 项 | 内容 |
+| --- | --- |
+| 日期 | 2026-11-04 |
+| Session | `session-patrol-lap-1-r5-clock-qos-observe-only-20261104T113800Z` |
+| Candidate | `cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z`，identity `391e0842…27b0102c` |
+| 来源 | R5 实际 Observer SHA256 `893b748f17596e3faa831b2e93eecce7391650726c90019177b68d8950dc7450`；R5 `run_patrol_lap.sh` SHA256 `83381602ba17d614091fcc0831fd4c96fd397ef6c1fe7317ed230facf52e555c` |
+| 根因 | R5 bag 有 698 条 `/clock`；publisher 为 BEST_EFFORT/VOLATILE，而 Observer 请求默认 RELIABLE，故收到 0 条。Mission Manager 仍有 TaskStatus 样本，lag 因无 `/clock` 参考而 UNKNOWN |
+| 修改 | 新副本仅改变 R5 harness：`/clock` 使用 KEEP_LAST(10)/BEST_EFFORT/VOLATILE；增加非零仿真时间戳 2 s 不前进阻断。其他 Observer QoS 与产品未改 |
+| 新 Observer SHA256 | `bd262fd79e357b9e841083b1ab72f79692e24d552cd69741158485c19ad1cef2` |
+| 离线验证 | clock gate **47/47**；observe-only 结构/状态测试 **9/9**；原生 QoS compatibility API 通过；R4 bag 428 条 `/clock` 输入、284 条回放窗口、最大 gap 0.6 s、无倒退，预期以 peer clock zero 阻断；R4 bag SHA 前后不变 |
+| 静止入口 | `run_clock_observe_only.sh`，domain 195、Gazebo 11755；显式 motion=false/auto-start=false，只启动 pinned full simulation 与只订阅/打印的 Observer，无 Gateway/submit/Lease/publisher 路径，无幂等数据库 |
+| 动态结果 | **NOT RUN**。没有启动 ROS/Gazebo；QoS 实际收数、MM lag、连续 3 s 门、Safety/定位和任何运动路径仍未动态验证 |
+| 保留 | R5 `RESULT.md`、`clock-gate.json`、日志、rosbag 全部保留且保护哈希检查通过。R5 一次性巡航授权已消耗；此 session 仅等待新的 observe-only 动态授权 |
+| 报告 | 新 session `PREP.md`、`RESULT.md`、`changes.patch`、`source-sha256.txt`、离线输出；`docs/OPERATIONS_RUNBOOK.md` 同名小节 |
+
+## 仍保留的正式资产
+
+- Mapping V1 数据库 `e16e672a46ebd237a607bf8c34fb968f3f0479ea00fd0de6b40ed5a1d5df9bbd`
+- 历史受保护数据库会话 `963cb87484e14059adc475da787a42b1`
+- 八柱 world、`patrol_pillar_v1_mapping_v1`、`route.json`
+- Candidate43 地图包 `patrol_A_closed_loop_rtab_v4`
+- 当前 E2E、health-fix、nav2-prep、dual-lidar、Candidate43 的 `env.sh` 和它们 source 的 install
+- 本目录所列的 Markdown 报告
+
+
+## 13. R5 Campus ownership 修复及首次 observe-only PASS（2026-11-04）
+
+- Session: `cleannav-experiments/cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z/session-patrol-r5-ownership-fix-20261104T130518Z`；domain208 / Gazebo11808；新条件授权1/2，首次通过，第二次未执行。
+- 修复：恢复实际SID导出，沿用profile FD9共享build.lock，不加独立runtime.lock；wait-n处理已观测启动失败收尾，新增被动验收证据。产品/阈值/安装/地图不变。
+- 离线：真实空ros2launch/安装guard正负例、锁释放/失败清理/外部进程保护PASS；47+9回归PASS。
+- 动态：clock943/MM115；初始MM零戳正确阻断，非零MM报告lag最大100.7ms/最终30ms；稳定55s；健康/READY持续，998速度样本全零、0ESTOP/无Lease；Safety停车可靠确认，进程/域/端口/锁清理PASS。
+- Runner130是观察完成后SIGINT，停止阶段重复shutdown警告保留。候选仍UNVERIFIED/approved=false；下一阶段R6需独立运动授权。完整证据：`RESULT.md`、`changes.patch`、`code-sha256.json`、`ownership-live.json`、`cleanup-final.json`。
+
+
+## 14. R6三次单圈动态（2026-11-04）：FAIL / 3次已用尽
+
+三次单POST202，GOTO均成功；首错依次为MM路径日志异常、原生更新跳过→LOST/保护ESTOP、PATROL首弯MPPI优化失败。末次定位/Security正常、0ESTOP、约1.65mPATROL后中止；无完整圈证据。全部最终停车/Lease释放/进程端口域锁清理通过。候选approved=false，未冻结Registry。[正式三次汇总](../CLEANNAV_PATROL_R6_DYNAMIC_RESULT_20261104.md)。
+
+- [尝试1](../../cleannav-experiments/cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z/session-patrol-lap-1-r6-a1-20261104T144229Z/RESULT.md)：原候选，bag缺失/236MB诊断保留。
+- [尝试2](../../cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/session-patrol-lap-1-r6-a2-20261104T145733Z/RESULT.md)：MM日志修复d228f51d…，有bag，LOST首错与ESTOP1保留。
+- [尝试3](../../cleannav-experiments/cleannav-patrol-pillar-v1-e2e-localization-cadence-fix-20261104T151050Z/session-patrol-lap-1-r6-a3-20261104T151050Z/RESULT.md)：运行时cadenced58f95d0…，有bag，optimizer首错/0LOST/0ESTOP；不追加第4次。
+
+
+## 15. R7-RC首次授权动态尝试（2026-11-05）：PRE-FLIGHT STOP
+
+| 项 | 内容 |
+|---|---|
+| Candidate | R7-RC identity `7262c8d7fcfa23e78fc17c417f1f904136e4862c5e2705db05de3c19f4ad6b67`, UNVERIFIED/approved=false |
+| 授权入口 | 唯一入口获授权，但`run_patrol_lap.sh`调用0次 |
+| 首错 | 外部preflight检查domain223发现PID886083，rc1；检查器自身已export该domain，疑似自匹配，PID argv未保留，未证明外部ROS holder |
+| 其他已完成项 | Gazebo/Gateway端口bind与listener空闲；受保护ROS/Gazebo进程扫描空 |
+| 未完成项 | fresh锁/地图/profile/prefix/clock断言；失败发生于其前 |
+| 动态证据 | Gazebo/HTTP POST/MM任务/Lease/cmd_vel均0；GOTO/PATROL未开始，不能评价巡航 |
+| 处置 | 按授权条件停止；保留preflight.log/代码/命令，未重查、未启动唯一runner；session禁止复用 |
+| 结果 | C. DYNAMIC FAIL — preflight aborted before runtime；不代表车辆或导航算法失败 |
+| RESULT | `cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/session-patrol-lap-1-r7-rc-20261105T022949Z/RESULT.md` |
+
+
+## 16. R7-RC Preflight最小修复（2026-11-05）：OFFLINE PASS / PREPARATION BLOCKED
+
+| 项 | 结果 |
+|---|---|
+| 修复目录 | `cleannav-experiments/cleannav-patrol-r7-preflight-fix-20261105T040536Z`，冻结候选外 |
+| 固定候选 | `7262c8d7fcfa23e78fc17c417f1f904136e4862c5e2705db05de3c19f4ad6b67`，UNVERIFIED/approved=false |
+| 根因/修复 | export后扫描自匹配；显式domain、扫描前移、精确self/wrapper、逐PID诊断及未知阻断；cleanup统计复用相同分类器 |
+| 离线 | 18domain/overlay +47clock +7ownership/cleanup +9observe +1passive全部通过；11prefix/5typesupport/3ldd通过 |
+| 保护 | 冻结全部375文件/205产品项不变，无构建/产品修改 |
+| 当前阻断 | 53PID中29UNKNOWN（28其他UID+同UID445），无已验证跨UID只读入口，不认定空域 |
+| 新session/入口 | NOT CREATED / NOT PREPARED；仅未分配session/domain/port的模板；原失败session不复用 |
+| 动态/清理 | ROS节点/Gazebo/Gateway/POST/Lease/cmd_vel全0；测试fixture与自有后台任务全部退出，外部受保护进程未终止 |
+| 正式记录 | [审计](../R7_PREFLIGHT_AUDIT.md)、[结果](../R7_PREFLIGHT_FIX_RESULT.md)；逐PID表、diff、SHA在新目录evidence |
+| 下一步 | 停止等待用户处理只读身份可见性；不再sudo、不改/proc，不发起动态 |
+
+
+## 17. R7-RC DDS Discovery替代审计（2026-11-05）：Graph验证PASS / Gate替代未成立
+
+| 项 | 结论 |
+|---|---|
+| 独立目录 | `cleannav-experiments/cleannav-r7-dds-discovery-audit-20261105T043925Z` |
+| 候选 | R7-RC7262c8d7…ad6b67，UNVERIFIED/approved=false；375文件/205产品项未变 |
+| 实际中间件 | rmw_fastrtps_cpp6.2.10 / FastDDS2.6.11；localhost-only=1 |
+| 能力 | ROS Graph节点/endpoint GID；native轮询枚举UNSUPPORTED；不具备完整DDS发现 |
+| 测试 | 12离线策略/worker单测通过；临时域131/132/133的Graph自身/同域/异域/无效RMW/不可达Server通过；raw DDS对照保留UNKNOWN |
+| 证据缺口 | 跨UID NOT RUN；native Participant移除未直接监听；远程被localhost配置限制 |
+| 决策 | 不替换Gate，不清除29UNKNOWN，Domain223未使用，不创建巡航session |
+| 清理/边界 | 所有自有测试进程退出、fixture自然rc0/0signals、锁释放；无Gazebo/Nav/MM/Gateway/POST/Lease/cmd_vel/构建 |
+| 报告 | [AUDIT](../R7_DDS_DOMAIN_DISCOVERY_AUDIT.md)、[RESULT](../R7_DDS_DOMAIN_DISCOVERY_RESULT.md) |
+
+
+## 2026-11-05 R7-RC dynamic Attempt1/3 — DYNAMIC FAIL (Keepout local_core)
+
+- Session: `cleannav-experiments/cleannav-patrol-r7-rc-dynamic-20261105T083318Z/session-patrol-lap-1-r7-rc-a1-20261105T083318Z`; domain226, Gazebo11842, Gateway18142; direct `bash run_patrol_lap.sh`, original candidate7262c8d7…4ad6b67.
+- SYSTEM READY/clock/onePOST202/realLease PASS; GOTO72.868s/15.7365m未完成，PATROL NOT STARTED。8个mask核心格实际253→Security LOST→保护ESTOP、MM223失败；非Optimizer failure。
+- 原policy离线复现；安全停车/Lease释放/自有进程组和锁端口清理。候选375/205哈希及地图未变。真正产生原因未确定，未修改产品/Keepout，Attempt2/3未跑。
+- [RESULT](../../cleannav-experiments/cleannav-patrol-r7-rc-dynamic-20261105T083318Z/session-patrol-lap-1-r7-rc-a1-20261105T083318Z/RESULT.md)、[轨迹与速度](../../cleannav-experiments/cleannav-patrol-r7-rc-dynamic-20261105T083318Z/session-patrol-lap-1-r7-rc-a1-20261105T083318Z/trajectory-and-velocity.png)。
+
+
+## 2026-11-05 — R7-A1 Keepout253空间/时间专项审计
+
+**2026-11-05 R7-A1 Keepout专项离线定位：时基差集精确解释8格，未修产品。** R7-A1自己的bag与失败Master逐元素一致；原stamp110.1TF投影2144核心/8×253，发布前5.995ms收到的新stamp110.2TF投影2136核心/0异常，旧减新恰好8格，Mask100→-1，位移约3.04–3.10mm。安装Nav2 1.1.20 Filter用latest，Publisher用发布clock打戳，Security严格按header查TF；高置信时基错配，但实际Filter TF/逐层输出未录，253首次写入者仍UNKNOWN。R6/R7 Mask数据及局部参数相同；146张R6回放无异常，R7仅110.1异常，GOTO轨迹/窗口/TF相位不同。3图、八格中心/四角表、14/14审计回归通过；不能把换latest或人工填254反事实当修复。按无法唯一闭合写入链则停止修改的要求，无product.patch/新候选/构建/ROS/Gazebo/Probe/POST；原候选与第一现场未改，原动态额度1/3、余2，本轮不消耗且等待新明确动态授权。下一步仅独立审查精确TF差集与最小写入链取证范围。[专项报告](../../cleannav-experiments/cleannav-r7-a1-keepout-253-audit-20261105T101143Z/KEEP_OUT_253_ROOT_CAUSE.md)。
+
+
+## 2026-11-05 — R7-A2 Keepout snapshot timestamp 修复候选
+
+**2026-11-05 R7-A2 Costmap快照时间修复：STATIC/BUILD/OFFLINE REPLAY PASS，DYNAMIC UNVERIFIED。** 新候选`cleannav-patrol-r7-a2-costmap-timestamp-20261105T104829Z`，identity`d705384e023a3c545f90d95fb7062c7bcedac7a47903507868128b56fc61e8f2`，父7262c8d7…4ad6b67，approved=false。仅Costmap更新链显式传snapshot_stamp，Keepout精确TF、Publisher同锁提交与raw/grid/GetCostmap同stamp；TF缺失回滚网格/origin、拒绝发布/服务，无latest/identity回退。原生修复输出仅A1八格253→254，原安装Security确认2144/2144；同步110.2及R6146/146通过，核心253/255/252/0仍拒绝，1000周期并发和11插件加载通过。CostmapFilter虚槽及Publisher私有布局变化已评估，同包库重编，9外部消费库/实际prefix验证；MPPI/安全/资产/正式runner未改。safe_colcon_build仅新增单包目标，maxcompiler1；原候选375/A1211/R6304文件未变，进程及锁清理。原动态仍1/3已用、余2，本轮0；没有新巡航session，旧runner尚未绑定新候选，下一轮明确授权后在新session保持原流程绑定验证。[修复报告](../../cleannav-experiments/cleannav-patrol-r7-a2-costmap-timestamp-20261105T104829Z/R7_A2_KEEPOUT_TIMESTAMP_FIX.md)。
+
+## 2026-11-05 — R7-A2 dynamic attempt（累计2/3）
+
+> **2026-11-05 R7-A2 单次动态：DYNAMIC FAIL，GOTO及原首弯通过，完整单圈未完成。** identity d705384e…1e8f2未改、UNVERIFIED/approved=false。指定session直接 `bash run_patrol_lap.sh`，Domain227/11843/18143，无外层检查或Probe。READY、3.014s时钟门、一次POST202、真实Lease、GOTO73.089s/15.412m/误差0.258m通过；PATROL119.222s/22.241m（路线弧长约55%）后左侧后续弯道Optimizer failure首错1793882787.442964342，MM FAILED223。A2核心253未复现：bag329局部+102全局快照原Security严格回放全PASS/核心均254，header/update stamp不一致0；实时判据337/105快照全PASS。任务期无LOST/ESTOP，关闭后localization停止引发LOST为后果。MPPI1882条P50/P95/P99/max10/19/22.19/36ms，cmd_vel10.005Hz，无missed日志；末尾零速、Lease清空、stop_confirmed、Safety可靠停车ack，组/端口/锁释放，可读Domain持有者0，其他UID不可读仍UNKNOWN。产品/历史/地图哈希不变。额度累计2/3、余1，本轮只授权并执行这一次，停止不重试。下一步仅本次左弯失败窗口离线根因分析，未定位前不消耗最后机会。[RESULT](../../cleannav-experiments/cleannav-patrol-r7-a2-dynamic-prep-20261105T115737Z/session-patrol-lap-1-r7-a2-20261105T115737Z/RESULT.md)。
+
+
+## 2026-11-05 — R7-A2左弯MPPI只读审计
+
+[专项审计](../../cleannav-experiments/cleannav-r7-a2-left-turn-mppi-audit-20261105T130730Z/R7_A2_LEFT_TURN_MPPI_AUDIT.md)：三弯同向正曲率/物理半径通过；首段真实终点在C弯内，XY到达但yaw未达，单点参考退化后全批CostCritic碰撞。172500条MC为估计，非原随机或原生全评分；建议通用终点位姿参考/制动覆盖，未应用/未build/未动态。原session与候选保留，2/3已用余1，等待审查。
+
+## 2026-11-05 — R7-A3有限终点实验候选
+
+> **2026-11-05 R7-A3 实验实现：BUILD PASS / OFFLINE PARTIAL FAIL / DYNAMIC NOT RUN。** 新候选`cleannav-patrol-r7-a3-terminal-pose-20261105T140353Z`，identity `e4b8b1b3e7ba3965f6c3f78ed1ada5c88c8d4adfa107b03c4089d67e66d1c62a`，父A2 d705384e…1e8f2/MPPI父7262c8d7…4ad6b67，UNVERIFIED/approved=false、不准入动态。真实FollowPath末端/原GoalChecker容差传递、OMPL有界参考/终点制动/原fallback保持、联合参考评分与终点输出一致性；750×50、噪声/速度/半径/接口/安全/地图/正式runner不变，A2 Costmap保留。原生6单元+7旧回归+2插件/PathHandler检查通过；16场景13通过（11联合终点+2弯道组件），记录全局网格上的理想plant连续两段174.2s/误差0.08924m与0.02447rad通过，**不是动态巡航**。原始近XY/yaw错恢复、已失败状态恢复、自由空间近XY错yaw仍FAIL，不能把停车/GoalChecker当前XY外返回true算成功。固定状态原生时延与8ELF/加载证明已保存，终点恢复计算量有显著增幅。最后动态仍2/3已用余1，本轮0；没有新巡航session。下一步仅审查失败恢复机制并继续MPPI内原生证明，不自动动态/放宽判据。[报告](../../cleannav-experiments/cleannav-patrol-r7-a3-terminal-pose-20261105T140353Z/R7_A3_TERMINAL_POSE_FIX.md)。
+
+
+
+## 2026-11-06 — R8-A4 独立候选（离线，无新Run）
+
+2026-11-06 R8-A4：STATIC/OFFLINE PASS，DYNAMIC NOT RUN。独立候选 `cleannav-patrol-r8-a4-path-split-20261106T020914Z`，identity `6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5`，直接父 A2 `d705384e…1e8f2`。仅新 Navigation 副本的分段模块变化；终点切线近直进场、原距离下限与fallback，当前932/反向751；166项回归含132起点/方向通过，实际新进程导入及9库静态ELF解析通过。RC MPPI+A2 Costmap及其余A2组件/资产保持，无构建、无动态入口/session；UNVERIFIED/approved=false，余1次动态机会未动。仅待用户审查和另行授权，非动态PASS。
+
+[报告](../../cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z/R8_A4_IMPLEMENTATION_RESULT.md)；候选内RUN_INDEX记录dynamic_entries=0、runtime_session=null。
+
+
+## 2026-11-06 — R8-A4 最后一次单圈动态准备，尚未执行
+
+2026-11-06 R8-A4 动态准备：PREPARED / DYNAMIC NOT RUN / AWAITING USER AUTHORIZATION。新session `/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-dynamic-prep-20261106T025507Z/session-patrol-lap-1-r8-a4-20261106T025507Z`，绑定候选identity `6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5`，父A2不变；228/11844/18144，新sequence/command及不存在的独立幂等DB。A2 runner/Observer只作身份、Navigation prefix、路径和资源替换，逆向还原逐字一致，R6-A3八清理函数交叉一致。未source/export、未执行runner/ROS/Gazebo/POST/Lease/速度，余1次动态机会保留。实际动态基线仍A2，A4未动态通过。
+
+未来唯一入口：进入上述新session执行 `bash run_patrol_lap.sh`，本轮未执行，先等新明确授权；不得外层source/export或调用辅助preflight，旧A2 session不得复用。27个environ不可读仍UNKNOWN；不新增Gate或修复产品。
+
+[准备报告](../../cleannav-experiments/cleannav-patrol-r8-a4-dynamic-prep-20261106T025507Z/R8_A4_DYNAMIC_PREP.md)。
+
+
+## 2026-11-06 R8-A4 首次完整单圈动态 PASS（最新动态基线）
+
+候选 `6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5`，父 A2 `d705384e023a3c545f90d95fb7062c7bcedac7a47903507868128b56fc61e8f2`。本次授权最多3次，实际首次即完整单圈成功，使用1/3；第2/3次未执行，立即停止，无R9。正式报告：`cleannav-experiments/cleannav-patrol-r8-a4-dynamic-prep-20261106T025507Z/R8_A4_THREE_ATTEMPT_DYNAMIC_RESULT.md`；session RESULT、bag、action UUID、Safety/cleanup、运行库路径和摘要完整保留。原正式session cwd执行 `bash run_patrol_lap.sh`（已执行，不可复用），Domain228/11844/18144，rc0；SYSTEM READY/clockPASS、唯一POST202、真实Lease、GOTO成功、两段和outer成功、MM/APP SUCCEEDED completed_steps2/2，Optimizer/LOST/ESTOP/核心253均0。新Facade+记录1649点输入确定性重建932，未记录原始goal payload；两段联合终点误差0.09717m/0.14162rad及0.09079m/0.00966rad。GOTO停车入口误差约0.5048m不能标成瞬时0.30m精度PASS；原Observer计数3包含延迟GOTO，真实PATROL为2段。可靠停车确认、Lease清空、自有进程/端口/锁清理和地图SHA一致。不可读环境/cgroup仍UNKNOWN；候选冻结元数据保持旧时间点，用外部动态收据证明PASS。产品/配置/runner/Observer未修改，MPPI为R7-RC、Costmap为A2，其余沿用A2。后续仅等待用户审查，不自动重跑或优化。此前PREP/NOT RUN/A2最新基线描述均为历史记录。

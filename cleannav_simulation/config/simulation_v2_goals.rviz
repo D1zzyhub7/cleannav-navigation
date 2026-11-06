@@ -1,0 +1,75 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+  - Class: rviz_common/Views
+    Name: Views
+Visualization Manager:
+  Global Options:
+    Fixed Frame: map
+    Frame Rate: 20
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Enabled: true
+    - Class: rviz_default_plugins/RobotModel
+      Name: RobotModel
+      Enabled: true
+      Description Source: Topic
+      Description Topic:
+        Value: /robot_description
+        Durability Policy: Transient Local
+    - Class: rviz_default_plugins/TF
+      Name: TF and Robot Pose
+      Enabled: true
+      Show Axes: true
+      Show Names: false
+    - Class: rviz_default_plugins/PoseWithCovariance
+      Name: Current Robot Pose
+      Enabled: true
+      Topic:
+        Value: /cleannav/simulation/localization_pose
+    - Class: rviz_default_plugins/LaserScan
+      Name: LiDAR
+      Enabled: true
+      Topic:
+        Value: /scan
+        Reliability Policy: Best Effort
+    - Class: rviz_default_plugins/Map
+      Name: RTAB Map
+      Enabled: true
+      Topic:
+        Value: /rtabmap/map
+        Durability Policy: Transient Local
+    - Class: rviz_default_plugins/Map
+      Name: Global Costmap
+      Enabled: true
+      Alpha: 0.5
+      Topic:
+        Value: /global_costmap/costmap
+    - Class: rviz_default_plugins/Map
+      Name: Local Costmap
+      Enabled: true
+      Alpha: 0.5
+      Topic:
+        Value: /local_costmap/costmap
+    - Class: rviz_default_plugins/Path
+      Name: Nav2 Planned Path
+      Enabled: true
+      Topic:
+        Value: /plan
+  Tools:
+    - Class: rviz_default_plugins/Interact
+    - Class: rviz_default_plugins/MoveCamera
+    - Class: rviz_default_plugins/Select
+    - Class: rviz_default_plugins/SetGoal
+      Topic: /cleannav/rviz/goal_pose
+  Views:
+    Current:
+      Class: rviz_default_plugins/TopDownOrtho
+      Scale: 70
+      Angle: 0
+      X: 0
+      Y: 0
+Window Geometry:
+  Width: 1200
+  Height: 800

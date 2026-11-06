@@ -3,19 +3,31 @@
 cleannav_safety_supervisor — Safety Supervisor Node.
 
 默认阻断所有 candidate 速度，只发布零速度到 /cmd_vel。
-不转发 candidate，不调用 FollowPath，不规划路径。
+显式解除 block_all 且有有效授权时，校验并限幅转发 candidate。
+不调用 FollowPath，不规划路径。
 """
 
+import math
 import signal
 import time
 
 import rclpy
+from rclpy.clock import Clock, ClockType
 from rclpy.executors import ExternalShutdownException, SingleThreadedExecutor
 from rclpy.node import Node
 
+from cleannav_interfaces.msg import SafetyStatus
+from cleannav_interfaces.srv import SafetyLease
 from geometry_msgs.msg import Twist
 from std_msgs.msg import Bool, String
-from std_srvs.srv import SetBool
+from std_srvs.srv import SetBool, Trigger
+
+
+SAFETY_ACQUIRE_LEASE_SERVICE = '/cleannav/safety/acquire_lease'
+SAFETY_RELEASE_LEASE_SERVICE = '/cleannav/safety/release_lease'
+SAFETY_RESET_ESTOP_SERVICE = '/cleannav/safety/reset_emergency_stop'
+SAFETY_ESTOP_TOPIC = '/cleannav/safety/emergency_stop'
+SAFETY_STATUS_TOPIC = '/cleannav/safety_status'
 
 
 class SafetySupervisorNode(Node):
@@ -27,6 +39,8 @@ class SafetySupervisorNode(Node):
         super().__init__('cleannav_safety_supervisor')
 
         self._block_all = self.declare_parameter('block_all', True).value
+        self._simulation_motion_authorization = self.declare_parameter(
+            'simulation_motion_authorization', False).value
         self._candidate_timeout_sec = self.declare_parameter(
             'candidate_timeout_sec', 0.5).value
         publish_freq = self.declare_parameter('publish_frequency', 10.0).value
@@ -41,9 +55,24 @@ class SafetySupervisorNode(Node):
             'max_angular_z', 0.3).value
         self._autonomous_timeout_sec = self.declare_parameter(
             'autonomous_timeout_sec', 5.0).value
+        for name, value in (
+            ('publish_frequency', publish_freq),
+            ('status_publish_frequency', status_freq),
+            ('candidate_timeout_sec', self._candidate_timeout_sec),
+            ('autonomous_timeout_sec', self._autonomous_timeout_sec),
+        ):
+            if not math.isfinite(value) or value <= 0.0:
+                raise ValueError(f'{name} must be finite and positive')
+        for value in (
+            self._max_forward_linear_x, self._max_reverse_linear_x,
+            self._max_angular_z,
+        ):
+            if not math.isfinite(value) or value < 0.0:
+                raise ValueError('velocity limits must be finite and nonnegative')
 
         self._emergency_stop = False
         self._last_candidate_time = self.get_clock().now()
+        self._last_candidate_monotonic = time.monotonic()
         self._candidate_count = 0
         self._nonzero_candidate_count = 0
         self._last_candidate_twist = None
@@ -51,22 +80,45 @@ class SafetySupervisorNode(Node):
 
         self._autonomous_enabled = False
         self._autonomous_start_time = None
+        self._lease_owner_execution_id: str | None = None
 
         self._cmd_vel_pub = self.create_publisher(Twist, '/cmd_vel', 1)
         self._status_pub = self.create_publisher(
             String, '/cleannav/safety_supervisor_status', 1)
+        self._structured_status_pub = self.create_publisher(
+            SafetyStatus, SAFETY_STATUS_TOPIC, 1)
 
         self._candidate_sub = self.create_subscription(
             Twist, '/cleannav/cmd_vel_candidate', self._candidate_cb, 1)
         self._estop_sub = self.create_subscription(
-            Bool, '/cleannav/safety/emergency_stop', self._estop_cb, 1)
+            Bool, SAFETY_ESTOP_TOPIC, self._estop_cb, 1)
 
         self._autonomous_srv = self.create_service(
             SetBool, '/cleannav/safety/set_autonomous_enabled',
             self._autonomous_srv_cb)
+        self._simulation_motion_srv = self.create_service(
+            SetBool, '/cleannav/safety/set_simulation_motion_enabled',
+            self._simulation_motion_cb)
+        self._acquire_lease_srv = self.create_service(
+            SafetyLease,
+            SAFETY_ACQUIRE_LEASE_SERVICE,
+            self._acquire_lease_cb,
+        )
+        self._release_lease_srv = self.create_service(
+            SafetyLease,
+            SAFETY_RELEASE_LEASE_SERVICE,
+            self._release_lease_cb,
+        )
+        self._reset_estop_srv = self.create_service(
+            Trigger,
+            SAFETY_RESET_ESTOP_SERVICE,
+            self._reset_estop_cb,
+        )
 
+        # Safety watchdog must keep producing zero even when /clock stops.
+        self._steady_clock = Clock(clock_type=ClockType.STEADY_TIME)
         self._cmd_timer = self.create_timer(
-            1.0 / publish_freq, self._cmd_timer_cb)
+            1.0 / publish_freq, self._cmd_timer_cb, clock=self._steady_clock)
         self._status_timer = self.create_timer(
             1.0 / status_freq, self._status_timer_cb)
 
@@ -74,7 +126,21 @@ class SafetySupervisorNode(Node):
             "Safety Supervisor started — default mode: block_all")
 
     def _candidate_cb(self, msg: Twist):
+        values = (
+            msg.linear.x, msg.linear.y, msg.linear.z,
+            msg.angular.x, msg.angular.y, msg.angular.z,
+        )
+        if (
+            not all(math.isfinite(value) for value in values)
+            or any(value != 0.0 for value in (
+                msg.linear.y, msg.linear.z, msg.angular.x, msg.angular.y,
+            ))
+        ):
+            self._invalidate_candidate()
+            self._cmd_vel_pub.publish(Twist())
+            return
         self._last_candidate_time = self.get_clock().now()
+        self._last_candidate_monotonic = time.monotonic()
         self._last_candidate_twist = msg
         self._candidate_count += 1
         if msg.linear.x != 0.0 or msg.linear.y != 0.0 or msg.linear.z != 0.0 \
@@ -83,17 +149,116 @@ class SafetySupervisorNode(Node):
             self._nonzero_candidate_count += 1
 
     def _estop_cb(self, msg: Bool):
-        if self._autonomous_enabled and msg.data:
+        if msg.data:
+            self._emergency_stop = True
             self._autonomous_enabled = False
             self._autonomous_start_time = None
-        self._emergency_stop = msg.data
+            self._lease_owner_execution_id = None
+            self._invalidate_candidate()
+            self._cmd_vel_pub.publish(Twist())
+        elif self._emergency_stop:
+            self.get_logger().warning(
+                'false emergency_stop message ignored; use reset service')
+
+    def _acquire_lease_cb(self, request, response):
+        execution_id = request.execution_id
+        if not self._valid_execution_id(execution_id):
+            response.success = False
+            response.message = 'execution_id must be a non-empty string'
+            return response
+        if self._emergency_stop:
+            response.success = False
+            response.message = 'rejected by emergency_stop'
+            return response
+
+        if self._block_all:
+            response.success = False
+            response.message = 'rejected by block_all; lease cannot authorize motion'
+            return response
+
+        if self._lease_owner_execution_id is None:
+            self._invalidate_candidate()
+            self._lease_owner_execution_id = execution_id
+            self._autonomous_enabled = True
+            self._autonomous_start_time = None
+            response.success = True
+            response.message = 'safety lease acquired'
+        elif self._lease_owner_execution_id == execution_id:
+            self._autonomous_enabled = True
+            self._autonomous_start_time = None
+            response.success = True
+            response.message = 'safety lease already owned'
+        else:
+            response.success = False
+            response.message = 'safety lease owned by another execution'
+        return response
+
+    def _release_lease_cb(self, request, response):
+        execution_id = request.execution_id
+        if not self._valid_execution_id(execution_id):
+            response.success = False
+            response.message = 'execution_id must be a non-empty string'
+            return response
+
+        if self._lease_owner_execution_id is None:
+            self._invalidate_candidate()
+            self._cmd_vel_pub.publish(Twist())
+            self._autonomous_enabled = False
+            self._autonomous_start_time = None
+            response.success = True
+            response.message = 'safety lease already released'
+        elif self._lease_owner_execution_id == execution_id:
+            self._invalidate_candidate()
+            self._cmd_vel_pub.publish(Twist())
+            self._autonomous_enabled = False
+            self._autonomous_start_time = None
+            self._lease_owner_execution_id = None
+            response.success = True
+            response.message = 'safety lease released'
+        else:
+            response.success = False
+            response.message = 'safety lease owned by another execution'
+        return response
+
+    def _reset_estop_cb(self, request, response):
+        self._invalidate_candidate()
+        self._cmd_vel_pub.publish(Twist())
+        self._emergency_stop = False
+        self._autonomous_enabled = False
+        self._autonomous_start_time = None
+        self._lease_owner_execution_id = None
+        response.success = True
+        response.message = 'emergency_stop reset; autonomous disabled'
+        return response
+
+    def _simulation_motion_cb(self, request, response):
+        """Change the simulation interlock without granting a motion lease."""
+        if request.data and (
+            not self._simulation_motion_authorization
+            or not self.get_parameter('use_sim_time').value
+            or self._emergency_stop
+        ):
+            response.success = False
+            response.message = 'requires explicit simulation authorization and no ESTOP'
+            return response
+        self._block_all = not request.data
+        self._invalidate_candidate()
+        self._cmd_vel_pub.publish(Twist())
+        if self._block_all:
+            self._autonomous_enabled = False
+            self._autonomous_start_time = None
+            self._lease_owner_execution_id = None
+        response.success = True
+        response.message = 'simulation interlock updated; Lease still required'
+        return response
 
     def _autonomous_srv_cb(self, request, response):
         if request.data:
-            if self._emergency_stop:
+            if self._emergency_stop or self._block_all:
                 response.success = False
-                response.message = "rejected by emergency_stop"
+                response.message = "rejected by emergency_stop or block_all"
             else:
+                self._invalidate_candidate()
                 self._autonomous_enabled = True
                 self._autonomous_start_time = time.monotonic()
                 response.success = True
@@ -101,6 +266,8 @@ class SafetySupervisorNode(Node):
                     f"autonomous enabled for "
                     f"{self._autonomous_timeout_sec} seconds")
         else:
+            self._invalidate_candidate()
+            self._cmd_vel_pub.publish(Twist())
             self._autonomous_enabled = False
             self._autonomous_start_time = None
             response.success = True
@@ -114,10 +281,21 @@ class SafetySupervisorNode(Node):
         else:
             rev = -self._max_reverse_linear_x
             out.linear.x = max(twist.linear.x, rev)
+        # Reducing vx alone tightens curvature. Scale wz by the same ratio;
+        # a further angular clamp can only increase the turning radius.
+        scaled_wz = (
+            twist.angular.z * (out.linear.x / twist.linear.x)
+            if twist.linear.x != 0.0 else 0.0
+        )
         out.angular.z = max(
-            min(twist.angular.z, self._max_angular_z),
+            min(scaled_wz, self._max_angular_z),
             -self._max_angular_z)
         return out
+
+    def _invalidate_candidate(self):
+        """Require a newly received candidate after any authority boundary."""
+        self._last_candidate_twist = None
+        self._last_output_limited = False
 
     def _cmd_timer_cb(self):
         # Priority 1: emergency_stop → zero
@@ -125,36 +303,53 @@ class SafetySupervisorNode(Node):
             if self._autonomous_enabled:
                 self._autonomous_enabled = False
                 self._autonomous_start_time = None
+                self._invalidate_candidate()
             self._cmd_vel_pub.publish(Twist())
             return
 
-        # Priority 2: autonomous timeout (checked before stale, so timeout
+        # Priority 2: block_all is an unconditional output interlock.
+        if self._block_all:
+            self._last_output_limited = False
+            self._cmd_vel_pub.publish(Twist())
+            return
+
+        # Priority 3: autonomous timeout (checked before stale, so timeout
         # works even without candidate)
-        if self._autonomous_enabled and self._autonomous_start_time is not None:
+        if (
+            self._autonomous_enabled
+            and self._lease_owner_execution_id is None
+            and self._autonomous_start_time is not None
+        ):
             elapsed = time.monotonic() - self._autonomous_start_time
             if elapsed >= self._autonomous_timeout_sec:
                 self._autonomous_enabled = False
                 self._autonomous_start_time = None
-                self._last_output_limited = False
+                self._invalidate_candidate()
                 self.get_logger().info(
                     "autonomous timeout — back to block_all")
                 self._cmd_vel_pub.publish(Twist())
                 return
 
-        # Priority 3: stale / no candidate → zero
+        # Priority 4: stale / no candidate → zero
         now = self.get_clock().now()
         age = (now - self._last_candidate_time).nanoseconds * 1e-9
-        stale = (self._candidate_count == 0) or (age > self._candidate_timeout_sec)
+        stale = (
+            self._candidate_count == 0
+            or age < 0.0
+            or age > self._candidate_timeout_sec
+            or time.monotonic() - self._last_candidate_monotonic
+            > self._candidate_timeout_sec
+        )
         if stale or self._last_candidate_twist is None:
             self._cmd_vel_pub.publish(Twist())
             return
 
-        # Priority 4: not autonomous → zero (default block_all)
+        # Priority 5: not autonomous → zero
         if not self._autonomous_enabled:
             self._cmd_vel_pub.publish(Twist())
             return
 
-        # Priority 5: forward limited candidate
+        # Priority 6: independently forward/reverse limited candidate
         limited = self._limit_twist(self._last_candidate_twist)
         self._last_output_limited = (
             limited.linear.x != self._last_candidate_twist.linear.x
@@ -166,13 +361,22 @@ class SafetySupervisorNode(Node):
         age = (now - self._last_candidate_time).nanoseconds * 1e-9
         if self._candidate_count == 0:
             freshness = "no_candidate"
-        elif age > self._candidate_timeout_sec:
+        elif (
+            self._last_candidate_twist is None
+            or age < 0.0
+            or age > self._candidate_timeout_sec
+            or time.monotonic() - self._last_candidate_monotonic
+            > self._candidate_timeout_sec
+        ):
             freshness = "candidate_stale"
         else:
             freshness = "candidate_fresh"
 
         remaining = 0.0
-        if self._autonomous_enabled and self._autonomous_start_time is not None:
+        if (
+            self._autonomous_enabled
+            and self._autonomous_start_time is not None
+        ):
             remaining = max(
                 0.0, self._autonomous_timeout_sec
                 - (time.monotonic() - self._autonomous_start_time))
@@ -193,10 +397,39 @@ class SafetySupervisorNode(Node):
             f"block_all={self._block_all} "
             f"emergency_stop={self._emergency_stop} "
             f"autonomous_enabled={self._autonomous_enabled} "
+            f"lease_owner={self._lease_owner_execution_id or 'none'} "
             f"autonomous_remaining_sec={remaining:.1f} "
             f"last_output_limited={self._last_output_limited}"
         )
         self._status_pub.publish(String(data=status))
+        self._structured_status_pub.publish(
+            self._structured_status_message())
+
+    def _structured_status_message(self):
+        """Build structured status directly from supervisor state."""
+        message = SafetyStatus()
+        message.header.stamp = self.get_clock().now().to_msg()
+        message.header.frame_id = ''
+        message.interface_version = '1.1'
+        message.emergency_stop_active = self._emergency_stop
+        message.autonomous_enabled = self._autonomous_enabled
+        message.block_all = self._block_all
+        message.lease_owner_execution_id = (
+            self._lease_owner_execution_id or ''
+        )
+        if self._emergency_stop:
+            message.message = 'emergency stop active'
+        elif self._block_all:
+            message.message = 'block_all active'
+        elif self._autonomous_enabled:
+            message.message = 'autonomous enabled'
+        else:
+            message.message = 'autonomous disabled'
+        return message
+
+    @staticmethod
+    def _valid_execution_id(execution_id):
+        return isinstance(execution_id, str) and execution_id != ''
 
 
 def main(args=None):

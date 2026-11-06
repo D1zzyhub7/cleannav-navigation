@@ -1,0 +1,35 @@
+collision_monitor:
+  ros__parameters:
+    use_sim_time: true
+    base_frame_id: base_link
+    odom_frame_id: odom
+    cmd_vel_in_topic: /cleannav/mapping/cmd_vel_raw
+    cmd_vel_out_topic: /cleannav/cmd_vel_candidate
+    transform_tolerance: 0.20
+    source_timeout: 0.30
+    base_shift_correction: true
+    stop_pub_timeout: 0.50
+    polygons: [MappingForwardStop, MappingSweptApproach]
+    MappingForwardStop:
+      type: polygon
+      points: [1.30, 0.70, 1.30, -0.70, 0.30, -0.70, 0.30, 0.70]
+      action_type: stop
+      max_points: 0
+      visualize: true
+      polygon_pub_topic: /cleannav/mapping/collision_stop_zone
+      enabled: true
+    MappingSweptApproach:
+      type: polygon
+      action_type: approach
+      footprint_topic: /cleannav/mapping/robot_footprint
+      time_before_collision: 2.0
+      simulation_time_step: 0.10
+      max_points: 1
+      visualize: true
+      polygon_pub_topic: /cleannav/mapping/collision_swept_footprint
+      enabled: true
+    observation_sources: [scan]
+    scan:
+      type: scan
+      topic: /scan
+      enabled: true

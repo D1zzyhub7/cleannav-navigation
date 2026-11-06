@@ -193,3 +193,27 @@ Navigation 闭环前：
 → 继续下一个组件模块化
 
 所有组件完成后，再建立 `cleannav-system`，使用 Git submodule 固定各组件精确 SHA。
+
+## 14. M1-6N Navigation Facade V1
+
+当前工作分支为 `feature/navigation-facade-v1`，基于 Ackermann feature
+HEAD `d7fa56c5414b6138cdb1f8a57d415f154104c65e`，实现保持未提交等待审查。
+
+- 外部接口为 `/cleannav/navigate_to_pose`，类型为 ROS 2 Humble
+  `nav2_msgs/action/NavigateToPose`；内部串行委托 `/compute_path_to_pose`
+  → `/follow_path`。
+- 已完成 rclpy-native Future runtime 迁移；生产代码不再依赖 asyncio event
+  loop。Python/rclpy-native 单元测试 `26 passed`，`colcon build` 与
+  `colcon test` 均 PASS。
+- source 与 installed artifact 的 `navigation_facade_node.py` SHA256 一致：
+  `8b9e2f655a6b0b5c4440337cc34bdacfd8527ae890f242431023708b093ab831`。
+- 真实 ROS 2 Humble runtime 已验证：Facade ActionServer discovery、invalid
+  outer goal rejection、planner unavailable controlled abort，以及真实
+  `ComputePathToPose → FollowPath → NavigateToPose` success 均 PASS。
+- 已验证 planner/controller ID forwarding、FollowPath 路径 timestamp 归零，
+  且真实 runtime 无 `no running event loop`、execute callback traceback 或
+  `Goal state not set, assuming aborted`。
+- 已实现 single active goal、no preemption、planning/following 两阶段 cancel
+  确认、terminal exactly-once；Facade 不发布 `/cmd_vel`，不承担 Mission
+  Manager、Safety 或其他业务逻辑。
+- facade 不包含 Safety lease、Ackermann/MPPI 参数或规划算法逻辑。

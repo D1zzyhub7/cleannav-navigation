@@ -1,0 +1,78 @@
+# R7-RC 强化离线验证
+
+结论：离线通过，动态NOT RUN。实际cwd为项目根目录；argv/日志/rc见候选`evidence/execution-receipts.json`及`evidence/*command.sh`。无Gazebo、实验launch、Gateway、Mission、Lease或速度发布者。
+
+## 输入与比较方法
+
+主回放只用R6-A3第三次原bag派生的6个100×100 raw Costmap、对应map↔odom TF、实测入口位姿/速度、带padding的实际1.12×.70m Footprint、Registry1649点和已录admitted path。FollowPath action原始payload未录，首段877点按当时Facade源码推导；不能称为录到了精确action输入。未用第二次bag代替。
+
+原生Nav2 1.1.20+R7、真实PathHandler/CriticManager/CostCritic/MPPI/Bounded插件；.1s理想Ackermann plant，每步选择位置最近的已录网格，不重建全部实时感知或执行器。首弯退出index≥120，最长60s，进度条件仍.1m/15s，不把停车算通过。failure-near对齐约99ms不确定性保留，原内部状态/RNG缺失。
+
+A在同一构建中关闭新增曲率/投影/参考行并复现旧sticky-flag，是原算法语义基线，非原R6 ELF/内存状态精确回放。D是最终R7。seed700–729逐对初态/路径/网格/Footprint相同；初始float32 Gaussian矩阵SHA逐对一致，[30组哈希](offline/paired/paired-noise-sha256.json)。后续控制均值/fallback自然分叉，不声称所有周期随机状态相同；不保证跨编译/浮点布局位级复现。
+
+## 30组结果
+
+| 方案 | 首弯退出 | abort | 停滞 | plant254终止 | 横向RMS m | 平均绝对航向 rad |
+|---|---:|---:|---:|---:|---:|---:|
+| A | 21/30 | 5 | 2 | 2 | 0.1385 | 0.2202 |
+| D | 30/30 | 0 | 0 | 0 | 0.1264 | 0.1277 |
+
+A总共9个未通过；D30/30不代表真实成功率100%或完整单圈已过。最近离散路径点距离用于横误（含采样分辨率）。统计按RUNNING控制周期汇总，终止行默认零命令排除，不能作为停车证据。
+
+| 方案 | 横误P50/P95/P99/max m | 绝对航向P50/P95/P99/max rad |
+|---|---|---|
+| A | 0.0999 / 0.2641 / 0.3394 / 0.3901 | 0.1895 / 0.4696 / 0.4982 / 0.6844 |
+| D | 0.1105 / 0.1870 / 0.2711 / 0.2755 | 0.1314 / 0.2149 / 0.3054 / 0.3096 |
+
+[每seed结果](offline/per-seed-summary.csv)、[原始周期](offline/paired/cycles.csv)、[终态](offline/paired/seeds.csv)、[机器可读汇总](offline/summary.json)。
+
+![轨迹/误差/耗时](offline/paired-comparison.png)
+
+## 可行率、重复和权重
+
+每20周期额外调用一次真实CostCritic评整批，未改原评分；要求同一行50步全部满足v/w/R界才计控制约束可行。诊断耗时从优化器计时扣除。以下为检查批次中位数，不是最低值。
+
+| 方案 | 无碰撞比例 | 同时控制约束可行 | 唯一控制序列 | 唯一端点1cm/0.01rad | ESS中位 | row0权重中位 |
+|---|---:|---:|---:|---:|---:|---:|
+| A | .6780 | 0 | 750/750 | 738/750 | 7.545 | 1.60e-8 |
+| D | .9313 | .9313 | 750/750 | 698/750 | 1.644 | .7792 |
+
+A整行可行0不表示每一步违规；输出仍有原Bounded约束，不能把候选越界称为实车命令越界。CostCritic>100区分碰撞成本300与非碰撞≤约4.5，不把253软代价误算碰撞。权重由相同post-gamma成本重算softmax，没有另设路径评分。D具有序列多样性，但权重明显集中；解释见审查报告。
+
+## 曲率时序与匹配对照
+
+4种子×A/D/J合成夹具，J仅关闭曲率软代价，参考行仍感知曲率。另4种子完全直线匹配对照，全部退出；没有写产品Registry或路线。
+
+种子0，D距弯1m/.5m为.1850/.1513m/s，完全直线对照.2640/.2579；四组同方向。距弯.1m约.2188，入口约.2035，对照约.2501/.2581。J同样提前下降，表明主要来自曲率参考而非Critic单项；临弯短暂再加速未隐藏，软目标不是硬限速。原A3无前直线，实车弯前减速仍NOT RUN。
+
+![曲率、预瞄、参考、实际原生输出、航向、距离](offline/prebend-speed-heading.png)
+
+![共同启动瞬态之后的几何影响](offline/prebend-matched-control.png)
+
+原始[合成时序](offline/prebend/cycles.csv)与[直线对照](offline/straight-control/cycles.csv)。这里“实际输出”指native compute返回，不是车辆传感器实测。
+
+## 10Hz预算与完整回调
+
+实际controller_frequency=10Hz，100ms预算。优化器计时包含prepare/更新/滤波/Bounded输出，扣除新增诊断，路径变换在外。另测真实插件configure/setPlan/activate/compute/deactivate/cleanup，149次按100ms调度；外层steady_clock计时包含PathHandler、TF、参数/Costmap锁、Optimizer、Bounded和启用的既有计时日志。
+
+| 范围 | P50 ms | P95 ms | P99 ms | max ms | >100ms |
+|---|---:|---:|---:|---:|---:|
+| A优化器 | 3.069 | 13.691 | 17.995 | 24.637 | 0 |
+| D优化器 | 14.414 | 25.875 | 28.055 | 39.229 | 0 |
+| 完整native D回调 | 17.916 | 27.837 | 28.872 | 29.011 | 0 |
+
+调用9.99993Hz，最大间隔100.647ms是调度抖动，不是compute超预算。**这是完整native plugin callback，不是完整controller_server/executor/DDS/Safety运行周期**。真实/cmd_vel发布频率、live Costmap竞争及运行时deadline NOT RUN；未来runner录速度/odom/local_plan与完整控制器日志，授权运行后才能对齐验证。
+
+![权重、ESS与完整回调](offline/weights-and-callback.png)
+
+## 构建与回归范围
+
+唯一safe_colcon_build入口，rc0、265.782s，max_compilers1，最低MemAvailable3741556KiB、最大swap162116KiB，PSI无压力。新前缀实际ELF/ament索引/头文件与插件绑定通过。BUILD_TESTING=OFF为正式入口固定选项；本轮运行专用原生受影响回归，**未宣称整个上游Nav2全部gtest已运行**。
+
+- 原生7组标签覆盖真实CostCritic全失败→可行重评分、所有后续Critic、第二次有界失败、跨周期/噪声/pose/speed、37500控制约束、曲率参考、749Gaussian行逐元素一致。另有完整PathHandler/真实Bounded绑定。
+- 47 clock gate、26 Facade生命周期/容差、27 MM transport定向回归通过。6项已在父MM失败的旧契约检查明确deselect，父parent-existing-suite.log有同样失败；不计新通过。
+- 真实空ros2-launch子进程+安装Campus检查：有效/缺SID/错SID/新SID/关闭FD/错inode六例符合预期。exit7启动中断清理、fixture锁释放、外部fixture进程保护通过。只使用临时fixture锁，没有运行实验launch或申请Lease。
+- 实际安装launch声明、Campus地图/遮罩/world身份、freeze_costmap→motion_profile→RewrittenYaml(simtime=true)离线组合通过，launch actions执行0。
+- failure-near真实grid145四种子D仍750/750碰撞拒绝、控制违规0，没有放宽碰撞判据。
+
+首错全部保留：clock测试预期仍是R6 ID，单项失败后仅改新测试ID；ownership清理夹具缺launch.log，补空日志/虚拟地图后通过；初版汇总缺pandas，改用已有numpy/csv。原生夹具class_loader卸载警告与旧underlay develop-hook警告保留，进程全退出、实际prefix已核对，不扩展无关修复。

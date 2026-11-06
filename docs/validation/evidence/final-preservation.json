@@ -1,0 +1,8 @@
+{
+  "candidate_identity": "6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5",
+  "product_entries": 392,
+  "product_mismatches": [],
+  "original_worktree_user_files": 17,
+  "original_worktree_unchanged": true,
+  "scope": "Frozen runtime product files verified; shared build manager modification separately recorded as authorized build support."
+}

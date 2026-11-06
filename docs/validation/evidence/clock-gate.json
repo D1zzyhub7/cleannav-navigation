@@ -1,0 +1,55 @@
+{
+  "phase": "passed",
+  "wall_time": "2026-11-06T11:30:48+0800",
+  "settle_target_sec": 3.0,
+  "settle_elapsed_sec": 3.015,
+  "stable_elapsed_sec": 3.02,
+  "mission_ready_at_monotonic": 13320.565,
+  "clock": {
+    "source": "/clock (rosgraph_msgs/Clock)",
+    "latest_sim_sec": 52.1,
+    "window_first_sim_sec": 49.1,
+    "samples_total": 521,
+    "samples_in_window": 30,
+    "gap_max_sec_total": 1.1497,
+    "gap_max_sec_window": 0.1023,
+    "backwards_total": 0,
+    "backwards_in_window": 0
+  },
+  "mission_manager_clock": {
+    "source": "/cleannav/task_status TaskStatus.header.stamp (idle heartbeat)",
+    "latest_sim_sec": 52.1,
+    "window_first_sim_sec": 49.1,
+    "samples_total": 9,
+    "samples_in_window": 7,
+    "backwards_in_window": 0,
+    "lag_vs_clock_min_sec": 0.009,
+    "lag_vs_clock_max_sec": 0.0151,
+    "lag_vs_clock_latest_sec": 0.009,
+    "last_status_age_wall_sec": 0.0202,
+    "tolerance_sec": 0.25,
+    "max_status_gap_sec": 0.75,
+    "confirmed": true
+  },
+  "gateway": {
+    "health": {
+      "ok": true,
+      "api_version": "1.0",
+      "gateway": "CONNECTED",
+      "mission_task_topic_ready": true,
+      "mission_sequence_service_ready": true,
+      "ros_clock_ready": true,
+      "estop_active": false
+    },
+    "ros_clock_ready": true,
+    "numeric_ros_time": "NOT_EXPOSED_BY_API",
+    "clock_proxy_sim_sec": 52.1
+  },
+  "submit_plan": {
+    "sequence_id": "pillar-v1-e2e-lap1-r8-a4-20261106T025507Z",
+    "command_id": "pillar-v1-e2e-lap1-r8-a4-20261106T025507Z-cmd",
+    "sequence_timestamp_source": "gateway get_clock().now() at request build (mission_bridge.py:228); not echoed by the submit response",
+    "expected_sequence_timestamp_sim_sec": 52.1
+  },
+  "blocked_reason": ""
+}

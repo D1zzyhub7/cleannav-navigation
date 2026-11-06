@@ -1,0 +1,15 @@
+{
+  "cwd": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r8-a4-source-release-20261106T045347Z/src/cleannav-navigation",
+  "argv": [
+    "python3",
+    "-B",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "tests/patrol",
+    "--junitxml=/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r8-a4-source-release-20261106T045347Z/evidence/patrol-source-tests.xml"
+  ],
+  "rc": 0
+}

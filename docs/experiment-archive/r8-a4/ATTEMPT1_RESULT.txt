@@ -1,0 +1,46 @@
+# R8-A4 Attempt 1 — VERIFIED SINGLE-LAP DYNAMIC PASS
+
+2026-11-06，实际执行 1/3 次；首次完整单圈成功，第二、三次 NOT RUN_STOPPED_AFTER_FIRST_SUCCESS。停止动态运行，不开展 R9。
+
+候选 identity：`6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5`；直接父候选 A2：`d705384e023a3c545f90d95fb7062c7bcedac7a47903507868128b56fc61e8f2`。本次后最新实际动态基线为 R8-A4；此前 PREP 的 NOT RUN / A2 baseline 属于历史时间点。候选冻结元数据不回写，以本次外部验证收据为准。
+
+实际 cwd：`/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-dynamic-prep-20261106T025507Z/session-patrol-lap-1-r8-a4-20261106T025507Z`。唯一调用 `bash run_patrol_lap.sh`，未在外层 source/export 或调用额外入口。Domain 228 / Gazebo 11844 / Gateway 18144。runner PID/SID 47238，launch PID/PGID 47485；正式入口 rc=0，launch 子进程独立退出码未另存，不能补写为 0。launch 开始 2026-11-06T11:29:45+08:00，清理开始 11:37:11+08:00。runner、Observer、候选产品与配置均未修改。
+
+| 验证项 | 实际结果 |
+|---|---|
+| SYSTEM READY / 时钟 | launch.log 有 SYSTEM READY；clock-gate.json 稳定 3.020s，MM 7 个不同窗口样本，无倒退 |
+| 提交 | 唯一 POST，HTTP 202、accepted=true、replayed=false；幂等库恰有一条 FINAL/202 记录 |
+| Safety Lease | GOTO ros-execution-1、PATROL ros-execution-2 均真实取得；末尾 owner 空 |
+| GOTO | action 与 Facade 均 SUCCEEDED；193.528s / 41.283m |
+| 第一段 PATROL | adffa66c3e1a43b2a5c15cb2531fda70，EXECUTING→SUCCEEDED |
+| 第二段 PATROL | 6fe32f6f28c1482b9b080ccf09c470c3，EXECUTING→SUCCEEDED |
+| outer FollowPath | e9237688e4bf416ebb617003b2ebc388，ACCEPTED→EXECUTING→SUCCEEDED |
+| Mission Manager / APP | sequence SUCCEEDED，completed_steps=2/2，APP 同步成功并释放资源 |
+| 完整单圈 | PASS；PATROL 187.305s，odom 实驶 40.281m，原路线弧长 41.086m |
+| Optimizer / LOST / ESTOP | Optimizer failure=0，Localization LOST=0（首次有效之后），Security LOST=0，保护 ESTOP=0 |
+| Keepout | local 656/global 201 个唯一记录判定均 PASS，核心异常 253=0；646 local+198 global 原始栅格离线严格策略重放全 PASS |
+| 停车 / 清理 | 最后 10 条 cmd_vel 的 6 分量全零；Safety 可靠停车确认、Lease 清空；自有 PID/进程组全退出，端口空闲、锁可重新取得后释放、地图摘要一致 |
+
+实际记录 admitted_path 为原 map-frame 1649 点路线，XY 最大差 0、wrapped yaw 差约 2.45e-16。运行中 Facade argv 指向 A4 Navigation prefix；进程 maps 确认 R7-RC MPPI、R7-A2 Costmap，以及 A4 复制的原 Navigation Bounded 库，未混入 A3。具体路径见 runtime-loaded-components.json、runtime-library-maps.json。Mission Manager 与其他 prefix 沿用 A2，详见 prefixes.txt、候选 env 与 PREP。
+
+固定新模块对该记录输入确定性重建得到 `((0, 933), (932, 1649))`。Observer 没有原始 FollowPath goal payload 或运行中 module.__file__ 遥测，因此 index 932 属于确定性重建证据，不能标成直接 action payload 观测。候选安装加载证据与运行中新 Facade 路径共同证明选路，原始输入由 bag 直接记录。
+
+两个成功事件之前最近的 bag 位姿分别为：第一段位置误差 0.097167m、航向误差绝对值 0.141618rad；第二段 0.090793m / 0.009656rad。均同时满足原 patrol_goal_checker 0.10m / 0.35rad；各自窗口还有 4 个联合满足样本。方法是记录 odom + 最近先到的 map←odom + 静态 base_link 变换，采样分别早于成功事件 59ms、36ms；这不是控制器内部 TF Buffer 或有状态 checker 的精确查询/闩锁遥测。完整证据及 UUID/时间戳见 terminal-evidence.json。
+
+原 Observer 的 PATROL success 原始计数为 3，包含步骤切换后延迟收到的 GOTO 成功状态。离线按完整 UUID 与 action accepted ROS stamp（outer 245.0s；两段 245.2s/351.4s）划分，实际 PATROL 为两段成功。保留原计数，不修改 Observer。最近路线弧长展开跨度 41.461m 包含起点接缝/入场偏移，run-metrics 的 1.0091 不能解释为精确 100.9% 覆盖率；单圈结论来自两段 action、outer 与 MM/APP 完整终态及轨迹共同印证。
+
+GOTO 的额外观察：191 次 PATH_REPLACED，路径明显较长；WAYPOINT_STOP_STABLE 的到入口距离约 0.5048m，不能称为停车瞬间 0.30m 精度通过。既有 stateful checker 可在先前 XY 闩锁后结束。本次只记录该边界，不修改冻结 checker；两段 PATROL 的联合终点样本独立满足原条件。
+
+MPPI 原生整毫秒 benchmark 3747 条：P50 8 / P95 16 / P99 18 / max 27ms，超过 100ms 为 0，missed 日志为 0。总体回调频率 9.843Hz、最大间隔 2.569s 包含换段/停车，不能宣称始终 10Hz。cmd_vel 约 10.003Hz，最大间隔 0.1043s，末尾零命令持续 2.600s；最终 odom vx=-0.000830m/s、wz=0.002918rad/s，末 1s 位移 0.000201m。未增加 CPU 运行时采样，CPU=NOT_SAMPLED。
+
+可靠停车的直接证据是 ros-log/safety_supervisor_node-2.log 的 SAFETY_SHUTDOWN：controlled stop published and reliably acknowledged; lease cleared; block_all=true。旧 security timeline 不包含 stop_confirmed 字段，不伪造该字段。cleanup.json rc=0、group_after=[]；其 Domain 自计数 1 为收集器自身。postrun-cleanup-verification.json 独立核验自有 PID/组无存活、11844/18144 空闲、可读进程无 Domain228 持有者，build.lock 可重取并释放。初始 PREP 27 个不可读环境保持历史 UNKNOWN；结束采样 26 个不可读仍 UNKNOWN，不能推断所有 UID Domain 完全空闲。cgroup 仍 UNKNOWN/WAIVED，不宣称完整资源 PASS。未给未知进程发信号。
+
+地图数据库前后 SHA256：`e16e672a46ebd237a607bf8c34fb968f3f0479ea00fd0de6b40ed5a1d5df9bbd`。392 个产品条目、冻结候选 96 项 manifest 核验无差异。Python 运行自动生成了 4 个未列入产品 manifest 的 __pycache__ 文件，见 postrun-identity.json；不将“源产品不变”写成整个目录逐字节不变。
+
+没有任务期首错或 Optimizer failure。启动前 entity 尚未出现的 GetEntityState 短暂错误、收尾 RTAB SIGINT exit -2 与 Oracle KeyboardInterrupt/traceback 均保留，不能写成日志完全无 ERROR。runtime-entrypoint.log 仅归档实际保存的输出片段，头部明确首批 8 行 setup 警告未持久捕获；launch.log 与复制的完整 ros-log 保留。runner 独立退出码为已知 0。
+
+离线后处理只读 bag、未启动节点：沿用 A2 分析器，修复本地消息 PYTHONPATH 和旧 stop_confirmed schema 假设后 rc=0；保留初始失败 stdout/stderr、失败脚本快照及 analysis-execution-receipts.json。新增 analyze_terminal_evidence.py 只做事后解析，不是运行时 Observer。未重新运行任务。
+
+证据：bag-patrol-lap-1/、launch.log、ros-log/、events.jsonl、sequence-status.jsonl、task-status.jsonl、safety-status.jsonl、gateway-idempotency-evidence.json、clock-gate.json、terminal-evidence.json、keepout-replay.json、run-metrics.json、trajectory-and-velocity.png、first-runtime-error.txt、cleanup.json、postrun-cleanup-verification.json、postrun-identity.json、dynamic-validation-receipt.json；RUNTIME_SHA256SUMS 为本次最终封存清单，原 SHA256SUMS 保留为准备时快照。
+
+终端与进程：新建 UI 终端 0、复用 UI 终端 0；工具前台进程会话已结束，无本 Agent 后台任务残留。自有 ROS/Gazebo 已按原 runner 清理，未终止其他受保护进程。使用 1/3 次后停止；不得复用此已执行 session。

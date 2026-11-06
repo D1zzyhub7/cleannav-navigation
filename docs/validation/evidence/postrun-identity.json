@@ -1,0 +1,13 @@
+{
+  "candidate_identity_sha256": "6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5",
+  "product_entries": 392,
+  "product_mismatches": [],
+  "frozen_manifest_mismatches": [],
+  "generated_runtime_python_caches": [
+    "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z/install/cleannav_navigation/share/cleannav_navigation/launch/__pycache__/cleannav_ackermann_navigation.launch.cpython-310.pyc",
+    "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z/install/cleannav_navigation/lib/cleannav_navigation/__pycache__/boundary_runtime.cpython-310.pyc",
+    "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z/install/cleannav_navigation/lib/cleannav_navigation/__pycache__/patrol_path_segments.cpython-310.pyc",
+    "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z/install/cleannav_navigation/lib/cleannav_navigation/__pycache__/polygon_constraint.cpython-310.pyc"
+  ],
+  "runtime_baseline_status": "Validated by external receipt; frozen candidate metadata not rewritten"
+}

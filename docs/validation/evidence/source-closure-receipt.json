@@ -1,0 +1,37 @@
+{
+  "status": "SOURCE_RESTORATION_BUILD_AND_REGRESSION_PASS",
+  "candidate_identity": "6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5",
+  "dynamic_repeated": false,
+  "four_runtime_python_shas_match": true,
+  "cpp_header_files_verbatim": 165,
+  "historical_source_seals": {
+    "RC": 79,
+    "A2": 108,
+    "mismatches": 0
+  },
+  "source_pytest": {
+    "A4": 166,
+    "package_units": 197,
+    "failed": 0
+  },
+  "native_regression": {
+    "RC_units": 7,
+    "binding_checks": 2,
+    "ABI_executables": 2,
+    "failed": 0
+  },
+  "final_package_builds": {
+    "costmap": 0,
+    "mppi": 0,
+    "mppi-source-only": 0,
+    "interfaces": 0,
+    "planner": 0,
+    "executor": 0,
+    "navigation": 0
+  },
+  "packaging_failures_preserved": [
+    "colcon missing local dependency setups",
+    "redundant unqualified mppi link removed"
+  ],
+  "scope": "Rebuilt artifacts separately identified; original dynamic candidate and its single-lap PASS retained."
+}

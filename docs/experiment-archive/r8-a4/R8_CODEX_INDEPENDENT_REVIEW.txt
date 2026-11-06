@@ -1,0 +1,369 @@
+# CleanNav R8 Codex 独立复核与最小修复决策
+
+2026-11-06（Asia/Shanghai）。本轮为独立离线审计，**没有实施产品修改，没有创建可运行候选，没有动态授权或动态入口调用**。
+
+**推荐先实施 A4 的分段思路，但不要原样粘贴 A4 代码。** 本轮发现其弦线判据会在反向路线和不同起点下选入弯道；建议仅在同一私有辅助函数中改用终点末段切线，并在候选筛选时保留原有最远距离下限。当前生产路线仍得到 `876 → 932`，不改 MPPI、路线、Registry、ROS 接口或启动流程。草案见 [proposed.patch](proposed.patch)，**未应用**。
+
+DeepSeek R8 的路线生成链、原路线复现、曲率及指定候选分段结果可信；其“任何闭环路线都通用”“弯内终点几何上不可达”“机械还有 20% 转角余量”等结论不能接受。路线优化有独立价值，应随后单独处理。**这些离线结果不证明最后一次动态运行必然成功。**
+
+## 1. 审计身份、范围与证据
+
+本目录是新增审计产物，不替换 R7/A2/A3/A4/R8 历史证据。读取了 PROJECT_MASTER、Operations Runbook、生命周期/Preflight/Git 规范、Navigation AGENTS、karpathy-guidelines 和 cleannav-operations Skill；按本轮用户边界不更新正式文档、不运行动态 preflight、不 source overlay。
+
+根目录和 `cleannav-tools` 均不是 Git 仓库，不能给整个运行链指定一个 HEAD。实际 Git 快照见 [git-before.json](evidence/git-before.json)：
+
+| 仓库 | 当前 HEAD | 说明 |
+|---|---|---|
+| Navigation startup worktree | `3c5b86bf8d07992df38b6b701fdcce79b58ffaf4` | 既有 dirty/untracked 保留 |
+| pc-sim-v2 mapping/localization 工作树 | `fcc451797b6883b347b7e75a80b28875eb86e7f1` | 子仓库已有修改 |
+| 上述工作树内 Navigation 子仓库 | `403639cafbc5b19d8a7ffc0699c0677831ba0fc6` | 有既有修改；不是当前 PATROL 安装源码快照 |
+| 上述工作树内 Mission 子仓库 | `1dae973267d28d885009269976032e3081146b23` | 有既有修改 |
+
+这些是**本轮当前文件状态**，不回填为历史运行 HEAD。详细 dirty/untracked/cached/gitlink 状态已保存。没有 init、stash、切分支、暂存、commit 或 push。
+
+候选身份与 product manifest 逐项重新核对，见 [candidate-identities-verified.json](evidence/candidate-identities-verified.json)：
+
+| 对象 | identity SHA256 | 逐项校验 | 当前角色 |
+|---|---|---|---|
+| R7-RC | `7262c8d7fcfa23e78fc17c417f1f904136e4862c5e2705db05de3c19f4ad6b67` | 205/205 匹配 | 当前 A2 使用的 MPPI/Navigation 父链 |
+| R7-A2 | `d705384e023a3c545f90d95fb7062c7bcedac7a47903507868128b56fc61e8f2` | 389/389 匹配 | 最近实际动态基线；Costmap 修复保留 |
+| R7-A3 | `e4b8b1b3e7ba3965f6c3f78ed1ada5c88c8d4adfa107b03c4089d67e66d1c62a` | 594/594 匹配 | 实验性终点增强，13/16，未晋升 |
+
+三者仍为 `UNVERIFIED / approved=false`。R7-A2 最近动态为 FAIL；GOTO 和前两个弯通过、PATROL 完整单圈未完成，不能用 R7_REVIEW_AND_NEXT_PLAN 的历史 READY 覆盖后续失败。
+
+本轮检查结果：
+
+| 检查 | 实际结果与证据 |
+|---|---|
+| R8 SHA256SUMS | 38/38 条匹配，含 7 个脚本、15 个候选文件、5 张图及缓存；[校验](evidence/r8-sha-verification.json) |
+| 原始 RTAB Admin 栅格 | 337260 格逐格一致；只读 immutable SQLite；[geometry.json](evidence/geometry.json) |
+| 原 owner 复现 | 1649×3 个数值按原顺序逐项完全相等，误差 0；不是只比较最近点 |
+| 指定 9 条优化候选 + 原路线 | 原规则和 A4 原提案分段索引全部复现；[独立联合比较](evidence/joint-independent.json) |
+| A4 宣称的五项验证 | 五项重做通过；另检查 3 种异常输入；[8 项检查](evidence/acceptance-checks.json) |
+| 本轮修正草案 | 10 项定向检查、66 起点×正反方向=132 个几何检查；[验收](evidence/proposal-acceptance.json)、[起点比较](evidence/proposal-phase-comparison.json) |
+| 所有 R8 候选 | 15 份文件重新分段，并调用原 owner 的 validate_loop；[分段](evidence/proposal-all-candidates.json)、[几何](evidence/candidate-owner-validator.json) |
+| 补丁 | `patch --dry-run --batch -p1` rc=0，审计夹具原文件不变；[收据](evidence/patch-dry-run.json) |
+
+重算入口均为纯离线 Python，cwd 为项目根，真实 argv/rc/stdout/stderr 见 [计算收据](evidence/final-calculation-receipts.json) 和 [补丁测试收据](evidence/proposal-checks-execution.json)。未运行会初始化 rclpy 的 Facade 生命周期测试或 native ROS 插件夹具。没有把几何检查计为控制器闭环 PASS。
+
+CSV/JSON也逐字段核对：candidate-metrics 14行、joint-split-comparison 10行无差异，route-curvature 1649行与摘要点数一致（CSV数值保留6位），见 [CSV交叉核对](evidence/csv-json-crosschecks.json)。
+
+R8 七个脚本已逐一检查：`curvature_analysis.py`、`candidate_routes.py`、`joint_split_compare.py`、`split_comparison.py`、`make_figures.py`、`registry_checks.py`、`print_table.py`。它们的 main 部分会写回原 R8 目录，因此没有执行那些 main；只在关闭 bytecode 写入的条件下调用已审查的只读函数。五张原图已查看。早期 `split_comparison.py` 使用不同的 ahead 规则和非垂距公式，**不作为 A4 验证依据**。
+
+## 2. 路线生成链的独立追踪
+
+事实源：[owner core.py](../../cleannav-tools/map-editor/core.py)、[原导出脚本](../cleannav-patrol-pillar-v1-route-20261102T163219Z/tools/export_map_and_plan_route.py)、[route.json](../cleannav-patrol-pillar-v1-route-20261102T163219Z/route.json)、[生成结果](../cleannav-patrol-pillar-v1-route-20261102T163219Z/route-generation-result.json)。关键行及 SHA 也集中在 [source-excerpts.txt](evidence/source-excerpts.txt)。
+
+1. 原导出脚本 `decode_grid():49` 以 `mode=ro&immutable=1` 读取原 session `8eb277f599194f49b9bb56e6014c6fb0` 的 `Admin.opt_map`；zlib 解压为 511×660，255 转为 -1。本轮与正式 `occupancy_grid.json` 的 337260 格、origin、resolution 全部核对一致。
+2. `cruise_polygon()` 生成真实自由轮廓的简化多边形。此次记录为 tolerance=.25、52 顶点，owner 返回 `Not enough edge length for minimum-radius turns`。
+3. **矩形选择属于本次导出脚本，不是 core.plan 默认把任意地图改成矩形。** `main():306–314` 先计算 outline_result，再无条件计算并选择起始自由连通域内的轴对齐最大矩形。并非一个“仅当轮廓失败才回退”的通用分支。此次两件事实恰好同时存在：轮廓失败；矩形方案成功。
+4. 本轮重算 `largest_free_rectangle()`，结果仍为 16.000×8.800 m、140.80 m²，与正式 `cruise_boundary` 一致。其约束为整格 known-free、最短边≥4 m；它不是整张地图的真实外轮廓，也不是完整清扫覆盖规划。
+5. `core.vehicle():38–46` 从源 YAML 的 **planner `GridBased.minimum_turning_radius`** 读取 1.12，从 footprint 计算外接圆 0.646606526 m。`plan():352–354` 使用 `R=turning_radius*1.03` 和 `clearance=disk_radius+margin+.02`。
+6. `buffer(-0.816606526)` 对 `region ∩ model.free` 作形态学内缩，为各朝向 footprint 外接圆和 .15 m margin 留空间。它是**圆盘净空约束**，不是把路线单独平移 .8166 m，更不是转弯半径。
+7. inset 0/.15/.30/.50/.75/1.0 与 simplify .03/.08/.15/.25/.40 搜索，在最浅成功 inset 中按路径长度择优；`rounded_loop():246` 用切线圆角，`validate_loop():305` 校验半径、闭合、简单性和 swept disk 包络。正式结果 inset=0。
+8. 每个圆角 73 点，短直线各195、长直线各483：`4×73+2×195+2×483+1=1649`。最后的1为闭合首点。`step=.025` 已在 rounded_loop 中采样，后续没有再把16个 checkpoint 插值成1649点。
+
+本轮直接调用当前未修改 `core.plan(model, cruise_boundary, .15, 'ccw', 1)`：**长度 41.086491263 m，1649 位姿，按顺序 x/y/yaw 完全一致**。R8 的零偏差主结论成立，并得到更强的顺序核验。
+
+下游链已补齐到实际 action client：
+
+```text
+route.json dense_path_map
+  → Registry._load_path_file():307（身份、区域、点数、entry、closure）
+  → Mission task_sequence.py:316（PathNavigationGoal，携带全部 path_poses）
+  → Mission adapters/real_navigation.py:107,115–135
+      构造 nav_msgs/Path，FollowPath.Goal，发 /cleannav/follow_path
+  → Navigation Facade _execute_patrol_path():1910
+      closed_loop_splits → 两个 Path 切片
+      goal_checker_id=patrol_goal_checker
+  → /follow_path → Controller/MPPI
+```
+
+上述 Mission 文件来自实际 MM 安装前缀 `cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/`。A2 admitted_path 的1649点证据与链一致。
+
+**Registry 不能笼统称为“只是派生数据”。** 其 waypoint 是路线的降采样副本，实际 PATROL 消费 path_file 的稠密数据；但 Registry 同时是 map identity、区域、entry、route_id 和任务校验的正式契约，具有独立约束。当前 `path_file` 从 R7-RC config 相对解析到原 route.json；并非运行中重新生成路线。
+
+## 3. 运动学核实：需要纠正“机械 0.877 m”的口径
+
+实际安装模型来自最近 A2 仿真的 Simulation prefix：`cleannav-patrol-pillar-v1-e2e-mask-lifecycle-freshness-fix-20261104T031832Z/install/cleannav_simulation/share/cleannav_simulation/urdf/cleannav_ackermann.urdf.xacro`。其中 L=.60 m、前后轮距=.48 m、**左右真实前轮转向关节各自**限位 ±.60 rad、速度限位1.5 rad/s。安装 launch 的 Oracle 分支调用已有 `prepare_oracle_runtime()` 隔离 wheel topics/TF，并不把四轮机构替换为单轨车。
+
+| 数值 | 正确含义 |
+|---|---|
+| `.60/tan(.60)=.877017568 m` | 把 .60 当作**等效单轨转向角**时的半径；不是四轮 Ackermann 后轴中心的机械下限 |
+| `.60/tan(.60)+.48/2=1.117017568 m` | 理想无侧滑 Ackermann 中，内侧前轮达到 .60 rad 时的后轴中心半径下限 |
+| `1.12 m` | 当前 Nav2 MPPI/Planner 使用的配置下限，不能和上面的等效单轨口径混算“保守21.7%” |
+| `1.1536 m` | 正式路线圆角半径；仍符合当前1.12配置下限 |
+
+左右轮角公式可直接由几何推导，也与已归档 `steering_odometry.cpp:315–320` 的 `atan2(2L sinφ, 2L cosφ ± W sinφ)` 一致。R=1.1536 时等效单轨角 .479607 rad，**内侧实际轮角约 .581101 rad、外侧约 .406553 rad**；内轮到 .60 仅余 .018899 rad，约1.083°，并非把 .479607 直接与真实关节 .60 比较得到的20%余量。
+
+这些是理想机构几何计算。路径跟踪 frame 与后轴参考点的偏置、执行器迟滞、接触/滑移及实际限位执行并未由本轮动态验证，不能用这个更正另行宣称某个动态物理半径已经测定。
+
+最近 A2 **实际生成的运行参数** `ros-log/localization/nav2_params.yaml` 核实：Ackermann、min_turning_r=1.12、project_samples=true、path_guided_sample=true、750×50×.1 s、vx_max=.30、wz_max=.267857、CurvatureSpeedCritic 的 a_lat=.0376055523、decel=.25、span=.1；PATROL checker 为 .10 m/.35 rad，stateful=true。
+
+真实 R7-RC `motion_models.hpp:114–141` 在 rollout 前共同裁剪 cvx/cwz：`v∈[0,.3]`、`|w|≤min(wmax,|v|/1.12)`；加权序列还受最小半径约束。采样物理投影存在，不能将 R8 只摘出的加权后约束当全部采样链。
+
+本轮独立三点圆结果 κmax=.866851595 /m；yaw导数 κmax=.866868319 /m，有限步长差异符合 R8。配置曲率上限 .892857143 /m，半径余量3%、曲率余量2.9126%、等效角余量 .01220255 rad，**这些数值可信**。
+
+### 3.1 3% 是否合理
+
+1.03 是 owner 中的固定倍率，**1.12 本身来自已有 planner YAML，并非 core 硬编码常数**。目前 planner 和实际 MPPI 恰好都为1.12；这不是两个值自动保持同步的证明。项目中未找到1.03来自跟踪误差/执行器辨识的设计证据，其选择依据为 UNKNOWN。
+
+3% 可使解析路线满足配置约束，却没有给出充分的跟踪设计裕量证明。它值得后续提高和验证，但“3%必然不足”“小于任何真实瞬态”不成立为定量论证：**车身航向误差与前轮转向余量不能直接比较**，一个弯达到过最大角速度也不能排除其他状态下控制余量的作用。
+
+路线生成与车辆参数的关联已经存在于 `vehicle()`，后续应最小扩展/修正这条已有离线链，使用同一可追溯参数并核对 planner/controller 一致性；不需要新增运行时参数服务或另一套运动学管理器。
+
+## 4. 对 R8/A4 根因与数据的修正
+
+| 原报告说法 | 独立复核 |
+|---|---|
+| 原路线、1649点、R=1.1536 | CONFIRMED，owner顺序复现完全一致 |
+| 当前 far=876 在第三弯内 | CONFIRMED，第三弯真实切点区间824…897，s=20.543245632…22.355281316 |
+| 9条优化候选仍在弯内 | CONFIRMED；限定于这批候选及其起点，不能外推“所有路线必然如此” |
+| 弯内目标“几何上不可达”或必然失败 | 不成立。它是半径合规路径上的合法 SE(2) 位姿，可沿原曲线到达；实际控制器在这次接近中错过联合容差，不能推导数学不可达 |
+| A3的3个失败排除了控制器修复 | 不成立。A3自己在理想native replay中通过原第一段和连续两段，同时有3个恢复失败；只能说明当前A3未证明通用恢复，不是所有控制方案无效的证明 |
+| 失败后局部plan真实录得1点、参考行/权重真实录得退化 | 历史bag没有 /local_plan 或实际FollowPath goal payload；一部分链由真实源码、TF、路径裁剪**重建**。确定性源码分支与原内部内存采样须分开 |
+| XY=.0054、yaw=.5645是实际段goal误差 | A4这组值混入最近**全路线点877**及其切向。实际段goal是876。本轮按实际goal重算：最近XY=.018136816 m，yaw=-.543620924 rad，仍明确超差 |
+| 前1m是完整直线 | 不成立；A4选中932的窗口从891开始，跨越圆弧尾部；详见下一节 |
+| 曲率“C0” | 位置/切线连续（几何G1）；κ从0跳到1/R，**κ不是C0连续**。弧长参数下曲线非C2 |
+| δ̇=.630 rad/s证明低于关节1.5、余量58% | 不成立为执行器证明。它是对估计/平滑曲率求导得到的单轨代理；理想直线/圆弧的曲率阶跃没有有限瞬时δ̇，且不是左右真实轮角速率 |
+| Python speed_profile逐行等价C++ | 不完全等价。R8向前/后扩展会把超出span的第一个点也纳入包络；本轮对同一几何按C++索引重算，49个位姿速度不同，最大差.023586 m/s；非native浮点逐位对比 |
+| 表中A_reference就是正式A | 两者不同。参数化A_reference的连接/重采样有小几何差，κmax=.884139；正式A_stored为.866852。不能把前者的vmin=.206237/转角=.487736当正式路线事实 |
+| EDT角点净空/footprint扫掠面积证明安全和清扫覆盖 | 仅是近似指标：角点不能覆盖整条footprint边，EDT没有把unknown当障碍，raster footprint也不是已标定刷盘覆盖范围；不能代替正式包络和Keepout契约 |
+| worktree落后728行 | 当前指定worktree为1488行、安装为2031行，差543；实际diff为新增598/删除55。缺PATROL的结论成立，728的数字未复现 |
+
+实际终点误差证据：[terminal-error-independent.json](evidence/terminal-error-independent.json)。使用 trajectory 的 map XY、最近先前记录的 map←odom yaw，不采用固定 .004 偏航猜值。2272条轨迹中的 PATROL窗口没有任何采样同时满足原 .10/.35；不能据此声称记录了 GoalChecker 内部 XY latch。
+
+**可信的因果判断**是：当前分段人为在弯内结束第一段；实际末端联合位姿未满足，后续偏离并由原CostCritic触发Optimizer failure。它与现有终点参考能力缺口相互作用。将终点移到有近直线进场的位置，是直接移除本次触发条件的低影响修复；**不是证明控制器缺陷从此消失**。RNG、逐Critic权重、精确内部裁剪游标未录，`v≈剩余距离/5`只能保留为高置信推断。A4“同样w、v变小使w/v能力变小”的解释也不符合代数，须观察w相对v的实际下降，不能把减速本身当该结论。
+
+## 5. A4 判据：当前路线有效，但原实现不够通用
+
+### 5.1 代码真正做了什么
+
+A4 §8.2 和 R8 `joint_split_compare.py` 的 `_straight_before()` 从候选index向**后**累积至少1.0 m，用窗口首尾点形成**弦线**，检查每个采样点到该无限直线的垂距≤.01 m。它不检查index之后的路径，不用终点yaw/端点切线，也不要求窗口内曲率严格为0。
+
+“前方1m”在这里应解释为**到达该终点之前的进场路径**；实现成终点之后1m，会验证错方向，无法解决当前段进场问题。本轮补丁保留 backward 语义。
+
+原 far=876：前置窗口835…876长1.017719 m，最大弦偏差 .110360 m，正确被排除。A4 far=932：窗口891…932长1.021168 m，弦偏差 .008204 m，因此通过；但其中891…897仍在弧尾。终点在真实弧出口之后 **.872233578 m**，不是整整1m直线。R8的.797471m是以有.1m支撑晕圈的估计曲率区间为“出口”，与实际切点口径不同。
+
+A4由前两个弯的衰减拟合外推yaw约.114–.119 rad具有解释价值，**不是新末端控制的实测裕量**，也不能用这个外推断言该goal一定成功。
+
+### 5.2 本轮发现的两个具体反例及局部修正
+
+**反例一：弦线会接纳弯入口。** 原路线倒序并将yaw加π，A4选择倒序index757，即原index891，仍在实际圆弧内。按每25点改变起点抽查66次，再对每个起点测试正反方向，共132次，原A4有104次选中实际弧内部。镜像和刚体变换本身没有符号问题；缺口在“弦线近直≠终点进场切线近直”。
+
+**最小修正：**同一个 `_straight_before()` 改用当前index与index-1构成的末段方向作为终点切线（零长度末段不合格），用同一.01 m垂距检查前置窗口。不读取未来路径、不新增yaw参数、不增加全局配置。当前路线仍选932；倒序选择751（原897，直线到弧的切点边界），132项均没有选择实际弧内部。
+
+**反例二：可用far被近处合格点替代后拒绝。** 本轮构造半径.6m圆环连近起点直线的纯几何输入：原规则有距起点1.2m的far而接受；A4存在距起点不足1m的“直线合格”样本，于是选它后抛 `closed path has no far point`。这同时改变接受结果和原错误文本。
+
+**最小修正：**扫描候选时只考虑 `distance >= minimum_far_m`；没有合格候选时回退原far，保留最后原有保护和文本 `closed path has no point far from the start`。没有加入新的拒绝层。
+
+[proposed.patch](proposed.patch) 实现的就是这两项修正，加原A4筛选逻辑。`straight_m/straight_chord_m` **未加入公共签名**，1.0/.01仅保留在私有函数。原函数 `closed_loop_splits(points, *, closure_m=.05, minimum_far_m=1.0)` 完全保留。原样A4参考另存 [a4_chord_reference.patch](a4_chord_reference.patch)，用于区别验证，**不推荐部署该参考版本**。
+
+![当前与反向路线](figures/split-and-reverse.png)
+
+![不同起点](figures/rephased-starts.png)
+
+### 5.3 正确性、适用范围与残留边界
+
+| 审查项 | 结论 |
+|---|---|
+| 是否识别弯出口后的直线 | 当前路线是；本质只要求终点之前近直，也可能选择下一个弯入口的切点，后者同样有直线进场 |
+| 任意转弯方向 | 垂距绝对值没有左/右特判；当前镜像、正反方向验证通过。原弦线版本倒序失败 |
+| 不同半径 | 指定9条优化候选上修正后末端局部曲率仍近0；并非所有可能半径和形状的证明 |
+| 不同起点 | 66个相位×2方向通过；这是抽样验证，不是全部1648个相位或任意闭环的数学保证 |
+| 短直线、缓弯、连续曲线 | 严格不足1m窗口不合格；但.01是近似几何容差，短直线+少量圆弧或大半径缓弯可能合格。原A4的R=20m纯圆已有4985个合格样本，故“纯圆一定没有合格点”是错的 |
+| 修正是否绝对避免曲线 | 否。扩展检查R8的S_3500mm时仍选近切点曲线过渡，三点估计κ约.1944；容差不能冒充严格零曲率。当前候选和该边界在[全量表](evidence/proposal-all-candidates.json)公开保留 |
+| 无合格点 | 回退原far，保留旧行为；这意味着纯圆/连续曲线的有限终点问题仍可能存在，不能叫完整通用终点修复 |
+| 段长 | 当前23.227515/17.858976m，无碎片。没有全局长度平衡或最大段长保证；径向下限1m只给空间分离约束，不等于通用弧长分配器 |
+| 闭环及两段连续性 | `((0,far+1),(far,n))` 共用完全相同的原pose，不插点、不改yaw；首末原pose也未改 |
+| 第二段起止姿态 | 第二段起点随far移到932；终点仍是原闭合pose0。控制器切goal会重置部分状态，不能由共享pose宣称动态交接无瞬态 |
+| 第二段最终进场 | 当前路线第四弯出口s=29.026904至闭环s=41.086491有12.059587m直线；当前几何没有再次在弯内收尾。改变路线起点后最终端点也可能在弯上，本补丁没有修复这个问题 |
+| GOTO/普通FollowPath | helper仅被Facade的PATROL路径接纳/执行调用；NavigateToPose、普通内层FollowPath路径不经过它。开放PATROL路径仍返回单段 |
+
+建议将其定位为**沿用现有控制器能力的分段政策修复**，不是所有未来巡航路线的充分可达性定理。未来路线仍应在原离线生成/验收中查看两个真实段终点及闭合进场；不增加在线Gate、运行时审查链或APP启动要求。
+
+纯函数计时25次，本机原规则P50约.392ms、原A4约13.58ms、修正约13.10ms。Facade在accept和execute各调用一次；这不是MPPI回调开销或10Hz动态证明。未因性能假设引入缓存、并行计算或新对象。
+
+## 6. 四种组合及9条候选的独立结果
+
+下表“修正A4”指本轮终点切线草案；原A4结果也保留，以免把两个版本混淆。
+
+| 路线 | 原far | 原A4 far | 本轮切线far | 本轮两段弧长m |
+|---|---:|---:|---:|---|
+| A_stored | 876 | 932 | 932 | 23.227515 / 17.858976 |
+| B_smooth | 1825 | 2000 | 2002 | 23.460289 / 17.581752 |
+| C_1232mm | 877 | 935 | 935 | 23.282082 / 17.669815 |
+| C_1288mm | 875 | 933 | 934 | 23.324259 / 17.531501 |
+| C_1344mm | 878 | 937 | 938 | 23.361844 / 17.397781 |
+| D_1344_smooth | 1957 | 2149 | 2151 | 23.573973 / 17.147299 |
+| S_1500mm | 879 | 941 | 941 | 23.450521 / 17.041294 |
+| S_2000mm | 883 | 952 | 953 | 23.781158 / 15.852278 |
+| S_2400mm | 887 | 963 | 964 | 24.065369 / 14.881355 |
+| S_3000mm | 893 | 979 | 981 | 24.465074 / 13.451575 |
+
+| 组合 | 第一段末端 | 两段弧长m | 结果边界 |
+|---|---|---|---|
+| A 原路线+原分段 | index 876，s=21.834011 | 21.834011 / 19.252480 | 实际A2动态FAIL；终点在弯内 |
+| B 原路线+修正A4 | index 932，s=23.227515 | 23.227515 / 17.858976 | 末端在直线；动态UNKNOWN |
+| C R=1.344+原分段 | index 878，s=21.870015 | 21.870015 / 18.889610 | 仍在弯内；不能推断动态必败或必过 |
+| D R=1.344+修正A4 | index 938，s=23.361844 | 23.361844 / 17.397781 | 末端在直线；路线/entry已变，动态UNKNOWN |
+
+原A4对R=1.344给937，本轮修正给938，移动约一个采样；原生产路线两者均为932。全部返回值仍为两段共享一pose，不改变原始位姿。
+
+**路线优化没有替代分段政策修复的证据。** 这批半径/平滑变化都保留了原规则在弯内结束的形态；但不能据此断言更大半径在动态上“绝不可能单独成功”，因为它可能改变到达误差。正确工程结论是：它没有明确修掉已知触发点，且会改变GOTO/资产身份；优先级低于分段修复。
+
+也不要求两项同时改。A4与圆角政策是两个不同改动面，分别实施可保留归因。若以后某条路线没有可用近直进场，分段fallback不能代替真正的曲线终点控制能力；届时按实际证据另行选择，不在本轮扩大架构。
+
+## 7. 源码归属、安装加载与部署
+
+### 7.1 源码归属与重建风险
+
+本轮用 `rg --files --hidden --no-ignore -g patrol_path_segments.py .` 搜索**当时审计夹具创建前**的整个工作区，确为5份历史install文件，无源码树文件。5份SHA均为 `d168e3a8199b7566d5c13cf63b1fc9b1b762cf099e2b83323682ec90a30bb587`，MD5均为 `3ff30507a3709db721a2eb98b007c220`。路径和symlink情况见 [source-inventory.json](evidence/source-inventory.json)。本目录后来新增的patch检查夹具不属于历史第6份安装。
+
+pc-sim工作树Facade1488行与RC安装2031行的 [完整diff](evidence/worktree-vs-installed-facade.diff) 确认前者没有 `patrol_path_segments` 导入或 `/cleannav/follow_path`。startup worktree的Facade更早，仅608行。**禁止从任一个过期worktree重建整个导航包来部署A4。** 那会丢失安装PATROL及其他历史修复；仅凭当前Git HEAD无法恢复当前运行产物。
+
+缺失可维护源码是实际技术债，但本轮不搬迁源码、不重建仓库、不补整套发布系统。补丁明确锚定可校验的RC安装模块，未来实施时在新候选中保留其源码副本、父哈希与未应用历史patch即可。
+
+### 7.2 “当前实际加载”的证据边界
+
+本轮没有新运行的Facade，不能声称读取了一个当前活进程的module。最近A2的真实 `prefixes.txt` 和已执行runner表明 Navigation 解析到：
+
+`cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/install/cleannav_navigation`
+
+安装launch执行该包 `lib/cleannav_navigation/navigation_facade_node.py`；该脚本第33行以顶层名字 `from patrol_path_segments import closed_loop_splits` 导入**同目录**模块。历史launch确认Facade PID970975运行过，但未保存该Python进程内 `module.__file__` 遥测。故上述为**历史真实prefix + 确定性加载路径证据**，不伪称历史已有进程内module哈希证明。
+
+标准Python执行此绝对脚本时，其目录在sys.path最前。已用全新Python进程只导入纯分段模块验证：新脚本目录在前→新helper；旧脚本目录在前→旧helper，即使把新目录放在后面的PYTHONPATH也不会替换它。[fresh-import-resolution.json](evidence/fresh-import-resolution.json) 保存实际argv、`__file__`、`__cached__`、SHA和行为检查。**仅更改PYTHONPATH不足以可靠部署。**
+
+### 7.3 可沿用的部署方式
+
+R7-RC `changed-source-files.json` 实际只记录CMake和native测试的变更；RC也真实构建过MPPI/Bounded私有库。它不是“已验证只替换一个Python文件”的直接先例。更准确的先例是 [Facade wake-race候选REPORT §10](../cleannav-patrol-pillar-v1-e2e-facade-wake-race-goto-tolerance-20261104T060808Z/REPORT.md)：新增Navigation prefix副本，只替换 `navigation_facade_node.py`，其余包沿用父链。A2的GOTO动态已覆盖该Facade后代链。
+
+建议未来实施只做以下操作，**本轮均未执行**：
+
+1. 直接父选A2；从A2当前选用的**RC Navigation package prefix**复制完整包到新的候选目录，普通复制而非对冻结文件作硬链接写入。不要复制A3 Navigation包：A3的Bounded库与A3 MPPI ABI绑定。
+2. 只在新副本的 `lib/cleannav_navigation/patrol_path_segments.py` 应用 proposed.patch。保留RC Facade、Bounded库、launch、资源索引及其他安装文件字节；父prefix和另外4份旧模块完全不动。**不是同步改5份install。**
+3. 环境沿用A2 env，在既有prefix选择方式中前置这个新Navigation prefix；MPPI明确仍为RC、Costmap明确仍为A2，MM/Simulation/Gateway/Safety等仍按A2原链。新候选identity写父A2 identity、精确prefix和manifest，不能只改一个文件后复用旧授权。
+4. 沿用 `changed-source-files.json` 结构记录模块 `parent_sha256 → sha256`，新 `product-sha256.json` 覆盖真实选用安装路径，更新新候选自身的runtime-candidate及摘要。**一个产品代码文件**不等于只有一个磁盘文件：identity/manifest/env是必要的候选元数据，不是新增接口。
+5. 复制时不携带该模块旧 `__pycache__`，只处理新副本。五份历史cache均是timestamp型，header记录source size1100；本草案2074字节，因此正常导入本已会使旧cache失效，但显式不带cache更易审查。不清理任何历史缓存。`-B`只禁止写cache，**不保证不读cache**。
+6. 全新会话/全新Python进程启动，不在已有Facade热替换或reload。新进程只应以同一个顶层module名加载一次；无需新增模块别名或运行时缓存管理器。
+7. 在**现有安装身份核对块**中确认实际选择的新package及绝对可执行文件；同目录纯Python导入记录 `__file__`/源SHA/真实路线输出932，检查Facade原文件SHA仍为 `c45132dbd5881a58df0087203418bb4b6b983d271436fd383a45da56ab12e948`。未来动态再保留实际Facade argv和prefix证据。没有新Gate/Probe/包装器，不修改Facade只为新增日志。
+
+这样可以可靠准备单文件部署，**无需 colcon build**：模块是同目录导入的纯Python，无生成代码、C++或ABI变化；完整原包副本保留已有ament index/可执行入口。静态导入机制已验证，**真正新候选的环境解析和在线加载仍是下一实施轮必须完成的实际工作**，本轮没有把未创建的prefix写成部署PASS。
+
+## 8. 路线生成的独立后续价值
+
+### 8.1 先比较10/15/20%半径余量
+
+| 半径倍率 | R m | κ 1/m | 相对Nav2曲率余量 | 单轨转角rad | 内侧前轮角rad | 内轮至.60余量rad |
+|---|---:|---:|---:|---:|---:|---:|
+| 1.03 | 1.1536 | 0.866852 | 2.913% | 0.479607 | 0.581101 | 0.018899 |
+| 1.10 | 1.2320 | 0.811688 | 9.091% | 0.453204 | 0.543970 | 0.056030 |
+| 1.15 | 1.2880 | 0.776398 | 13.043% | 0.435947 | 0.519968 | 0.080032 |
+| 1.20 | 1.3440 | 0.744048 | 16.667% | 0.419880 | 0.497822 | 0.102178 |
+
+这些是分析目标，不是本轮参数修改。R=1.344可以作为下一轮优先比较点，而不是已认证最优值；R=1.288也有较小覆盖损失，应按实际跟踪/执行器/覆盖共同选择，不能宣布“至少15%”已被证明。
+
+保持相同矩形和直线支撑线，仅扩大局部圆角，会在角部切入内部，不必把整条路线向内平移。与此同时第一个圆弧切点随R移动：1.344相对原entry约.1904m，1.232约.0784m；都超过Registry的.05m entry约束。**本次生成方式下GOTO目标、route.json和Registry必须一起形成新资产身份**，不能只改core倍率后用旧路线。若未来想保留entry，需要另行设计闭环相位；本轮不引入该改动。
+
+### 8.2 曲率连续性
+
+放大圆角半径降低κ峰值和跳变幅度，但**不会把直线—圆弧的κ阶跃变连续**。继续调整精确切线圆角，是最简单的第一步；不能把“加大R”写成G2修复。
+
+若后续证据表明曲率过渡/真实内外轮转角速率仍是主要负担，再考虑固定长度的Euler spiral—圆弧—Euler spiral局部过渡。它可以使κ连续，但要在现有owner内统一处理积分、相切、闭环、姿态和采样；R8的数值样本可作分析原型，不能直接替换生产。受约束样条也可行，但必须额外约束最大曲率、空间包络和首尾匹配，当前没有证据需要先引入它。
+
+R8平滑路线按.005m积分会生成较多点：SD_3000为4793点，超过真实Registry4096上限。不能仅凭“闭合/区域内”宣布Registry PASS，必须重新选择离散步长后复验曲率/姿态及包络。R8 `registry_checks.py` 用硬编码矩形/entry而没有加载真实Registry，它输出的start_gap恰好表明大部分新路线**不符合旧Registry**。
+
+### 8.3 净空和清扫覆盖
+
+扩大圆角在当前自由矩形内部有几何空间，短边约7.166787m；按owner的.02m边长余量，圆角半径上限约3.573393m，而不是简单取短边一半后同时说“直线为0”。接近该上限会丢失短侧直线进场，分段难度也改变；本轮S_3500的结果已经提示这一点。
+
+本轮把15份原R8候选交给**未修改**owner `validate_loop`，当前MapModel known-free下的闭合/半径/保守disk envelope均通过。这比EDT角点检查强，但该模型此次 `keepout_area=0`，**不代表运行时正式Keepout掩膜已经逐格验收**；也不证明动态tracking扫掠或刷盘覆盖。
+
+下一路线轮次应沿用原导出器/owner和正式Keepout输入，联合比较实际自由区域、已有footprint及padding、转弯连续扫掠、未知区域和真实清扫工具范围。固定直线位置、局部扩大圆角时，角部遗漏区域需单独量化。R8的footprint raster面积约32.05→31.76m²（1.344）可作相对参考；“清扫只损失.9%”仍缺刷盘尺寸和真实轨迹证据。不要为了补面积直接向外平移直线、扩大区域或减安全margin。
+
+## 9. 四种方案的工程比较
+
+| 评价维度 | A：只修分段（本轮修正A4） | B：只优化路线 | C：两者一起 | D：继续改MPPI |
+|---|---|---|---|---|
+| 已知触发点覆盖 | 直接把当前中弯末端移走 | 指定9候选没有移走中弯末端 | 覆盖，同时多变量 | 可改善终点能力，但没有已通过的通用恢复版本 |
+| 产品代码文件 | 1个Python模块 | 至少owner政策1处 | 至少2处 | YAML或C++，数量取决方案 |
+| 资产/身份文件 | 新候选env/manifest/identity | 新route/entry/Registry及身份 | 两套改动的身份都需绑定 | 参数或库/身份 |
+| C++修改 | 无 | 无 | 无 | 参数方案可无；A3式实现有 |
+| ROS接口/状态 | 无 | 无需 | 无 | 可保持内部，无必然接口变化 |
+| GOTO | 调用链不变、目标不变 | 当前生成方式entry改变 | entry改变 | 共用FollowPath会受行为影响；不能说只影响PATROL |
+| APP/Gateway/Mission | 不改接口/代码 | 不必改接口/代码，任务所引用数据身份改变 | 同B | 不必改接口，但执行行为可能变化 |
+| Safety/Keepout/Footprint | 全部不改 | 全部保持；新路径需在既有约束内验证 | 同B | 可保持代码/阈值不变，但可行轨迹与碰撞行为需复验 |
+| 构建 | 不需要 | 不需要C++构建 | 不需要C++构建 | YAML不需；C++需唯一safe build入口 |
+| 部署风险 | 低至中：源码债/选错prefix/缓存，已有机制可处理 | 中：entry/Registry/地图/路径验证面 | 更高，且两变量 | 中至高，可能ABI/性能/控制行为变化 |
+| 单次动态归因 | 最清晰 | 路线/入口同时变化 | 最困难 | 难区分控制变化与原末端形态 |
+| 未来路线价值 | 无坐标特判，改善近直进场；fallback及闭合末端仍有限制 | 改善所有经此owner生成的路线 | 两方面收益 | 真正通用有限终点能力可能有价值，但需专门证明 |
+
+**当前推荐A；B为独立后续工作，不选C消耗最后一次机会，不选D继续盲调。** 这与R8先分段的排序方向一致，理由是已观察到的触发点和改动影响面，而不是“MPPI已经被排除为任何根因”或“控制器永远无法完成弯内goal”。
+
+## 10. 具体修改位置、实施顺序与最后一次动态计划
+
+### 10.1 修改位置及最小范围
+
+仅目标模块：**新候选** `install/cleannav_navigation/lib/cleannav_navigation/patrol_path_segments.py`。
+
+- 原文件第14行前增加私有 `_straight_before(points,index)`，局部常量1.0/.01，末段切线垂距。
+- 原第24行far选择改为有原minimum_far_m约束的候选扫描，无候选回退原max。
+- 保留开放路径、闭合容差、短输入异常、minimum_far_m最终检查及返回切片语义。更正文档字符串，不作控制器不可达断言。
+
+补丁父SHA、新文件SHA及状态见 [proposal-identity.json](evidence/proposal-identity.json)。草案在审计目录内，连审计夹具都只做了dry-run，**没有向任何安装副本应用**。
+
+新增私有辅助函数为什么必要：**已观察到原far落弯内，且原A4弦线判据在倒序/相位变更中仍落弯内**。候选距离筛选为什么必要：**已观察到A4拒绝原来具备有效far的输入**。没有新Gate、包装器、状态机、接口、重试框架或启动审查层。
+
+### 10.2 用户决定实施后，先完成静态候选
+
+1. 按§7从A2链准备独立新候选；只改分段模块，保留RC MPPI+A2 Costmap及原route/Registry。复核除该文件外Navigation包相对父的字节差，候选identity明确未动态验证。
+2. 将已有两项split测试绑定到**新副本**执行，再跑本轮10项和132项几何回归，真实路线应为`0:933`、`932:1649`，闭合及段间pose保持。直接运行原测试不会天然测试新文件：它硬编码最早e2e install路径，必须重绑测试fixture；不能拿旧副本PASS冒充新候选PASS。
+3. 按原runner既有身份块核验新prefix、模块导入和Facade/Bounded原SHA；复核A2四个Costmap库、RC MPPI及其他包未混入A3，旧候选哈希保留。不要重新构建过期worktree。
+4. 将新session仅绑定候选/env/identity和新资源/幂等身份，沿用A2成功启动及GOTO流程。旧session已消耗且含失败现场，不能原地再跑。
+5. 离线证据与动态证据分开。现有A3 native双段夹具硬编码877/876且加载A3控制器，不能直接称为A4/RC验证；R7-RC native夹具也会初始化rclcpp，**本轮未运行**。若实施轮要进一步做原控制器末端/双段离线验证，应明确授权其范围并复用原夹具、实际新切片和对应ELF；不得偷偷引入A3产品修复或新增在线验证链。
+
+这里不设置新的运行前Gate；是本次变更的离线验收和原身份维护。几何通过仍不能预告真实yaw收敛与第二段控制瞬态；是否基于这些已知边界使用最后机会，交由用户在候选具体可审查后决定。
+
+### 10.3 唯一剩余动态机会（本轮没有使用）
+
+当前累计2/3已用、余1，原授权不可继承给新代码。**只有用户随后对新候选/新session明确授权时**才执行一次。恢复命令的依据是最近A2真实 `runtime-invocation.json`、原 `run_patrol_lap.sh` 及当次log，不按报告重新拼一条启动链。
+
+未来唯一外层调用仍为：进入已完成身份绑定的**新session**，`bash run_patrol_lap.sh`。本轮未创建可执行新session，也未分配domain/端口；不得直接复制此段重用旧A2 session。
+
+保持原source顺序、lock FD9/SID/inode、资源监测、就绪与3s时钟条件、单次POST、原安全停止/Lease/清理路径。按原契约检查真实资源/Swap/PSI/OOM、现有Gazebo/编译、端口、Domain及进程归属；未知按原规则处理，不新增扫描器、Probe或APP依赖。
+
+一次运行需要同时回答：
+
+- GOTO是否沿原目标和checker完成；轨迹、耗时和定位/安全状态与A2比较。
+- 第一段是否实际在932附近满足原checker并返回SUCCEEDED，第二段是否真正下发并返回SUCCEEDED，外层PATROL和sequence是否SUCCEEDED；不能仅凭机器人看起来绕一圈。
+- 当前真实XY/yaw与目标、已有stateful checker结果分别记录。原阈值.10/.35不变；不把XY已离开后的历史latch误称当前联合位姿精度通过。
+- 记录末端窗口实际w/v、已有MPPI计时、控制频率、Optimizer错误和跟踪误差；是否仍发生路径耗尽后持续爬行。
+- 按原合同完成零速、Lease释放、stop_confirmed、进程组/端口/锁清理；cgroup若仍UNKNOWN/WAIVED如实保留，不能升级完整资源PASS。
+
+P99=22.19ms是A2比较基准，**不是新增必须小于等于该数的动态门槛**；不要因单次统计波动额外中断正常任务。沿用原真实安全条件/截止时间，首错后停止并保全原始证据，不重跑、不在同一授权内临时调参。APP/Gateway/Mission控制链没有增加任何审查前置或辅助启动要求。
+
+## 11. 最终回答与停点
+
+| 必答问题 | 决策 |
+|---|---|
+| DeepSeek R8审计是否可信 | 主链与当前路线/候选几何可信；机械口径、原A4通用性、不可达性及若干数字/方法表述需要上述修正，不能整体照单实施 |
+| A4是否应先实施 | 是，先做**本轮修正的局部分段版本**；原弦线版本有实际可复现反例，不建议原样粘贴 |
+| 路线生成是否应随后优化 | 是，作为独立资产/几何轮次；先比较10/15/20%局部圆角余量，随后再由证据决定是否需要曲率连续过渡 |
+| 单文件替换是否可靠 | 可以：新Navigation包副本、A2父链、RC库不变、一个模块替换、既有manifest和实际prefix/导入核对；不能原地改冻结5份，也不能从A3复制完整Navigation包 |
+| 是否需要构建 | 该纯Python修复不需要；本轮构建0次，禁止过期worktree整包重建 |
+| 是否同时改MPPI | 否；保留A2已运行的RC MPPI。控制器终点能力缺口保留为后续问题，不能冒称已彻底解决 |
+| 如何降低最后一次运行失败风险 | 先交付实际独立候选并完成针对性离线/加载核对，只变分段；沿用已发生的成功启动/GOTO流程和安全清理；新授权单次执行，真实验证两段及外层任务，不用静态PASS预支动态结论 |
+
+本轮仅新增本审计目录、补丁草案及纯离线计算/测试产物。正式源码、安装、MPPI参数、route/Registry、地图/Keepout/Footprint、runner、历史证据和正式文档保持原样。未执行POST、Lease、速度发布、ROS/Gazebo或动态巡航。任务完成后停止，等待用户决定是否实施。
+
+最终保护/进程/Git核对、Memory Checkpoint和本目录SHA清单随本报告归档；Shared Memory只追加审计交接，不改已有baseline/known-issues/next-actions结论，不将草案晋升为已部署或动态PASS。
+
+## 12. 最终核对与交接
+
+[保护核对](evidence/preservation-final.json)：2351个受保护文件无差异，相关Git before/after逐项相等；报告本地链接均可解析。此清单覆盖历史候选/审计、当前管理文档、owner及补充核对的地图/配置资产；不将其说成整个磁盘所有文件的审计。
+
+[执行汇总](EXECUTION_SUMMARY.json)：新建VS Code/UI终端0、复用UI终端0（使用工具普通管道）；4个持续托管的前台命令会话均已退出。后台任务0、无残留PID，无临时UI终端需要关闭。最终保护进程匹配0，Agent未启动或终止ROS/Gazebo、没有发出进程信号。独立审计不获取构建/runtime锁或执行准入；当前资源快照仅存档，不宣称动态资源PASS。
+
+[Memory Checkpoint](MEMORY_CHECKPOINT.json)：仅创建独立审计Session Handoff，既有baseline、known issues、next actions及正式文档结论保持不变，等待用户决定实施后再推进正式状态。
+
+Shared Memory updated: `cleannav_session_20261106_r8_codex_independent_review`。

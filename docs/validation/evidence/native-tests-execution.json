@@ -1,0 +1,48 @@
+[
+  {
+    "cwd": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r8-a4-source-release-20261106T045347Z/src/cleannav-navigation",
+    "argv": [
+      "bash",
+      "-e",
+      "-c",
+      "source /opt/ros/humble/setup.bash\nsource /home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r8-a4-source-release-20261106T045347Z/install/local_setup.bash\nexport ROS_DOMAIN_ID=232\nexec /home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r8-a4-source-release-20261106T045347Z/install/nav2_mppi_controller/lib/nav2_mppi_controller/r7_offline_regression /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r8-a4-source-release-20261106T045347Z/src/cleannav-navigation/vendor/nav2_mppi_controller/test/fixtures/r7_rc /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r8-a4-source-release-20261106T045347Z/evidence/native--units 0.03760555233740373 --units"
+    ],
+    "rc": 0,
+    "scope": "existing offline native fixture, no task/Lease/cmd_vel publication"
+  },
+  {
+    "cwd": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r8-a4-source-release-20261106T045347Z/src/cleannav-navigation",
+    "argv": [
+      "bash",
+      "-e",
+      "-c",
+      "source /opt/ros/humble/setup.bash\nsource /home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r8-a4-source-release-20261106T045347Z/install/local_setup.bash\nexport ROS_DOMAIN_ID=232\nexec /home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r8-a4-source-release-20261106T045347Z/install/nav2_mppi_controller/lib/nav2_mppi_controller/r7_offline_regression /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r8-a4-source-release-20261106T045347Z/src/cleannav-navigation/vendor/nav2_mppi_controller/test/fixtures/r7_rc /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r8-a4-source-release-20261106T045347Z/evidence/native--binding 0.03760555233740373 --binding"
+    ],
+    "rc": 0,
+    "scope": "existing offline native fixture, no task/Lease/cmd_vel publication"
+  },
+  {
+    "argv": [
+      "bash",
+      "-e",
+      "-c",
+      "source /opt/ros/humble/setup.bash\nsource /home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r8-a4-source-release-20261106T045347Z/install/local_setup.bash\nexport ROS_DOMAIN_ID=232\nexec /home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r8-a4-source-release-20261106T045347Z/install/nav2_costmap_2d/lib/nav2_costmap_2d/snapshot_abi_original"
+    ],
+    "cwd": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r8-a4-source-release-20261106T045347Z/src/cleannav-navigation",
+    "rc": 0,
+    "stdout": "208 304 328 312 1760 240\n",
+    "stderr": ""
+  },
+  {
+    "argv": [
+      "bash",
+      "-e",
+      "-c",
+      "source /opt/ros/humble/setup.bash\nsource /home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r8-a4-source-release-20261106T045347Z/install/local_setup.bash\nexport ROS_DOMAIN_ID=232\nexec /home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r8-a4-source-release-20261106T045347Z/install/nav2_costmap_2d/lib/nav2_costmap_2d/snapshot_abi_candidate"
+    ],
+    "cwd": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r8-a4-source-release-20261106T045347Z/src/cleannav-navigation",
+    "rc": 0,
+    "stdout": "208 304 328 312 1760 272\n",
+    "stderr": ""
+  }
+]

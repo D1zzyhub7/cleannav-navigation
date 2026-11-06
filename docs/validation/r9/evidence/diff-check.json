@@ -1,0 +1,13 @@
+{
+  "full_check_rc": 2,
+  "full_check_warning_paths": [
+    "docs/validation/r9/evidence/R9_SOURCE_DIFF.patch",
+    "docs/validation/r9/evidence/historical-source-regressions.stdout",
+    "docs/validation/r9/evidence/historical-source-regressions.xml",
+    "docs/validation/r9/evidence/smac-first-planner.log",
+    "docs/validation/r9/evidence/smac-planner.log"
+  ],
+  "source_documentation_check_rc": 0,
+  "note": "Only verbatim raw logs and patch context have whitespace warnings; raw evidence not rewritten.",
+  "no_runtime_or_vendor_diff": true
+}

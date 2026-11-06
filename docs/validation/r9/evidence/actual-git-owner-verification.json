@@ -1,0 +1,16 @@
+{
+  "module": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r9-regular-release-20261106T103918Z/src/cleannav-navigation/tools/map-editor/core.py",
+  "source_sha256": "ca9d3a3f74f85a0128f0dbe5c3fe436b9324392248db63fdf769f20edff33e28",
+  "radius": 1.344,
+  "C_exact_equal": true,
+  "split": [
+    [
+      0,
+      939
+    ],
+    [
+      938,
+      1637
+    ]
+  ]
+}

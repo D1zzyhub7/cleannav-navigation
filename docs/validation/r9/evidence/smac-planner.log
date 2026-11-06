@@ -1,0 +1,44 @@
+[INFO] [1793962071.993963871] [planner_server]: 
+	planner_server lifecycle node launched. 
+	Waiting on external lifecycle transitions to activate
+	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[INFO] [1793962071.998568838] [planner_server]: Creating
+[INFO] [1793962072.006332952] [global_costmap.global_costmap]: 
+	global_costmap lifecycle node launched. 
+	Waiting on external lifecycle transitions to activate
+	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[INFO] [1793962072.009773103] [global_costmap.global_costmap]: Creating Costmap
+[INFO] [1793962073.054152550] [planner_server]: Configuring
+[INFO] [1793962073.054202751] [global_costmap.global_costmap]: Configuring
+[INFO] [1793962073.059045122] [global_costmap.global_costmap]: Using plugin "exact_snapshot"
+[INFO] [1793962073.114089431] [global_costmap.global_costmap]: Initialized plugin "exact_snapshot"
+[INFO] [1793962073.137689978] [planner_server]: Created global planner plugin GridBased of type nav2_smac_planner/SmacPlannerHybrid
+[INFO] [1793962073.137746479] [planner_server]: Configuring GridBased of type SmacPlannerHybrid
+[INFO] [1793962073.139761708] [planner_server]: Even sized heuristic lookup table size set 400.000000, increasing size by 1 to make odd
+[WARN] [1793962073.139793409] [computeCircumscribedCost]: No inflation layer found in costmap configuration. If this is an SE2-collision checking plugin, it cannot use costmap potential field to speed up collision checking by only checking the full footprint when robot is within possibly-inscribed radius of an obstacle. This may significantly slow down planning times!
+[INFO] [1793962076.913519066] [planner_server]: Configured plugin GridBased of type SmacPlannerHybrid with maximum iterations 1000000, max on approach iterations 1000, and not allowing unknown traversal. Tolerance 0.50.Using motion model: Dubin.
+[INFO] [1793962076.913598367] [planner_server]: Planner Server has GridBased  planners available.
+[INFO] [1793962076.928694089] [planner_server]: Activating
+[INFO] [1793962076.928758090] [global_costmap.global_costmap]: Activating
+[INFO] [1793962076.928768590] [global_costmap.global_costmap]: Checking transform
+[INFO] [1793962076.928903992] [global_costmap.global_costmap]: start
+[INFO] [1793962076.979104430] [planner_server]: Activating plugin GridBased of type SmacPlannerHybrid
+[INFO] [1793962076.980009443] [planner_server]: Creating bond (planner_server) to lifecycle manager.
+[WARN] [1793962077.852385665] [computeCircumscribedCost]: No inflation layer found in costmap configuration. If this is an SE2-collision checking plugin, it cannot use costmap potential field to speed up collision checking by only checking the full footprint when robot is within possibly-inscribed radius of an obstacle. This may significantly slow down planning times!
+[WARN] [1793962077.971795320] [computeCircumscribedCost]: No inflation layer found in costmap configuration. If this is an SE2-collision checking plugin, it cannot use costmap potential field to speed up collision checking by only checking the full footprint when robot is within possibly-inscribed radius of an obstacle. This may significantly slow down planning times!
+[WARN] [1793962078.082562747] [computeCircumscribedCost]: No inflation layer found in costmap configuration. If this is an SE2-collision checking plugin, it cannot use costmap potential field to speed up collision checking by only checking the full footprint when robot is within possibly-inscribed radius of an obstacle. This may significantly slow down planning times!
+[WARN] [1793962078.195305704] [computeCircumscribedCost]: No inflation layer found in costmap configuration. If this is an SE2-collision checking plugin, it cannot use costmap potential field to speed up collision checking by only checking the full footprint when robot is within possibly-inscribed radius of an obstacle. This may significantly slow down planning times!
+[WARN] [1793962078.306068832] [computeCircumscribedCost]: No inflation layer found in costmap configuration. If this is an SE2-collision checking plugin, it cannot use costmap potential field to speed up collision checking by only checking the full footprint when robot is within possibly-inscribed radius of an obstacle. This may significantly slow down planning times!
+[INFO] [1793962090.453613370] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [1793962090.453678571] [planner_server]: Running Nav2 LifecycleNode rcl preshutdown (planner_server)
+[INFO] [1793962090.453747972] [planner_server]: Deactivating
+[INFO] [1793962090.453771172] [global_costmap.global_costmap]: Deactivating
+[INFO] [1793962090.529178180] [planner_server]: Deactivating plugin GridBased of type SmacPlannerHybrid
+[INFO] [1793962090.529223181] [planner_server]: Destroying bond (planner_server) to lifecycle manager.
+[INFO] [1793962090.539585033] [planner_server]: Cleaning up
+[INFO] [1793962090.544401904] [global_costmap.global_costmap]: Cleaning up
+[INFO] [1793962090.546258831] [planner_server]: Cleaning up plugin GridBased of type SmacPlannerHybrid
+[INFO] [1793962090.546861340] [planner_server]: Destroying plugin GridBased of type SmacPlannerHybrid
+[INFO] [1793962090.550006686] [planner_server]: Destroying bond (planner_server) to lifecycle manager.
+[INFO] [1793962090.552243819] [global_costmap.global_costmap]: Destroying
+[INFO] [1793962090.557067390] [planner_server]: Destroying

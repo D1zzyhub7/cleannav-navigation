@@ -126,3 +126,21 @@ Track owned PID/start ticks/PGID/SID. Follow original registered process-group c
 [Validation history](VALIDATION_HISTORY.md) retains R6 failures, R7-RC253, A2 later-turn failure, A3 offline noneligibility and R8-A4 correction. [Verbatim implementation](experiment-archive/r8-a4/R8_A4_IMPLEMENTATION_RESULT.txt) and [PREP](experiment-archive/r8-a4/R8_A4_DYNAMIC_PREP.txt) are dated snapshots; final dynamicPASS is authoritative.
 
 No multi-lap statistics or real-vehicle validation has passed. Full foreign-process/cgroup visibility remains unknown. General continuous-curve fallback/endpoints and GOTO precision observations remain. R9 route radius/curvature continuity changes have not been implemented. After publication stop; future R9 development and any dynamics require their own scope and evidence.
+
+## R9 candidate operations boundary
+
+R9 is an offline regular-site candidate, not the current dynamic baseline. Its C
+entry moves0.1904m west, heading unchanged; use the newly generated Registry/route
+together. Do not deploy either into a frozen A4 session or reuse an old task DB.
+Only fixed production start and forward route are accepted for this candidate;
+reverse/rephasing scope is not expanded by the unchanged A4 helper.
+
+No R9 dynamic session or runnable environment has been prepared by this PR. After
+user review and a separate dynamic authorization, bind a fresh independent session
+through the established A2/A4 runner and Observer contract, preserving component
+prefixes, new IDs/ports/domain, clock/readiness, Lease/stop and cleanup. The sole
+formal command remains `bash run_patrol_lap.sh` in that fresh session’s cwd; no
+outer source/export or evidence/preflight entry. No new runtime Gate is added.
+
+The irregular-site file is NOT_INTEGRATED and cannot be selected in the editor or
+runner. The offline editor/demo is unrelated to Gateway task submission.

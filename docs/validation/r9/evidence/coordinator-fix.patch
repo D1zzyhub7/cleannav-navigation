@@ -1,0 +1,11 @@
+--- historical-executed/replay_smac_entries.py
++++ corrected-offline/replay_smac_entries.py
+@@ -125,7 +125,7 @@
+         if client is not None:client.destroy_node()
+         rclpy.shutdown()
+         for stream in handles:stream.close()
+-        survivors=[proc.pid for _,proc in processes if Path('/proc'/str(proc.pid)).exists()]
++        survivors=[proc.pid for _,proc in processes if (Path('/proc')/str(proc.pid)).exists()]
+         save('cleanup.json',dict(processes=stop,survivors=survivors,no_Gazebo_MM_Safety_Lease_velocity=True))
+         fcntl.flock(lock,fcntl.LOCK_UN);lock.close()
+         assert not survivors,survivors

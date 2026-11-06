@@ -1,0 +1,20 @@
+[
+  {
+    "name": "planner",
+    "pid": 165651,
+    "cwd": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r9-regular-release-20261106T103918Z",
+    "log": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r9-regular-release-20261106T103918Z/evidence/smac/planner.log"
+  },
+  {
+    "name": "tf",
+    "pid": 165652,
+    "cwd": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r9-regular-release-20261106T103918Z",
+    "log": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r9-regular-release-20261106T103918Z/evidence/smac/tf.log"
+  },
+  {
+    "name": "lifecycle",
+    "pid": 165653,
+    "cwd": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r9-regular-release-20261106T103918Z",
+    "log": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r9-regular-release-20261106T103918Z/evidence/smac/lifecycle.log"
+  }
+]

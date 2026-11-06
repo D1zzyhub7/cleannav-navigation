@@ -1,0 +1,276 @@
+--- original-non-git-owner/core.py
++++ tools/map-editor/core.py
+@@ -10,7 +10,8 @@
+ import tempfile
+ 
+ TOOL = Path(__file__).resolve().parent
+-ROOT = TOOL.parents[1]
++ROOT = next((parent for parent in TOOL.parents if (parent / "PROJECT_MASTER.md").is_file()),
++            TOOL.parents[1])
+ sys.path.insert(0, str(TOOL / '.deps'))
+ import numpy as np
+ from PIL import Image
+@@ -20,15 +21,13 @@
+ from shapely.geometry import Polygon, LineString, Point, box
+ from shapely.ops import unary_union
+ 
++REPO = TOOL.parents[1]
+ SRC = ROOT / 'cleannav-worktrees/pc-sim-v2-mapping-localization/src'
+ SIM = SRC / 'cleannav-navigation/cleannav_simulation'
+-MISSION = SRC / 'cleannav-mission-manager'
+-INTERFACES = SRC / 'cleannav-interfaces'
+ DEFAULT_MAP = ROOT / 'cleannav-experiments/campus-curb-safety-20261012/maps/campus_curb_scan_20261012_083555_fd1b1b'
+ DEFAULT_PROFILE = SIM / 'config/campus/security-profile.json'
+ DEMO_MAP = TOOL / 'fixtures/perimeter_demo'
+-sys.path.insert(0, str(MISSION))
+-from cleannav_mission_manager.domain.region_registry import RegionRegistry
++from support.region_registry import RegionRegistry
+ 
+ 
+ def digest(path):
+@@ -36,13 +35,13 @@
+ 
+ 
+ def vehicle():
+-    path = SIM / 'config/campus/nav2_campus_keepout.yaml'
++    path = REPO / 'cleannav_navigation/config/nav2_local_recovery.yaml'
+     params = yaml.safe_load(path.read_text())
+     footprint = json.loads(params['global_costmap']['global_costmap']['ros__parameters']['footprint'])
+     radius = params['planner_server']['ros__parameters']['GridBased']['minimum_turning_radius']
+     return dict(footprint=footprint, turning_radius=float(radius),
+                 disk_radius=max(math.hypot(*xy) for xy in footprint),
+-                source=str(path.relative_to(ROOT)), source_sha256=digest(path))
++                source=str(path.relative_to(REPO)), source_sha256=digest(path))
+ 
+ 
+ def grid_geometry(mask, resolution, origin):
+@@ -77,7 +76,7 @@
+             if candidate.get('editor_fixture') is True:
+                 self._load_fixture(directory, candidate)
+                 return
+-        spec = importlib.util.spec_from_file_location('existing_map_assets', SIM/'scripts/mapping_assets.py')
++        spec = importlib.util.spec_from_file_location('existing_map_assets', TOOL/'support/mapping_assets.py')
+         assets = importlib.util.module_from_spec(spec)
+         spec.loader.exec_module(assets)
+         assets.validate_map(directory)
+@@ -349,7 +348,7 @@
+     region = Polygon(points)
+     if not region.is_valid or region.area < 0.01:
+         raise ValueError('Polygon is invalid, self-intersecting or degenerate')
+-    radius = model.vehicle['turning_radius']*1.03
++    radius = model.vehicle['turning_radius']*1.20
+     clearance = model.vehicle['disk_radius']+float(margin)+0.02
+     navigable = region.intersection(model.free).buffer(-clearance)
+     if navigable.is_empty:
+@@ -391,7 +390,7 @@
+ 
+ def validate_registry(model, data):
+     import jsonschema
+-    schema = json.loads((INTERFACES/'config/region_registry.schema.json').read_text())
++    schema = json.loads((TOOL/'support/region_registry.schema.json').read_text())
+     validator = jsonschema.Draft202012Validator(schema)
+     validator.validate(data)
+     if data['map'] != model.identity:
+--- original-non-git-owner/tests/test_core.py
++++ tools/map-editor/tests/test_core.py
+@@ -20,22 +20,27 @@
+ import numpy as np
+ from PIL import Image
+ from core import digest
+-
+-SCENE_MAP = (TOOL.parents[1] /
+-             'cleannav-experiments/cleannav-patrol-sim-scene-20261014T155000Z/maps/gazebo_patrol_v1')
++from unittest.mock import patch
++from fixture_helpers import load_site, unpack_projection
++import server
++
++
+ 
+ 
+ class PerimeterPlannerTests(unittest.TestCase):
+     @classmethod
+     def setUpClass(cls):
+         cls.demo = MapModel(DEMO_MAP)
+-        cls.campus = MapModel(DEFAULT_MAP)
++        cls.campus = load_site('campus')
++        cls.scene_temp = tempfile.TemporaryDirectory()
++        cls.addClassCleanup(cls.scene_temp.cleanup)
++        cls.scene = unpack_projection(Path(cls.scene_temp.name) / 'scene')
+         cls.boundary = [[1, 1], [14, 1], [14, 14], [1, 14]]
+ 
+     def test_demo_map_is_explicit_synthetic_fixture(self):
+         self.assertTrue(self.demo.info()['test_only'])
+         self.assertTrue(self.demo.info()['identity']['map_id'].startswith('DEMO-'))
+-        self.assertFalse(self.campus.info()['test_only'])
++        self.assertTrue(self.campus.info()['test_only'])  # derived real-map fixture, never runtime
+         self.assertEqual(self.campus.info()['identity']['map_id'], 'campus_curb_scan_20261012_083555_fd1b1b')
+         self.assertEqual(len(self.campus.profile_sha256), 64)
+ 
+@@ -83,15 +88,15 @@
+         # Preserve historical map bytes; reproduce and repair the old 205/.25
+         # export in a private test bundle before testing the complete editor.
+         with self.assertRaisesRegex(ValueError, 'unknown cells'):
+-            MapModel(SCENE_MAP)
++            MapModel(self.scene)
+         temporary = tempfile.TemporaryDirectory()
+         self.addCleanup(temporary.cleanup)
+         directory = Path(temporary.name) / 'projection'
+-        shutil.copytree(SCENE_MAP, directory)
++        shutil.copytree(self.scene, directory)
+         grid = json.loads((directory / 'occupancy_grid.json').read_text())
+         Image.fromarray(encode_trinary(np.array(grid['data']).reshape(grid['height'], grid['width']))).save(directory / 'map.pgm')
+         manifest = json.loads((directory / 'manifest.json').read_text())
+-        manifest['source_world'] = str((SCENE_MAP / manifest['source_world']).resolve())
++        manifest['source_world'] = str((self.scene / manifest['source_world']).resolve())
+         manifest['sha256']['map.pgm'] = digest(directory / 'map.pgm')
+         (directory / 'manifest.json').write_text(json.dumps(manifest))
+         model = MapModel(directory)
+@@ -169,6 +174,10 @@
+ class LocalEditorApiTests(unittest.TestCase):
+     @classmethod
+     def setUpClass(cls):
++        cls.scene_temp = tempfile.TemporaryDirectory()
++        cls.scene = unpack_projection(Path(cls.scene_temp.name) / 'scene')
++        cls.maps = patch.dict(server.MAPS, {'saved-gazebo-patrol-v1': cls.scene})
++        cls.maps.start()
+         cls.http = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
+         cls.http.app = App('demo-fixture')
+         cls.thread = threading.Thread(target=cls.http.serve_forever, daemon=True)
+@@ -178,6 +187,7 @@
+     @classmethod
+     def tearDownClass(cls):
+         cls.http.shutdown(); cls.http.server_close(); cls.thread.join(timeout=2)
++        cls.maps.stop(); cls.scene_temp.cleanup()
+ 
+     def test_editor_static_app_map_and_plan_api(self):
+         with urlopen(self.base+'/') as response:
+--- original-non-git-owner/README.md
++++ tools/map-editor/README.md
+@@ -1,52 +1,93 @@
+-# CleanNav map region editor
++# CleanNav map editor — regular-site R9 candidate
+ 
+-This local browser tool draws named map regions, automatically builds a closed perimeter loop, places charger staging poses, and exports the existing Mission RegionRegistry v1. It has no ROS node, Mission client, cmd_vel publisher, Gazebo launch, or vehicle movement interface.
++Offline map-bound region editing and perimeter generation. No ROS node, vehicle
++command publisher, Mission/Gateway client or movement authorization exists here.
++The original UI and API are retained. R8-A4 remains the only dynamically validated
++baseline; R9 is a fixed-start, forward-route **offline candidate**.
+ 
+-## Start in WSL2
++## Source and local use
+ 
+-From the repository root:
++The former non-Git `cleannav-tools/map-editor` is restored into this repository's
++`tools/map-editor`. Python dependencies are listed in `requirements.txt`; this
++change installed none. Use Ubuntu22.04 / Python3.10 with NumPy, Pillow, PyYAML,
++Shapely2.0.7 and jsonschema4.23.0. Existing validation helpers are bundled verbatim
++in `support`, with original source SHA in `support/SOURCES.json`; these are not
++new runtime packages or altered Mission interfaces.
++
++From this Git checkout:
+ 
+ ```bash
+-python3 -m pip install --only-binary=:all: --target cleannav-tools/map-editor/.deps 'shapely==2.0.7' 'jsonschema==4.23.0'
+-python3 cleannav-tools/map-editor/server.py
++python3 tools/map-editor/server.py --map demo-fixture
++python3 -m pytest -q tools/map-editor/tests tests/patrol
+ ```
+ 
+-Then open `http://localhost:8765` in Windows. The server binds only to WSL loopback and accepts requests from that local page. Stop it with Ctrl+C.
++The local editor binds loopback at `http://localhost:8765`. This is an offline
++editor API, not the vehicle Gateway. Ctrl+C stops it. The demo is explicitly
++synthetic/test-only. A production saved-map bundle still needs its original
++manifest/database/OccupancyGrid/YAML/Profile/Keepout assets; these are not replaced
++by derived test fixtures. In the established CleanNav workspace, saved maps are
++discovered by the unchanged existing discovery flow. The old default Campus
++export is known to fail current image/Occupancy validation; do not overwrite that
++frozen map or treat it as a current valid production input.
+ 
+-The current WSL Python environment already provides NumPy, Pillow, and PyYAML. Shapely and jsonschema are installed in the tool-local `.deps` directory; jsonschema is pinned because the Mission Registry file declares Draft 2020-12. If a different Python lacks NumPy, Pillow, or PyYAML, install their wheels into the same `.deps` directory too. No ROS/C++ build is required.
++## Regular-site geometry and constraints
+ 
+-To open the corrected independent three-bay Gazebo patrol reference under
+-`cleannav-experiments/cleannav-review-fixes-20261015T062757Z/scene`, start the
+-same editor with:
++The existing pipeline retains free-region extraction, largest interior rectangle,
++simplification, inward buffer, tangent rounded loops, .025m sampling and closure.
++Only the design radius factor changes from1.03 to1.20. Vehicle geometry is read
++from the existing frozen `cleannav_navigation/config/nav2_local_recovery.yaml`:
++minimum turn radius1.12m, full Footprint1.10×.68m. The design radius is1.344m
++(20% margin), maximum circle curvature .74404762m⁻¹.
+ 
+-```bash
+-python3 cleannav-tools/map-editor/server.py --map saved-gazebo-patrol-v2
+-```
++The nominal buffer remains .8166065264130885m = .6466065264130885m vehicle
++circumscribed radius + .15m safety margin + .02m existing allowance. Complete
++oriented Footprint and +.15m swept geometry are checked separately. Straight
++support lines remain unchanged; circular/straight joins are G1 tangent-continuous,
++not G2 curvature-continuous. Larger radius is not automatically a better patrol.
+ 
+-That map is generated from the collision geometry in its matching Gazebo SDF
+-world. It is explicitly labelled as a world projection, not an RTAB-Map sensor
+-capture. Its current A/B/C preview and exported Mission Registry are prepared
+-in the experiment directory; changing the world invalidates the bound map and
+-registry SHA and requires regenerating both.
++R9 C has1637 poses; existing A4 source computes `((0,939),(938,1637))` from the
++fixed production start/forward route. Neither938 nor the radius is hard-coded
++into A4. Arbitrary start/reverse routes are outside this candidate's product
++scope; the prior near-straight/exact-straight counterexamples remain recorded.
++No A4, MPPI, Goal Checker, speed, Safety, Keepout or public interface changes.
+ 
+-The historical v1 PGM used gray 205 with free_thresh=0.25, which Nav2 treats
+-as free rather than unknown. It is preserved for evidence and explicitly
+-rejected by the editor. V2 preserves all unknown cells using a checked
+-PGM/YAML/OccupancyGrid round trip. Neither projection is a localization-ready
+-sensor map or a motion authorization.
++## Export and validation scope
+ 
+-## Edit a map
++Draw/finish a region, generate a loop, place a charger staging pose and export the
++existing RegionRegistry v1. The owner export uses existing tangent checkpoints;
++the reviewed PATROL asset then uses the existing arc-length checkpoints and
++`path_file` dense-route binding. R8-A4 Mission Manager performs GOTO then admits
++the dense PATROL path through Facade into two finite FollowPath segments; the
++older independent-checkpoint execution note in the legacy validator is not a
++claim about this current runtime chain.
+ 
+-1. Keep **Saved Campus map** selected to use the saved RTAB OccupancyGrid and its checksum-bound Campus Keepout profile. Select another saved map from the menu when one is available. The built-in **DEMO fixture** exists only for a successful example and never represents a surveyed map.
+-2. Click **New region**, draw three or more vertices on the map, and click **Complete boundary** (or Enter). Scroll to zoom and drag with the right mouse button to pan. Select a region, drag its boundary vertices to adjust them, or Shift+click a vertex to remove it. After a boundary edit, click Generate again to refresh the preview.
+-3. Select a region, choose the safety margin, direction, and patrol preview laps, then click **Generate safe perimeter loop**. The tool reports the specific geometry/turning/mission-budget failure when no candidate passes.
+-4. Click **Add charger**, click its staging position, then click an arrow direction. The right panel lets you edit the ID/name/pose, replace the map mark, or delete it. Export checks footprint clearance.
+-5. Save the editable project to continue later. **Export Mission Registry** emits the existing v1 schema and a separate offline validation report. The map id, revision, and OccupancyGrid SHA must match when reopening; the editor will reject a different map snapshot.
++[Current result](../../docs/validation/R9_REGULAR_SITE_RESULT.md) records real-map
++sweeps, new entry, Registry and actual SMAC static replay. Geometry/static planning
++PASS is not tracking/full-lap PASS. `motion_validated=false` remains. No startup
++runner, authorization, runtime Gate or dynamic task was added.
+ 
+-The standalone Campus map in this repository is roughly 12.8 × 15.15 m. It has a separate formal Keepout mask and only about 36.67 m² of known free space after that mask. The current vehicle profile has a 1.10 × 0.68 m footprint, 1.12 m minimum turn radius, and the planner reserves a 3% radius margin plus the selected safety distance. The editor never changes map, Keepout, or Mission files.
++## Reproducible fixtures and known history
+ 
+-## Verification limits
++`tests/fixtures/SOURCES.json` records SHA256 of every exact gzip capture from the
++real Pillar map/Keepout, legacy Campus export and projection reference. No RTAB DB
++is bundled; a test-only model uses decoded captured grids/masks. It never claims
++to validate a production map DB or bypasses production MapModel loading. Synthetic
++demo tests remain explicitly labelled separately.
+ 
+-Green means the dense closed curve passed geometry checks against known-free map cells and Keepout, its circumscribed vehicle disk, boundary margin, and turn-radius sampling. It does not mean Smac will follow every leg or that the vehicle has driven it. Mission currently executes each route checkpoint as a separate NavigateToPose goal, so it stops and releases Lease at segment boundaries. A saved Smac path can be checked through local `POST /api/check-planner-path` with JSON fields `boundary`, `candidate_dense`, `actual_poses` (each `[x,y,yaw]`), and optional `corridor` in metres. The result checks obstacle sweep, region boundary, route corridor, and sampled curvature. Actual tracking still needs a separately authorized Gazebo run.
++The10 historical setup errors came from eager loading the old Campus default:
++52550 unknown cells used gray205, interpreted as free at free_thresh=.25;24677
++free cells used254 instead of the validator's255, yielding77227 exact-image
++mismatches. Tests now isolate inputs, reproduce that failure from exact captured
++bytes, and exercise the real current site without mutating historical assets.
++Original failure logs/SHAs remain in the validation archive. Geometry assertions
++were retained; only fixture binding/provenance classification changed.
+ 
+-The exported demo file deliberately has `DEMO-perimeter-15m` identity. Mission's loader accepts its structure, but its map hash cannot match the real Campus map. Do not treat the demo configuration as a real location registry.
++## Future Extensions
++
++[Fields2Cover](https://github.com/Fields2Cover/Fields2Cover) (BSD-3-Clause) is a
++research reference for non-convex areas, obstacle-aware decomposition, region
++connections and feasible/continuous-curvature turns. See the [future contract and
++feature mapping](future/README.md). `future/irregular_site_planner.py` is
++**NOT_INTEGRATED / FUTURE_EXTENSION**: an input/output convention, no algorithm.
++It always raises NotImplementedError and is never imported by core/UI/ROS. No
++Fields2Cover/GDAL/GEOS/OR-Tools dependency was installed or integrated.

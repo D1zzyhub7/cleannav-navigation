@@ -14,3 +14,13 @@
 Formal [dynamic result](validation/R8_A4_DYNAMIC_RESULT.md) supersedes old PREPARED/latest-A2 wording. Verbatim originals, failure analyses, implementation and preparation are retained as .txt historical archives; [SOURCES.json](experiment-archive/r8-a4/SOURCES.json) records source paths/dates/SHA. Their absolute paths are evidence locators, not runnable instructions or claims that raw bags are in Git.
 
 Remaining: multi-lap statistical robustness, real vehicle validation, full foreign-process visibility/cgroup verification, GOTO stateful endpoint precision/long detour observation, general continuous-curve endpoint reachability. R9 route-generation geometry/turn-radius/curvature optimization has not been implemented. No Safety criterion or map/Registry/route is relaxed for publication.
+
+## R9 regular-site candidate — offline fixed-start/forward PASS, dynamic NOT RUN
+
+C radius1.344m,20% margin; real-map full body/+ .15m sweep, Registry/new entry and
+5/5 SMAC static action results pass, complete corrected coordinator rc0/cleanup
+receipt present.184 source tests and independent Git archive184 pass; legacy
+Campus encoding errors are isolated/reproduced in captured fixtures, frozen assets
+unchanged. Current scope explicitly excludes arbitrary starts/reverse routes; A4
+not changed. R8-A4 remains formal dynamic baseline. Irregular-site extension is
+interface/documentation only, NOT_INTEGRATED. [Result](validation/R9_REGULAR_SITE_RESULT.md).

@@ -1,0 +1,11 @@
+{
+  "status": "NOT_INTEGRATED / FUTURE_EXTENSION",
+  "result": "PASS: no route/backend, expected NotImplementedError",
+  "new_modules": [
+    "typing",
+    "typing.io",
+    "typing.re"
+  ],
+  "no_production_import": true,
+  "no_third_party_install": true
+}

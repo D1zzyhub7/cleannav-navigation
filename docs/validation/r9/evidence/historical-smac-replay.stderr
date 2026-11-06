@@ -1,0 +1,16 @@
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_global_planner/../../build/cleannav_global_planner/share/cleannav_global_planner/hook/pythonpath_develop.sh"
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_interfaces/share/cleannav_interfaces/local_setup.bash"
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_mission_manager/../../build/cleannav_mission_manager/share/cleannav_mission_manager/hook/pythonpath_develop.sh"
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_path_executor/../../build/cleannav_path_executor/share/cleannav_path_executor/hook/pythonpath_develop.sh"
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_rtabmap/share/cleannav_rtabmap/local_setup.bash"
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_safety_supervisor/../../build/cleannav_safety_supervisor/share/cleannav_safety_supervisor/hook/pythonpath_develop.sh"
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_navigation/share/cleannav_navigation/local_setup.bash"
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_simulation/share/cleannav_simulation/local_setup.bash"
+Traceback (most recent call last):
+  File "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r9-path-generation-20261106T092401Z/tools/replay_smac_entries.py", line 134, in <module>
+    if __name__=='__main__':main()
+  File "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r9-path-generation-20261106T092401Z/tools/replay_smac_entries.py", line 128, in main
+    survivors=[proc.pid for _,proc in processes if Path('/proc'/str(proc.pid)).exists()]
+  File "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r9-path-generation-20261106T092401Z/tools/replay_smac_entries.py", line 128, in <listcomp>
+    survivors=[proc.pid for _,proc in processes if Path('/proc'/str(proc.pid)).exists()]
+TypeError: unsupported operand type(s) for /: 'str' and 'str'

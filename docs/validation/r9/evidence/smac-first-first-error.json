@@ -1,0 +1,8 @@
+{
+  "rc": 1,
+  "domain": 230,
+  "cause": "wrong source hook missing share/cleannav_nav2_offline_probe/; exact_snapshot plugin not registered",
+  "no_native_planning_result": true,
+  "own_pids_absent": true,
+  "lock_released": true
+}

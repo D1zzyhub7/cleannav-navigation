@@ -1,0 +1,7 @@
+{
+  "original_owner_sha256": "6a508d68bdd10af396156d772cf2ca827feefb70df877384b626cc2d63f56cb4",
+  "original_default_map": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/campus-curb-safety-20261012/maps/campus_curb_scan_20261012_083555_fd1b1b",
+  "original_unmodified_owner_failure": "ValueError: exported image differs from frozen OccupancyGrid",
+  "current_pillar_model_with_frozen_keepout": "PASS, separate R9 geometry receipts",
+  "maps_modified": false
+}

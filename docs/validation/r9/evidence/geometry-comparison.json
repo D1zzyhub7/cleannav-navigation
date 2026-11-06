@@ -1,0 +1,597 @@
+[
+  {
+    "label": "A",
+    "radius_m": 1.1536,
+    "minimum_actual_circle_radius_m": 1.1535999999937239,
+    "max_curvature": 0.8668515950116509,
+    "curvature_percentiles": [
+      0.0,
+      0.0,
+      0.8668515950067891,
+      0.8668515950072757,
+      0.8668515950088285,
+      0.8668515950116509
+    ],
+    "radius_margin_percent": 2.9999999999999805,
+    "poses": 1649,
+    "length_m": 41.08649126331353,
+    "max_sample_step_m": 0.024968089411165906,
+    "closure_xy_m": 0.0,
+    "closure_yaw_rad": 0.0,
+    "entry": [
+      14.005502233908052,
+      -6.831575183979148,
+      0.0
+    ],
+    "entry_translation_m": 1.7763568394002505e-15,
+    "entry_yaw_change_rad": 0.0,
+    "straight_lengths_m": [
+      4.859587078304042,
+      12.059587185592402,
+      4.859587078304042,
+      12.059587185592402
+    ],
+    "selected_inset_m": 0,
+    "original_buffer_m": -0.8166065264130885,
+    "body_sweep_in_allowed_free": true,
+    "padded_sweep_in_allowed_free": true,
+    "body_region_clearance_m": 0.3756173935516012,
+    "body_observed_free_clearance_m": 0.3756173935516012,
+    "body_keepout_clearance_m": 1.0403360680765557,
+    "padded_keepout_clearance_m": 0.8454517005517388,
+    "padded_region_clearance_m": 0.180786139669978,
+    "keepout_intersection_area_m2": 0.0,
+    "endpoint_index": 932,
+    "split_forward": [
+      [
+        0,
+        933
+      ],
+      [
+        932,
+        1649
+      ]
+    ],
+    "split_reverse": [
+      [
+        0,
+        752
+      ],
+      [
+        751,
+        1649
+      ]
+    ],
+    "split_geometric_curvature": 0.0,
+    "incoming_1m_max_tangent_deviation_m": 0.00960104376417903,
+    "split_tangent_heading_error_rad": 0.0,
+    "shared_original_pose": true,
+    "owner_validator": {
+      "geometry_pass": true,
+      "kinematics_pass": true,
+      "motion_validated": false,
+      "planner_segments_validated": false,
+      "minimum_radius_m": 1.1536,
+      "max_sample_curvature": 0.8668683187471369,
+      "length_m": 41.08649126331382,
+      "footprint_disk_radius_m": 0.6466065264130885,
+      "safety_margin_m": 0.15,
+      "checked_samples": 1649,
+      "closure_error_m": 0,
+      "execution_note": "Mission uses independent NavigateToPose goals and stops/releases Lease at each segment. Smac paths and tracking still require separate validation."
+    },
+    "registry_runtime_load_pass": true,
+    "registry_sha256": "697b4d1e31aeab67e23793bdd83b73ddc6c8c7a26523c139f75dfcfb3dfd11bb",
+    "route_sha256": "a5585e413a3a217473e37896121d136ba84aa1859f9888e141f1cfcae1b0e3ef",
+    "corner_vertices": [
+      [
+        15.159102233908051,
+        -6.831575183979148
+      ],
+      [
+        15.159102233908051,
+        0.33521189432489307
+      ],
+      [
+        0.7923150483156496,
+        0.33521189432489346
+      ],
+      [
+        0.7923150483156498,
+        -6.831575183979148
+      ]
+    ],
+    "corner_turn_angles_rad": [
+      1.5707963267948966,
+      1.5707963267948966,
+      1.5707963267948968,
+      1.5707963267948966
+    ],
+    "G1_tangent_connections": true,
+    "G1_max_connection_heading_error_rad": 0.0,
+    "G2_curvature_continuous": false,
+    "max_inter_sample_rotation_sagitta_m": 0.00010418907669598833,
+    "centerline_hausdorff_original_m": 3.552713678800501e-15,
+    "GOTO_entry_delta_xy": [
+      1.7763568394002505e-15,
+      0.0
+    ],
+    "straight_perpendicular_offset_original_m": 0.0
+  },
+  {
+    "label": "B",
+    "radius_m": 1.25,
+    "minimum_actual_circle_radius_m": 1.2499999999925966,
+    "max_curvature": 0.8000000000047383,
+    "curvature_percentiles": [
+      0.0,
+      0.0,
+      0.7999999999999565,
+      0.8000000000004278,
+      0.8000000000016798,
+      0.8000000000047383
+    ],
+    "radius_margin_percent": 11.607142857142838,
+    "poses": 1641,
+    "length_m": 40.92100078328018,
+    "max_sample_step_m": 0.02498270986440687,
+    "closure_xy_m": 0.0,
+    "closure_yaw_rad": 0.0,
+    "entry": [
+      13.909102233908051,
+      -6.831575183979148,
+      0.0
+    ],
+    "entry_translation_m": 0.09639999999999915,
+    "entry_yaw_change_rad": 0.0,
+    "straight_lengths_m": [
+      4.666787078304042,
+      11.8667871855924,
+      4.666787078304042,
+      11.8667871855924
+    ],
+    "selected_inset_m": 0,
+    "original_buffer_m": -0.8166065264130885,
+    "body_sweep_in_allowed_free": true,
+    "padded_sweep_in_allowed_free": true,
+    "body_region_clearance_m": 0.3811888134132172,
+    "body_observed_free_clearance_m": 0.3811888134132176,
+    "body_keepout_clearance_m": 1.0573504332874086,
+    "padded_keepout_clearance_m": 0.8643494131277909,
+    "padded_region_clearance_m": 0.18810069106483596,
+    "keepout_intersection_area_m2": 0.0,
+    "endpoint_index": 934,
+    "split_forward": [
+      [
+        0,
+        935
+      ],
+      [
+        934,
+        1641
+      ]
+    ],
+    "split_reverse": [
+      [
+        0,
+        743
+      ],
+      [
+        742,
+        1641
+      ]
+    ],
+    "split_geometric_curvature": 0.0,
+    "incoming_1m_max_tangent_deviation_m": 0.008884907872533154,
+    "split_tangent_heading_error_rad": 0.0,
+    "shared_original_pose": true,
+    "owner_validator": {
+      "geometry_pass": true,
+      "kinematics_pass": true,
+      "motion_validated": false,
+      "planner_segments_validated": false,
+      "minimum_radius_m": 1.25,
+      "max_sample_curvature": 0.8000131786015102,
+      "length_m": 40.921000783281315,
+      "footprint_disk_radius_m": 0.6466065264130885,
+      "safety_margin_m": 0.15,
+      "checked_samples": 1641,
+      "closure_error_m": 0,
+      "execution_note": "Mission uses independent NavigateToPose goals and stops/releases Lease at each segment. Smac paths and tracking still require separate validation."
+    },
+    "registry_runtime_load_pass": true,
+    "registry_sha256": "6b780a3cbe3db9271b3a29b9dff35284b0aae6b70e4eb20089ff322e501ed38a",
+    "route_sha256": "70b6e75f70a3aa5300ef875367bfe50ec10614ef8dd8c7a1c7829fe3645fbc95",
+    "corner_vertices": [
+      [
+        15.159102233908051,
+        -6.831575183979148
+      ],
+      [
+        15.159102233908051,
+        0.33521189432489307
+      ],
+      [
+        0.7923150483156496,
+        0.33521189432489346
+      ],
+      [
+        0.7923150483156498,
+        -6.831575183979148
+      ]
+    ],
+    "corner_turn_angles_rad": [
+      1.5707963267948966,
+      1.5707963267948966,
+      1.5707963267948968,
+      1.5707963267948966
+    ],
+    "G1_tangent_connections": true,
+    "G1_max_connection_heading_error_rad": 0.0,
+    "G2_curvature_continuous": false,
+    "max_inter_sample_rotation_sagitta_m": 9.372797800388253e-05,
+    "centerline_hausdorff_original_m": 0.039925194924927035,
+    "GOTO_entry_delta_xy": [
+      -0.09639999999999915,
+      0.0
+    ],
+    "straight_perpendicular_offset_original_m": 0.0
+  },
+  {
+    "label": "C",
+    "radius_m": 1.344,
+    "minimum_actual_circle_radius_m": 1.3439999999917533,
+    "max_curvature": 0.7440476190521844,
+    "curvature_percentiles": [
+      0.0,
+      0.0,
+      0.7440476190476226,
+      0.744047619048035,
+      0.7440476190496363,
+      0.7440476190521844
+    ],
+    "radius_margin_percent": 19.999999999999996,
+    "poses": 1637,
+    "length_m": 40.759629418422065,
+    "max_sample_step_m": 0.024954673473489564,
+    "closure_xy_m": 0.0,
+    "closure_yaw_rad": 0.0,
+    "entry": [
+      13.815102233908052,
+      -6.831575183979148,
+      0.0
+    ],
+    "entry_translation_m": 0.19039999999999857,
+    "entry_yaw_change_rad": 0.0,
+    "straight_lengths_m": [
+      4.478787078304041,
+      11.678787185592402,
+      4.478787078304041,
+      11.678787185592402
+    ],
+    "selected_inset_m": 0,
+    "original_buffer_m": -0.8166065264130885,
+    "body_sweep_in_allowed_free": true,
+    "padded_sweep_in_allowed_free": true,
+    "body_region_clearance_m": 0.38606809541379494,
+    "body_observed_free_clearance_m": 0.386068095413795,
+    "body_keepout_clearance_m": 1.0758576765628955,
+    "padded_keepout_clearance_m": 0.8842890659411285,
+    "padded_region_clearance_m": 0.19458331850583982,
+    "keepout_intersection_area_m2": 0.0,
+    "endpoint_index": 938,
+    "split_forward": [
+      [
+        0,
+        939
+      ],
+      [
+        938,
+        1637
+      ]
+    ],
+    "split_reverse": [
+      [
+        0,
+        735
+      ],
+      [
+        734,
+        1637
+      ]
+    ],
+    "split_geometric_curvature": 0.0,
+    "incoming_1m_max_tangent_deviation_m": 0.008253320012751808,
+    "split_tangent_heading_error_rad": 0.0,
+    "shared_original_pose": true,
+    "owner_validator": {
+      "geometry_pass": true,
+      "kinematics_pass": true,
+      "motion_validated": false,
+      "planner_segments_validated": false,
+      "minimum_radius_m": 1.344,
+      "max_sample_curvature": 0.7440582066036039,
+      "length_m": 40.75962941842205,
+      "footprint_disk_radius_m": 0.6466065264130885,
+      "safety_margin_m": 0.15,
+      "checked_samples": 1637,
+      "closure_error_m": 0,
+      "execution_note": "Mission uses independent NavigateToPose goals and stops/releases Lease at each segment. Smac paths and tracking still require separate validation."
+    },
+    "registry_runtime_load_pass": true,
+    "registry_sha256": "0aa2bcd552b8c87e54598f26751dde5a2ca315382018f5f1e2be3f36e3405032",
+    "route_sha256": "4d5f24a19600790eae561c4b17fc2ddbf032ed4d830efa81a42b257902cd03ea",
+    "corner_vertices": [
+      [
+        15.159102233908051,
+        -6.831575183979148
+      ],
+      [
+        15.159102233908051,
+        0.3352118943248932
+      ],
+      [
+        0.7923150483156496,
+        0.33521189432489346
+      ],
+      [
+        0.7923150483156498,
+        -6.831575183979148
+      ]
+    ],
+    "corner_turn_angles_rad": [
+      1.5707963267948966,
+      1.5707963267948966,
+      1.5707963267948968,
+      1.5707963267948966
+    ],
+    "G1_tangent_connections": true,
+    "G1_max_connection_heading_error_rad": 0.0,
+    "G2_curvature_continuous": false,
+    "max_inter_sample_rotation_sagitta_m": 8.497560187735734e-05,
+    "centerline_hausdorff_original_m": 0.07885686938543308,
+    "GOTO_entry_delta_xy": [
+      -0.19039999999999857,
+      0.0
+    ],
+    "straight_perpendicular_offset_original_m": 0.0
+  },
+  {
+    "label": "D",
+    "radius_m": 1.4,
+    "minimum_actual_circle_radius_m": 1.399999999993679,
+    "max_curvature": 0.7142857142889393,
+    "curvature_percentiles": [
+      0.0,
+      0.0,
+      0.714285714285768,
+      0.7142857142863057,
+      0.7142857142878533,
+      0.7142857142889393
+    ],
+    "radius_margin_percent": 24.99999999999998,
+    "poses": 1629,
+    "length_m": 40.66349117761044,
+    "max_sample_step_m": 0.024989609800618033,
+    "closure_xy_m": 0.0,
+    "closure_yaw_rad": 0.0,
+    "entry": [
+      13.75910223390805,
+      -6.831575183979149,
+      0.0
+    ],
+    "entry_translation_m": 0.2463999999999995,
+    "entry_yaw_change_rad": 0.0,
+    "straight_lengths_m": [
+      4.366787078304043,
+      11.566787185592402,
+      4.366787078304043,
+      11.566787185592402
+    ],
+    "selected_inset_m": 0,
+    "original_buffer_m": -0.8166065264130885,
+    "body_sweep_in_allowed_free": true,
+    "padded_sweep_in_allowed_free": true,
+    "body_region_clearance_m": 0.3887571000600225,
+    "body_observed_free_clearance_m": 0.38875710006002256,
+    "body_keepout_clearance_m": 1.086938679322043,
+    "padded_keepout_clearance_m": 0.8963282656704588,
+    "padded_region_clearance_m": 0.1981466864084392,
+    "keepout_intersection_area_m2": 0.0,
+    "endpoint_index": 937,
+    "split_forward": [
+      [
+        0,
+        938
+      ],
+      [
+        937,
+        1629
+      ]
+    ],
+    "split_reverse": [
+      [
+        0,
+        728
+      ],
+      [
+        727,
+        1629
+      ]
+    ],
+    "split_geometric_curvature": 0.0,
+    "incoming_1m_max_tangent_deviation_m": 0.008021577519343626,
+    "split_tangent_heading_error_rad": 0.0,
+    "shared_original_pose": true,
+    "owner_validator": {
+      "geometry_pass": true,
+      "kinematics_pass": true,
+      "motion_validated": false,
+      "planner_segments_validated": false,
+      "minimum_radius_m": 1.4,
+      "max_sample_curvature": 0.7142951971420377,
+      "length_m": 40.66349117760997,
+      "footprint_disk_radius_m": 0.6466065264130885,
+      "safety_margin_m": 0.15,
+      "checked_samples": 1629,
+      "closure_error_m": 0,
+      "execution_note": "Mission uses independent NavigateToPose goals and stops/releases Lease at each segment. Smac paths and tracking still require separate validation."
+    },
+    "registry_runtime_load_pass": true,
+    "registry_sha256": "e6fca3ce47dd6eaf54aed70708a3e7cf45d1b8659c31498ea800bdcfb8b23397",
+    "route_sha256": "2dcbc26c36c51b5bfa55cee8f4e3588f6121d78330837b294411a6b95d5ff53a",
+    "corner_vertices": [
+      [
+        15.159102233908051,
+        -6.831575183979148
+      ],
+      [
+        15.159102233908051,
+        0.3352118943248932
+      ],
+      [
+        0.7923150483156496,
+        0.33521189432489346
+      ],
+      [
+        0.7923150483156498,
+        -6.831575183979148
+      ]
+    ],
+    "corner_turn_angles_rad": [
+      1.5707963267948966,
+      1.5707963267948966,
+      1.5707963267948968,
+      1.5707963267948966
+    ],
+    "G1_tangent_connections": true,
+    "G1_max_connection_heading_error_rad": 0.0,
+    "G2_curvature_continuous": false,
+    "max_inter_sample_rotation_sagitta_m": 8.15109387096079e-05,
+    "centerline_hausdorff_original_m": 0.102102161857718,
+    "GOTO_entry_delta_xy": [
+      -0.2463999999999995,
+      -8.881784197001252e-16
+    ],
+    "straight_perpendicular_offset_original_m": 0.0
+  },
+  {
+    "label": "E",
+    "radius_m": 1.5,
+    "minimum_actual_circle_radius_m": 1.4999999999904405,
+    "max_curvature": 0.6666666666709153,
+    "curvature_percentiles": [
+      0.0,
+      0.0,
+      0.6666666666667997,
+      0.6666666666672985,
+      0.6666666666690478,
+      0.6666666666709153
+    ],
+    "radius_margin_percent": 33.928571428571416,
+    "poses": 1625,
+    "length_m": 40.4918191264743,
+    "max_sample_step_m": 0.024981949858446484,
+    "closure_xy_m": 0.0,
+    "closure_yaw_rad": 0.0,
+    "entry": [
+      13.659102233908051,
+      -6.831575183979148,
+      0.0
+    ],
+    "entry_translation_m": 0.34639999999999915,
+    "entry_yaw_change_rad": 0.0,
+    "straight_lengths_m": [
+      4.166787078304042,
+      11.3667871855924,
+      4.166787078304042,
+      11.3667871855924
+    ],
+    "selected_inset_m": 0,
+    "original_buffer_m": -0.8166065264130885,
+    "body_sweep_in_allowed_free": true,
+    "padded_sweep_in_allowed_free": true,
+    "body_region_clearance_m": 0.3932131696502524,
+    "body_observed_free_clearance_m": 0.3932131696502524,
+    "body_keepout_clearance_m": 1.0913947489122728,
+    "padded_keepout_clearance_m": 0.9023221670262443,
+    "padded_region_clearance_m": 0.20414058776422492,
+    "keepout_intersection_area_m2": 0.0,
+    "endpoint_index": 942,
+    "split_forward": [
+      [
+        0,
+        943
+      ],
+      [
+        942,
+        1625
+      ]
+    ],
+    "split_reverse": [
+      [
+        0,
+        719
+      ],
+      [
+        718,
+        1625
+      ]
+    ],
+    "split_geometric_curvature": 0.0,
+    "incoming_1m_max_tangent_deviation_m": 0.007375646182482654,
+    "split_tangent_heading_error_rad": 0.0,
+    "shared_original_pose": true,
+    "owner_validator": {
+      "geometry_pass": true,
+      "kinematics_pass": true,
+      "motion_validated": false,
+      "planner_segments_validated": false,
+      "minimum_radius_m": 1.5,
+      "max_sample_curvature": 0.666674261067377,
+      "length_m": 40.49181912647529,
+      "footprint_disk_radius_m": 0.6466065264130885,
+      "safety_margin_m": 0.15,
+      "checked_samples": 1625,
+      "closure_error_m": 0,
+      "execution_note": "Mission uses independent NavigateToPose goals and stops/releases Lease at each segment. Smac paths and tracking still require separate validation."
+    },
+    "registry_runtime_load_pass": true,
+    "registry_sha256": "a620fa03e633137d042a21a7410a8ba5185e8957a76407e8e4cc3f036613aff3",
+    "route_sha256": "23c8f53ff9048813c27e22951a9236b216ddb5c9648ef5be290dcf432525fd58",
+    "corner_vertices": [
+      [
+        15.159102233908051,
+        -6.831575183979148
+      ],
+      [
+        15.159102233908051,
+        0.3352118943248932
+      ],
+      [
+        0.7923150483156496,
+        0.33521189432489346
+      ],
+      [
+        0.7923150483156498,
+        -6.831575183979148
+      ]
+    ],
+    "corner_turn_angles_rad": [
+      1.5707963267948966,
+      1.5707963267948966,
+      1.5707963267948968,
+      1.5707963267948966
+    ],
+    "G1_tangent_connections": true,
+    "G1_max_connection_heading_error_rad": 0.0,
+    "G2_curvature_continuous": false,
+    "max_inter_sample_rotation_sagitta_m": 7.335885231868123e-05,
+    "centerline_hausdorff_original_m": 0.14346807391993888,
+    "GOTO_entry_delta_xy": [
+      -0.34639999999999915,
+      0.0
+    ],
+    "straight_perpendicular_offset_original_m": 0.0
+  }
+]

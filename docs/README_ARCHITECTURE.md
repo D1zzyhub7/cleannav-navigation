@@ -28,4 +28,22 @@ The Navigation repository declares these external dependencies; restoring naviga
 
 ## Evidence and scope
 
-See [dynamic result](validation/R8_A4_DYNAMIC_RESULT.md) for action UUIDs and endpoint samples, and [history](VALIDATION_HISTORY.md) for A2 failure and the A4 decision. One original-route simulated lap is validated. Multi-lap statistics, real vehicle dynamics and R9 geometry changes remain unimplemented/unverified.
+See [dynamic result](validation/R8_A4_DYNAMIC_RESULT.md) for action UUIDs and endpoint samples, and [history](VALIDATION_HISTORY.md) for A2 failure and the A4 decision. One original-route simulated lap is validated. Multi-lap statistics, real vehicle dynamics and R9 geometry has offline evidence on its own branch, with no dynamic validation.
+
+## Offline regular-site generation and future boundary
+
+`tools/map-editor/core.py` owns offline perimeter geometry; it is distinct from the
+frozen Facade splitter. The map editor produces map-identity-bound route/Registry
+assets, and the existing Mission/Facade chain consumes them. R9 raises only the
+design radius factor1.03→1.20; footprint/minR/buffer/.15m safety margin and existing
+rounding/discretization/closure remain. Vehicle values now come from the identical
+frozen YAML in this checkout; read-only map/Registry helper snapshots remove old
+local-worktree import dependencies, without modifying any runtime package.
+
+Fixed original entry/forward C-route compatibility is the product acceptance
+scope. Wider reverse/rephasing cases are documented limitations of the unchanged
+near-straight predicate, not a new runtime Gate or an A4 redesign.
+
+The separate future irregular-site contract has no arrows into core, UI, launch or
+ROS. It names possible Fields2Cover research stages only; it does not add reverse
+execution, continuous-curvature geometry or coverage planning to CleanNav.

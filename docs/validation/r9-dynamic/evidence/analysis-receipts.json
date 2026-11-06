@@ -1,0 +1,32 @@
+{
+  "analyze_bag.py": {
+    "rc": 0,
+    "cwd": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r9-c-dynamic-20261106T112441Z/session-patrol-lap-1-r9-20261106T112441Z",
+    "argv": [
+      "python3",
+      "-B",
+      "analyze_bag.py"
+    ],
+    "scope": "post-cleanup immutable/read-only bag message decode; no ROS init/nodes/control"
+  },
+  "analyze_terminal_evidence.py": {
+    "rc": 0,
+    "cwd": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r9-c-dynamic-20261106T112441Z/session-patrol-lap-1-r9-20261106T112441Z",
+    "argv": [
+      "python3",
+      "-B",
+      "analyze_terminal_evidence.py"
+    ],
+    "scope": "actual action status UUID classification; deterministic target reconstruction, no goal payload"
+  },
+  "analyze_run_metrics.py": {
+    "rc": 0,
+    "cwd": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r9-c-dynamic-20261106T112441Z/session-patrol-lap-1-r9-20261106T112441Z",
+    "argv": [
+      "python3",
+      "-B",
+      "analyze_run_metrics.py"
+    ],
+    "scope": "recorded core verdicts and original strict Security raw-grid replay; no Gate changes"
+  }
+}

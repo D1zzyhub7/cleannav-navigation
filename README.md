@@ -2,7 +2,7 @@
 
 CleanNav is a ROS 2 Humble navigation stack for an Ackermann cleaning vehicle. This repository owns Navigation, its Facade, Planner/Path Executor adapters, and the source snapshots of the R7-RC MPPI and R7-A2 Costmap used by R8-A4. Mission Manager, Safety Supervisor, HMI Gateway, localization, simulation and deployment assets form the surrounding system; their responsibilities are distinct from navigation planning and control.
 
-**Validated scope:** R8-A4 completed **one full simulated PATROL lap** on 2026-11-06. Both inner FollowPath actions, outer FollowPath, Mission Manager and APP sequence succeeded with `completed_steps=2/2`. This is not multi-lap statistical robustness or real-vehicle validation. R9 regular-site geometry is implemented and tested offline on a separate branch; it has not completed a dynamic lap.
+**Validated scope:** R8-A4 completed **one full simulated PATROL lap** on 2026-11-06. Both inner FollowPath actions, outer FollowPath, Mission Manager and APP sequence succeeded with `completed_steps=2/2`. This is not multi-lap statistical robustness or real-vehicle validation. R9 C regular-site geometry also completed one full simulated lap on2026-11-06 using the unchanged R8-A4 execution chain. Its validated scope is fixed production path start, ccw, R=1.344m; no multi-lap/real-vehicle/irregular-site claim.
 
 Candidate identity: `6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5`. The candidate identity identifies the frozen installed experiment; Git commits identify this source recovery. Recompiled binaries are separately identified and are not asserted byte-identical or newly dynamically validated.
 
@@ -42,7 +42,7 @@ R8-A4 changes only the closed-loop split selection relative to its A2 runtime pa
 
 ## R9 regular-site candidate
 
-The restored [map editor](tools/map-editor/README.md) keeps the existing rounded-loop pipeline and uses a1.20 design-radius factor:1.344m versus the vehicle minimum1.12m. Real Pillar Footprint/+0.15m sweeps, entry/Registry and SMAC static planning are verified. Fixed production start/forward A4 splitting returns index938 on1637poses. Arbitrary starts/reverse routes are not this candidate’s product scope. [Result and figures](docs/validation/R9_REGULAR_SITE_RESULT.md) distinguish offline PASS from dynamic NOT RUN. R8-A4 remains the formal dynamic baseline.
+The restored [map editor](tools/map-editor/README.md) keeps the existing rounded-loop pipeline and uses a1.20 design-radius factor:1.344m versus the vehicle minimum1.12m. Real Pillar Footprint/+0.15m sweeps, entry/Registry and SMAC static planning are verified. Fixed production start/forward A4 splitting returns index938 on1637poses. Arbitrary starts/reverse routes are not this candidate’s product scope. [Offline geometry](docs/validation/R9_REGULAR_SITE_RESULT.md) and the later [dynamic PASS result](docs/validation/R9_DYNAMIC_RESULT.md) record separate stages. The frozen current regular-patrol combination is R9 C route + the existing R8-A4 installation; neither identity is the other.
 
 ## Future Extensions
 
@@ -90,3 +90,19 @@ The split index is deterministically reconstructed from the pinned module and re
 - [Historical report archive and sources](docs/experiment-archive/r8-a4/SOURCES.json)
 
 License: [Apache 2.0](LICENSE), with upstream notices retained in vendored files and MPPI's LICENSE.md.
+
+## Frozen R9 regular patrol and other task modes
+
+The one authorized R9 attempt completed GOTO, both inner FollowPath actions, outer
+PATROL and MM/APP V1 Sequence success2/2, with original Safety/Lease/Keepout and
+complete cleanup. [Freeze receipt and limits](docs/validation/R9_DYNAMIC_RESULT.md)
+include actual GOTO terminal offset and small Gazebo stop jitter; command zeros
+are not misreported as exact-zero measured physical velocity. No new ROS install
+package, startup Gate or runner was introduced. The consumed session is not a
+future launch entry. Main/R8-A4 tag are not changed by this validation commit.
+
+[Read-only mode audit and next minimal plan](docs/V1_MODE_ARCHITECTURE_AUDIT.md)
+separate Task30/31/32 target cleaning,41/42 region navigation/patrol,43 staging-only
+return and global controls. Current Flutter remains a Task30 legacy-endpoint
+client; APP V1 sequence success does not prove a phone UI workflow. No mode was
+newly enabled or integrated.

@@ -1,0 +1,106 @@
+[
+  {
+    "path": "cleannav-build/step3-2-f/review-fixes-patrol-goal-checker-interfaces-r1/install/cleannav_interfaces/share/cleannav_interfaces/config/task_catalog.yaml",
+    "sha256": "8364ed12db8b8404ae59a75ad9644ffcbffac8c97b11e0931a225687c06471c9"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/node.py",
+    "sha256": "96a2d22928d19cb12622b9718c3e87a47d4b5fd143ab26e4121b3e4e760dd648"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/simulation_runner.py",
+    "sha256": "79ad5973c0a1127ba4f9e84271e06dece1637cab6115de9927ea5c1aa872abb0"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/core.py",
+    "sha256": "31d2061e8587f5d93575a1bfd89f38c2daf3d436e9b0614cc2839519ff10bce5"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/domain/task_catalog.py",
+    "sha256": "121390bcde7b22e89357e0dc641f63b84a4ffe0dc1d955adb0820781c3641d7d"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/domain/command_processing.py",
+    "sha256": "fdd6768e49a8c4e0032e35ce287325ba563b1a9bca3095ddafc3c9714e4760c1"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/domain/task_sequence.py",
+    "sha256": "56365595d40f346782269376b5eb1da18b9c8d2ea3b203f49d2d7979698b71d2"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/domain/region_registry.py",
+    "sha256": "c5aa9fc84808d7bff83edea210bb8065ee7825533e53feea859326bfcd98d268"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/domain/target_selector.py",
+    "sha256": "d80454ec81798a21c8447ebb9f3ee8559a31d450dbcf195d385c7f97a87ff8ec"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/domain/target_registry.py",
+    "sha256": "e235c80f6281f465589c03c683575c5212090d3f92fe46c9a4b75c83563c69c0"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/visual_target_goal_resolver.py",
+    "sha256": "11fb04c64b0f02a26de6f6480ab93ffb305b8ce8f4251cc894bf1b70a0945a46"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/visual_target_ros_bridge.py",
+    "sha256": "9fdb5d7af6badc8bab9836e4b06d54fb078f6d3a6b5235b554629d75d86d2d7b"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_hmi_gateway/lib/python3.10/site-packages/cleannav_hmi_gateway/http_server.py",
+    "sha256": "04dd297dd7b953e567cc8bef3dd43f8c53f1c758274c0e6e07d1a2783831d9b9"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_hmi_gateway/lib/python3.10/site-packages/cleannav_hmi_gateway/app_contract.py",
+    "sha256": "07db3ab012f5ff28710d0cfa6b5346261d74702cfbdb78e1bed2c127a0cb62d1"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_hmi_gateway/lib/python3.10/site-packages/cleannav_hmi_gateway/mission_bridge.py",
+    "sha256": "3d49813b0f28d748b2639fc76b1bd95fa9e93681a1ffde15f15d3b6b86868601"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_hmi_gateway/lib/python3.10/site-packages/cleannav_hmi_gateway/status_cache.py",
+    "sha256": "805c4742cf1a4104b752c1638f777083a1882bf9070326439067737b94ae3c7e"
+  },
+  {
+    "path": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_hmi_gateway/lib/python3.10/site-packages/cleannav_hmi_gateway/idempotency_store.py",
+    "sha256": "651a56d2db1fe6c6d639519012854893105c0a3178c2a959febedd2d5ccc2d20"
+  },
+  {
+    "path": "cleannav-hmi/pubspec.yaml",
+    "sha256": "e9dbb77e4ec6a5b4317d05a5a2f0f7827dee5841396ac8e7844ffa14eb287bc7"
+  },
+  {
+    "path": "cleannav-hmi/lib/models/task_definition.dart",
+    "sha256": "f7736500acad831dd5b6250f80b1f3cf052ec7f028e4c665a57c462b819a8e1a"
+  },
+  {
+    "path": "cleannav-hmi/lib/screens/tasks_page.dart",
+    "sha256": "e0653ca7a4b3b75ab2045af3d366d255a3d9b021639af7df2e98305e70701161"
+  },
+  {
+    "path": "cleannav-hmi/lib/screens/overview_page.dart",
+    "sha256": "69edd51d04002155f2a3eae4c5aa8f194038d2d680e14ec8dfa1769227314663"
+  },
+  {
+    "path": "cleannav-hmi/lib/models/hil_snapshot.dart",
+    "sha256": "dd3bf1eaddeaed114691119d65d26452f36de514520132ca89d6862b028d2e4b"
+  },
+  {
+    "path": "cleannav-hmi/lib/services/http_transport.dart",
+    "sha256": "2bb2feb541674776d66c8aaa5008d4d0953c0c2915b861f8e79a8e8920ca5c82"
+  },
+  {
+    "path": "cleannav-hmi/lib/controllers/app_controller.dart",
+    "sha256": "9e2f972d268174a5ad3ec7450e3f969b456da2af6264278213361ebf68b34864"
+  },
+  {
+    "path": "docs/app/README.md",
+    "sha256": "2822e954c6aa48ea5df9bc1a1d6fc5869da10ac30b9bf021553756aa90f6d9ac"
+  },
+  {
+    "path": "docs/app/openapi.yaml",
+    "sha256": "d44769b22bb0b7c90eee5017e84d5a066e175f54067d0ba443ebe95a15c97e78"
+  }
+]

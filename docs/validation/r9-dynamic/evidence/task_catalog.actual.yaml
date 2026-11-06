@@ -1,0 +1,168 @@
+interface_version: "1.0"
+
+# task_kind 是任务与命令的分流依据: MISSION 进入 FIFO，CONTROL 不进入队列
+# 尚未配置真实坐标或路线的任务设为 enabled: false
+
+ranges:
+  system_command: [1, 9]
+  fixed_goal: [10, 19]
+  fixed_route: [20, 29]
+  visual_target: [30, 39]
+  reserved: [40, 99]
+
+tasks:
+  - id: 1
+    name: START_DEFAULT_CLEANING
+    task_kind: MISSION
+    enabled: false
+    allowed_sources: [VOICE, APP, MOCK]
+    requires_confirmation: false
+    description: "执行默认任务队列或默认路线。当前默认任务未配置，暂不可用。"
+
+  - id: 2
+    name: PAUSE_CURRENT_TASK
+    task_kind: CONTROL
+    enabled: true
+    allowed_sources: [VOICE, APP, MOCK]
+    requires_confirmation: false
+    description: "暂停当前活动任务：release Safety Lease、取消当前 navigation generation 并等待 confirmed，保留原 execution_id 和队列。"
+
+  - id: 3
+    name: RESUME_CURRENT_TASK
+    task_kind: CONTROL
+    enabled: true
+    allowed_sources: [VOICE, APP, MOCK]
+    requires_confirmation: false
+    description: "从 PAUSED 或 SAFETY_BLOCKED 恢复：创建新 generation，重新提交目标并获取 Lease。"
+
+  - id: 4
+    name: STOP_CURRENT_TASK
+    task_kind: CONTROL
+    enabled: true
+    allowed_sources: [VOICE, APP, MOCK]
+    requires_confirmation: false
+    description: "停止当前活动任务并清空普通等待队列：release Lease、取消导航并等待 confirmed 后安全收口。"
+
+  - id: 5
+    name: RETURN_HOME
+    task_kind: CONTROL
+    enabled: false
+    allowed_sources: [VOICE, APP, MOCK]
+    requires_confirmation: false
+    description: "终止当前任务并清空队列，创建独立的返航 execution 前往 home_pose。home_pose 尚未配置，暂不可用。"
+
+  - id: 6
+    name: SOFTWARE_EMERGENCY_STOP
+    task_kind: CONTROL
+    enabled: true
+    allowed_sources: [VOICE, APP, MOCK]
+    requires_confirmation: false
+    description: "立即触发 Safety 急停：Manager Mode 进入 EMERGENCY_LATCHED，release Lease，清空队列，取消当前导航。最高优先级，不进入普通队列。"
+
+  - id: 7
+    name: RESET_SOFTWARE_EMERGENCY_STOP
+    task_kind: CONTROL
+    enabled: true
+    allowed_sources: [APP, MOCK]
+    requires_confirmation: true
+    description: "在安全条件确认后解除急停，Manager Mode 回到 NORMAL。不自动恢复旧任务，队列保持为空。语音不得解除急停。"
+
+  - id: 10
+    name: GOTO_POINT_1
+    task_kind: MISSION
+    enabled: false
+    allowed_sources: [VOICE, APP, MOCK]
+    requires_confirmation: false
+    description: "前往预设固定点 1。当前目标坐标未配置，暂不可用。"
+    goal_pose: null
+
+  - id: 20
+    name: CLEAN_ROUTE_1
+    task_kind: MISSION
+    enabled: false
+    allowed_sources: [VOICE, APP, MOCK]
+    requires_confirmation: false
+    description: "沿预设路线 1 清扫。当前路线未定义，暂不可用。"
+    route_id: ""
+
+  - id: 30
+    name: CLEAN_NEAREST_LEAF
+    task_kind: MISSION
+    enabled: true
+    allowed_sources: [VOICE, APP, MOCK]
+    requires_confirmation: false
+    description: "清扫最近的落叶目标。"
+    target_type: LEAF
+    selection_rule: NEAREST_VALID
+    wait_timeout_sec: 10.0
+    completion_radius_m: 0.35
+
+  - id: 31
+    name: CLEAN_NEAREST_LEAF_PILE
+    task_kind: MISSION
+    enabled: true
+    allowed_sources: [VOICE, APP, MOCK]
+    requires_confirmation: false
+    description: "清扫最近的落叶堆目标。"
+    target_type: LEAF_PILE
+    selection_rule: NEAREST_VALID
+    wait_timeout_sec: 10.0
+    completion_radius_m: 0.40
+
+  - id: 32
+    name: CLEAN_NEAREST_PUDDLE
+    task_kind: MISSION
+    enabled: true
+    allowed_sources: [VOICE, APP, MOCK]
+    requires_confirmation: false
+    description: "清扫最近的积水目标。"
+    target_type: PUDDLE
+    selection_rule: NEAREST_VALID
+    wait_timeout_sec: 10.0
+    completion_radius_m: 0.40
+
+  - id: 33
+    name: CLEAN_HIGHEST_PRIORITY_TARGET
+    task_kind: MISSION
+    enabled: false
+    allowed_sources: [VOICE, APP, MOCK]
+    requires_confirmation: false
+    description: "当前 CleaningTarget V1 尚无 priority contract，暂不启用。"
+    target_type: ANY
+    selection_rule: HIGHEST_PRIORITY_THEN_NEAREST
+    wait_timeout_sec: 10.0
+    completion_radius_m: 0.40
+
+  # Allocated from reserved [40,99]; dedicated service only, not HMI V1.
+  - id: 40
+    name: NAVIGATE_TO_POSE
+    task_kind: MISSION
+    enabled: true
+    allowed_sources: [RVIZ]
+    requires_confirmation: false
+    explicit_pose: true
+    description: "受管理的显式 map 位姿导航；不代表清扫完成。"
+
+  - id: 41
+    name: GOTO_REGION
+    task_kind: MISSION
+    enabled: true
+    allowed_sources: [VOICE, APP, MOCK]
+    requires_confirmation: false
+    description: "通过已配置且绑定当前地图版本的区域入口前往具名区域。"
+
+  - id: 42
+    name: PATROL_REGION
+    task_kind: MISSION
+    enabled: true
+    allowed_sources: [VOICE, APP, MOCK]
+    requires_confirmation: false
+    description: "沿区域内人工审核闭环路线逐航点执行指定轮数；不代表覆盖率或清扫机构完成。"
+
+  - id: 43
+    name: RETURN_CHARGER
+    task_kind: MISSION
+    enabled: true
+    allowed_sources: [VOICE, APP, MOCK]
+    requires_confirmation: false
+    description: "导航到已配置充电位staging pose；不执行自动对接或充电。"

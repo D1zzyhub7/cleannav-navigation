@@ -1,0 +1,1 @@
+No Optimizer failure in controller log; inspect launch/startup warnings separately

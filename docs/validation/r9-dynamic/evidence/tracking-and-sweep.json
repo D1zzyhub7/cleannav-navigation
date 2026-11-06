@@ -1,0 +1,27 @@
+{
+  "scope": "Recorded base_link reconstruction from odom and latest prior bag-received map<-odom, not exact controller Buffer/true collision telemetry",
+  "samples": 1847,
+  "patrol_wall_start": 1793964618.2563462,
+  "patrol_wall_end": 1793964803.332854,
+  "tracking_error_m": {
+    "mean": 0.05649003925916755,
+    "p95": 0.2152818457773309,
+    "max": 0.24395596641347525
+  },
+  "heading_error_abs_rad": {
+    "p95": 0.2836738026671994,
+    "max": 0.4173336174154485
+  },
+  "body_in_observed_allowed_free": true,
+  "padded015_in_observed_allowed_free": true,
+  "body_inside_boundary": true,
+  "padded015_inside_boundary": true,
+  "body_boundary_gap_m": 0.43409592661831375,
+  "body_keepout_gap_m": 0.9922814795151874,
+  "body_keepout_overlap_m2": 0.0,
+  "padded_boundary_gap_m": 0.2400841188159202,
+  "padded_keepout_gap_m": 0.8413200996375734,
+  "padded_keepout_overlap_m2": 0.0,
+  "point_interval_max_s": 0.10390615463256836,
+  "no_new_acceptance_threshold": true
+}

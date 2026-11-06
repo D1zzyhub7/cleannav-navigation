@@ -24,3 +24,18 @@ Campus encoding errors are isolated/reproduced in captured fixtures, frozen asse
 unchanged. Current scope explicitly excludes arbitrary starts/reverse routes; A4
 not changed. R8-A4 remains formal dynamic baseline. Irregular-site extension is
 interface/documentation only, NOT_INTEGRATED. [Result](validation/R9_REGULAR_SITE_RESULT.md).
+
+## 2026-11-06 R9 — VERIFIED fixed-start/forward single-lap PASS
+
+One formal attempt1/1, runnerrc0; actual1637point C admitted, deterministic A4split938;
+GOTO +two real PATROL inner goals +outer SUCCEEDED, MM/APP V1 SUCCEEDED2/2.
+Optimizer/Localization LOST/Security LOST/ESTOP/core253 all0.642local/196global
+raw-grid replays pass; original Safety controlled stop acknowledged, final zero
+commands/Lease empty, owned process/port/lock cleanup and map SHA unchanged.
+818 installed files unchanged; path identity25239cb9… and installation identity
+6785d5a3… are different objects. GOTO final~.549m offset is not instant.30m
+accuracy; small measured terminal jitter is retained, not falsely exact-zero.
+Frozen scope: original production path start,ccw, C1.344m +A4 runtime, one
+simulated lap only. Earlier R9 offline NOT RUN entries are time-point history.
+[Dynamic result](validation/R9_DYNAMIC_RESULT.md);
+[read-only mode audit](V1_MODE_ARCHITECTURE_AUDIT.md). No other task dynamically run.

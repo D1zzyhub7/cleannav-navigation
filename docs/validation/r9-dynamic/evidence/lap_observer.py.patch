@@ -1,0 +1,22 @@
+--- successful-A4/lap_observer.py
++++ R9-session/lap_observer.py
+@@ -65,15 +65,13 @@
+ from nav2_msgs.action import FollowPath
+ 
+ SESSION = Path(__file__).resolve().parent
+-ROUTE = Path(
+-    '/home/d1zzy/code/cleannav_modularization/cleannav-experiments/'
+-    'cleannav-patrol-pillar-v1-route-20261102T163219Z/route.json')
+-ENTRY = (14.00550223390805, -6.831575183979148)
++ROUTE = SESSION / 'assets/route.json'
++ENTRY = (13.815102233908052, -6.831575183979148)
+ PREFLIGHT_SEC = 420.0
+ MOTION_SEC = 900.0
+-SEQUENCE_ID = 'pillar-v1-e2e-lap1-r8-a4-20261106T025507Z'
++SEQUENCE_ID = 'pillar-v1-e2e-lap1-r9-20261106T112441Z'
+ SUCCEEDED = 4
+-GATEWAY = 'http://127.0.0.1:18144'
++GATEWAY = 'http://127.0.0.1:18145'
+ # --- pre-submit clock gate (r5) -------------------------------------------
+ CLOCK_SETTLE_SEC = 3.0        # required continuous observation before POST
+ CLOCK_SETTLE_MAX_SEC = 30.0   # hard cap; abort instead of waiting forever

@@ -1,6 +1,6 @@
 # Navigation Operations Runbook — R8-A4
 
-Status: R8-A4 completed one full simulated lap on2026-11-06; this source release restores that version. It does not grant a new runtime authorization. [Final dynamic result](validation/R8_A4_DYNAMIC_RESULT.md) supersedes the historical PREPARED reports. The [verbatim workspace Runbook](experiment-archive/r8-a4/WORKSPACE_OPERATIONS_RUNBOOK.txt) and [report source index](experiment-archive/r8-a4/SOURCES.json) retain earlier successes/failures without treating their consumed sessions as current commands.
+Status: R8-A4 completed one full simulated lap on2026-11-06; R9 C later completed one authorized fixed-start/ccw lap with that unchanged installation. See [R9 final result](validation/R9_DYNAMIC_RESULT.md). It does not grant a new runtime authorization. [Final dynamic result](validation/R8_A4_DYNAMIC_RESULT.md) supersedes the historical PREPARED reports. The [verbatim workspace Runbook](experiment-archive/r8-a4/WORKSPACE_OPERATIONS_RUNBOOK.txt) and [report source index](experiment-archive/r8-a4/SOURCES.json) retain earlier successes/failures without treating their consumed sessions as current commands.
 
 ## 1. Workflows and scope
 
@@ -125,9 +125,9 @@ Track owned PID/start ticks/PGID/SID. Follow original registered process-group c
 
 [Validation history](VALIDATION_HISTORY.md) retains R6 failures, R7-RC253, A2 later-turn failure, A3 offline noneligibility and R8-A4 correction. [Verbatim implementation](experiment-archive/r8-a4/R8_A4_IMPLEMENTATION_RESULT.txt) and [PREP](experiment-archive/r8-a4/R8_A4_DYNAMIC_PREP.txt) are dated snapshots; final dynamicPASS is authoritative.
 
-No multi-lap statistics or real-vehicle validation has passed. Full foreign-process/cgroup visibility remains unknown. General continuous-curve fallback/endpoints and GOTO precision observations remain. R9 route radius/curvature continuity changes have not been implemented. After publication stop; future R9 development and any dynamics require their own scope and evidence.
+No multi-lap statistics or real-vehicle validation has passed. Full foreign-process/cgroup visibility remains unknown. General continuous-curve fallback/endpoints and GOTO precision observations remain. At the R8-A4 source-release point R9 was not implemented; the later R9 result below supersedes that historical status. Further changes and dynamics require their own scope and evidence.
 
-## R9 candidate operations boundary
+## R9 candidate operations boundary — historical offline stage, superseded below
 
 R9 is an offline regular-site candidate, not the current dynamic baseline. Its C
 entry moves0.1904m west, heading unchanged; use the newly generated Registry/route
@@ -144,3 +144,33 @@ outer source/export or evidence/preflight entry. No new runtime Gate is added.
 
 The irregular-site file is NOT_INTEGRATED and cannot be selected in the editor or
 runner. The offline editor/demo is unrelated to Gateway task submission.
+
+## R9 dynamic freeze — current limited baseline
+
+R9 path identity25239cb9dec7c29e2939a7a6cc745f0a7b6daa355d030c43265dcd8f07404c4c
+was run with A4 install identity6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5.
+No R9 ROS package exists; offline generator source is not a runtime overlay.
+Use the original A4 Navigation/RC MPPI/A2 Costmap/MM/Safety/Gateway/environment
+unchanged with checksum-bound R9 C route and matching Registry. The final
+[composition](validation/r9-dynamic/R9_FROZEN_COMPOSITION.json) pins all prefixes,
+world/map/profile and identities. Keep the old profile's historical mask-tube
+route metadata as provenance, not a current path selector.
+
+Session session-patrol-lap-1-r9-20261106T112441Z (224/11845/18145) is consumed1/1,
+rc0 and fully cleaned. Do not rerun its bash script or reuse its sequence/command/
+idempotency DB. Any future dynamic work requires new authorization and a fresh
+independent binding through the original formal runner/Observer. Source/export,
+resource checks,FD9/SID,3s/250ms clock gate,one POST,Lease/stop/cleanup stay in the
+runner; no outer preflight/source/export, no new Gate.
+
+This freeze covers fixed production path start,forward ccw,regular site,C1.344m
+and the A4 execution chain only. It does not validate arbitrary starts/reverse,
+multi-lap,real vehicle or irregular-site backend. Current V1 API status was read
+by the Observer, not a Flutter phone UI run. GOTO stateful endpoint behavior
+(~.549m final offset) remains recorded. Safety confirms reliable zero-command
+delivery; measured tiny final odom/Oracle jitter is listed, not replaced with0.
+
+Other modes remain at the [read-only audit](V1_MODE_ARCHITECTURE_AUDIT.md) stage.
+Current Registry has no charger. Do not open disabled tasks, reuse R9 motion
+authorization for target cleaning, change APIs or attach the future irregular
+planner. Pause/Resume/STOP/ESTOP/Reset remain global controls.

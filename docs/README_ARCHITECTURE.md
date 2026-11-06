@@ -28,7 +28,7 @@ The Navigation repository declares these external dependencies; restoring naviga
 
 ## Evidence and scope
 
-See [dynamic result](validation/R8_A4_DYNAMIC_RESULT.md) for action UUIDs and endpoint samples, and [history](VALIDATION_HISTORY.md) for A2 failure and the A4 decision. One original-route simulated lap is validated. Multi-lap statistics, real vehicle dynamics and R9 geometry has offline evidence on its own branch, with no dynamic validation.
+See [dynamic result](validation/R8_A4_DYNAMIC_RESULT.md) for action UUIDs and endpoint samples, and [history](VALIDATION_HISTORY.md) for A2 failure and the A4 decision. R8-A4 original-route and the later R9 C fixed-start/ccw route each have one validated simulated lap. Multi-lap statistics and real-vehicle dynamics remain unverified.
 
 ## Offline regular-site generation and future boundary
 
@@ -47,3 +47,13 @@ near-straight predicate, not a new runtime Gate or an A4 redesign.
 The separate future irregular-site contract has no arrows into core, UI, launch or
 ROS. It names possible Fields2Cover research stages only; it does not add reverse
 execution, continuous-curvature geometry or coverage planning to CleanNav.
+
+## R9 execution evidence and mode boundary
+
+R9 C is now a dynamically verified fixed-start/ccw single-lap geometry asset used
+by the unchanged A4 runtime, not a new ROS package/controller. Two finite goals
+share the original split Pose938; actual admission1637 and action/sequence
+terminals are recorded in the [dynamic report](validation/R9_DYNAMIC_RESULT.md).
+Task modes, Flutter legacy/V1 distinctions and unverified target cleaning/charger
+capabilities are captured in the [mode audit](V1_MODE_ARCHITECTURE_AUDIT.md); no
+mode integration or safety/core change accompanies this documentation.

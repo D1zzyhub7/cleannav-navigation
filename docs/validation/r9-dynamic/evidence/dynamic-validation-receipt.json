@@ -1,0 +1,63 @@
+{
+  "status": "VERIFIED_R9_C_FIXED_START_FORWARD_SINGLE_LAP_DYNAMIC_PASS",
+  "formal_attempts_authorized": 1,
+  "formal_attempts_used": 1,
+  "no_second_attempt": true,
+  "path_candidate_identity": "25239cb9dec7c29e2939a7a6cc745f0a7b6daa355d030c43265dcd8f07404c4c",
+  "runtime_install_candidate_identity": "6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5",
+  "tested_git_PR_head": "f01b4df2564ce65e6bf5a1f72eb4254d8c97a83d",
+  "PR": 4,
+  "checks": {
+    "formal_entry_rc0": true,
+    "one_POST202": true,
+    "one_POST_event": true,
+    "one_idempotency_record": true,
+    "real_Lease_two_steps": true,
+    "GOTO_SUCCEEDED": true,
+    "two_patrol_FollowPath_SUCCEEDED": true,
+    "outer_FollowPath_SUCCEEDED": true,
+    "MM_SUCCEEDED_2of2": true,
+    "APP_SUCCEEDED_2of2": true,
+    "admitted1637_exact": true,
+    "original_goal_tolerances_jointly_met": true,
+    "optimizer_failure_zero": true,
+    "Localization_LOST_zero": true,
+    "Security_LOST_zero": true,
+    "ESTOP_zero": true,
+    "core253_zero": true,
+    "original_raw_core_replay_all_pass": true,
+    "recorded_body_and_margin_sweep_inside": true,
+    "final_commands_all6_zero": true,
+    "lease_empty": true,
+    "safety_reliable_stop_ack": true,
+    "own_processes_exit": true,
+    "ports_free": true,
+    "readable_domain_released": true,
+    "shared_lock_released": true,
+    "map_db_sha_unchanged": true,
+    "all818_install_files_unchanged": true,
+    "runtime_assets_sha_unchanged": true
+  },
+  "physical_stop_measurement": {
+    "final_odom": {
+      "linear_x": -0.0008275841972606937,
+      "angular_z": 0.00290687377735546,
+      "last_1s_distance_m": 0.00019230498473813426
+    },
+    "last1s_distance_m": 0.00019230498473813426,
+    "strict_floating_point_zero": "NOT_OBSERVED: small Gazebo contact/odom jitter; do not label all measured velocities exactly zero",
+    "acceptance_scope": "Existing controlled-zero-command/reliable Safety stop contract, released Lease, measured settled pose and cleanup; no new speed threshold introduced"
+  },
+  "trajectory_evidence_scope": "Recorded base_link reconstruction from odom and latest prior bag-received map<-odom, not exact controller Buffer/true collision telemetry",
+  "goal_evidence_scope": "Actual admitted1637 points, installed unchanged A4 => reconstructed938; action goal payload not recorded; do not claim direct payload",
+  "domain_visibility": "Unreadable26 processes remain UNKNOWN; own/readable domain empty",
+  "cgroup": "UNKNOWN/WAIVED baseline boundary retained",
+  "frozen_scope": "Fixed production path start, ccw regular site, C1.344m, R8-A4 execution chain; one simulated lap only",
+  "not_claimed": [
+    "multi-lap statistical robustness",
+    "real vehicle",
+    "arbitrary start/reverse routes",
+    "irregular-site planning",
+    "GOTO instantaneous .30m accuracy"
+  ]
+}

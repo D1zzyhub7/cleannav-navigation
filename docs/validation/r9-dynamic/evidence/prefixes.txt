@@ -1,0 +1,13 @@
+cleannav_simulation /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mask-lifecycle-freshness-fix-20261104T031832Z/install/cleannav_simulation
+cleannav_mission_manager /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager
+nav2_costmap_2d /home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-a2-costmap-timestamp-20261105T104829Z/install/nav2_costmap_2d
+nav2_mppi_controller /home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-rc-20261105T022949Z/install/nav2_mppi_controller
+cleannav_navigation /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z/install/cleannav_navigation
+cleannav_hmi_gateway /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_hmi_gateway
+cleannav_safety_supervisor /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_safety_supervisor
+cleannav_global_planner /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_global_planner
+cleannav_path_executor /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_path_executor
+cleannav_rtabmap /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_rtabmap
+cleannav_interfaces /home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-patrol-goal-checker-interfaces-r1/install/cleannav_interfaces (recorded, not pinned)
+monitor 003e8b3b94fc86c1725f10895f39db3067ef211c49c85f2ca07b670e116f9caf
+identity 6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5

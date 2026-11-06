@@ -1,0 +1,1940 @@
+{
+  "topic_counts": {
+    "/cleannav/campus/security_readiness": 845,
+    "/cmd_vel": 4232,
+    "/cleannav/localization/health": 844,
+    "/cleannav/safety_status": 840,
+    "/odom": 4030,
+    "/tf": 36136,
+    "/cleannav/task_status": 9066,
+    "/cleannav/task_sequence_status": 9,
+    "/follow_path/_action/status": 573,
+    "/cleannav/follow_path/_action/status": 3
+  },
+  "odom_distance_m": 81.05524110698207,
+  "cmd_count": 4232,
+  "cmd_nonzero": 3699,
+  "speed_max": 0.2823179066181183,
+  "yaw_rate_max": 0.18321689484374862,
+  "last_commands": [
+    {
+      "wall": 1793964805.42624,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "wall": 1793964805.5262513,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "wall": 1793964805.6261494,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "wall": 1793964805.7261455,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "wall": 1793964805.8261428,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "wall": 1793964805.9261558,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "wall": 1793964806.026561,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "wall": 1793964806.126206,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "wall": 1793964806.2262323,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "wall": 1793964806.3261127,
+      "values": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  ],
+  "estop_count": 0,
+  "lease_owners": [
+    "ros-execution-1",
+    "ros-execution-2"
+  ],
+  "last_safety": {
+    "wall": 1793964806.1832414,
+    "estop": false,
+    "block_all": false,
+    "owner": ""
+  },
+  "action_goals": {
+    "/follow_path/_action/status": {
+      "unique": 192,
+      "status_counts": {
+        "0": 0,
+        "1": 0,
+        "2": 192,
+        "3": 189,
+        "4": 3,
+        "5": 189,
+        "6": 0
+      }
+    },
+    "/cleannav/follow_path/_action/status": {
+      "unique": 1,
+      "status_counts": {
+        "0": 0,
+        "1": 1,
+        "2": 1,
+        "3": 0,
+        "4": 1,
+        "5": 0,
+        "6": 0
+      }
+    }
+  },
+  "terminal_sequence": {
+    "wall": 1793964803.332854,
+    "value": {
+      "header": {
+        "stamp": {
+          "sec": 417,
+          "nanosec": 100000000
+        },
+        "frame_id": ""
+      },
+      "interface_version": "1.0",
+      "sequence_id": "pillar-v1-e2e-lap1-r9-20261106T112441Z",
+      "command_id": "pillar-v1-e2e-lap1-r9-20261106T112441Z-cmd",
+      "state": 3,
+      "current_execution_id": "",
+      "current_step_id": "patrol",
+      "current_step_index": 2,
+      "step_count": 2,
+      "completed_steps": 2,
+      "operation": 2,
+      "region_id": "pillar_v1",
+      "charger_id": "",
+      "route_id": "pillar_v1_outer_loop_auto",
+      "current_lap": 1,
+      "total_laps": 1,
+      "current_segment": 1,
+      "total_segments": 1,
+      "reason_code": 0,
+      "message": "all business steps succeeded and resources were released"
+    }
+  },
+  "step_starts": {
+    "goto": 1793964426.2587616,
+    "patrol": 1793964618.2563462
+  },
+  "goto": {
+    "wall_duration_s": 191.99758458137512,
+    "odom_distance_m": 40.96050035448596,
+    "last_pose": {
+      "wall": 1793964618.2370534,
+      "odom_x": 12.977061028812178,
+      "odom_y": -6.7046701188385205,
+      "map_x": 13.284206410013784,
+      "map_y": -6.690375225049424,
+      "odom_yaw": -0.23488846908360275,
+      "distance": 40.96576806236448
+    },
+    "entry_error_m": 0.5493521677668425
+  },
+  "patrol": {
+    "wall_duration_s": 185.07650780677795,
+    "odom_distance_m": 40.07011261667276,
+    "last_pose": {
+      "wall": 1793964803.2785733,
+      "odom_x": 13.41204447110815,
+      "odom_y": -6.838177450509168,
+      "map_x": 13.7164158774839,
+      "map_y": -6.823563552780176,
+      "odom_yaw": -0.00990577108118543,
+      "distance": 81.03590153994237
+    },
+    "entry_error_m": 0.09901102554131525,
+    "route_length_m": 40.759629418422065,
+    "route_arc_span_m": 41.183858867471365,
+    "nearest_route_index_min": 0,
+    "nearest_route_index_max": 1635
+  },
+  "health": {
+    "samples": 844,
+    "after_first_good": 792,
+    "bad_after_first_good": [],
+    "last": {
+      "wall": 1793964805.9651725,
+      "value": {
+        "localized": true,
+        "native_parameters_verified": true,
+        "frozen_map": true,
+        "map_server_active": true,
+        "assets_unchanged": true,
+        "sensors_fresh": true,
+        "map_tf_valid": true,
+        "scan_tf_valid": true,
+        "scan_tf_diagnostics": {
+          "result": true,
+          "query_wall_monotonic": 42281.189291695,
+          "ros_now": 419.7,
+          "freshness_bounds": {
+            "receipt_age_wall_s": [
+              0.0,
+              2.5
+            ],
+            "scan_age_ros_s": [
+              -0.5,
+              0.5
+            ]
+          },
+          "header_window": [
+            {
+              "frame_id": "base_scan",
+              "stamp": 418.771,
+              "receipt_age_wall_s": 0.9955347870054538,
+              "scan_age_ros_s": 0.9289999999999736,
+              "eligibility": {
+                "eligible": false,
+                "reason": "scan_ros_time_outside_window"
+              }
+            },
+            {
+              "frame_id": "base_scan",
+              "stamp": 418.896,
+              "receipt_age_wall_s": 0.871722634001344,
+              "scan_age_ros_s": 0.8039999999999736,
+              "eligibility": {
+                "eligible": false,
+                "reason": "scan_ros_time_outside_window"
+              }
+            },
+            {
+              "frame_id": "base_scan",
+              "stamp": 419.021,
+              "receipt_age_wall_s": 0.7464649920002557,
+              "scan_age_ros_s": 0.6789999999999736,
+              "eligibility": {
+                "eligible": false,
+                "reason": "scan_ros_time_outside_window"
+              }
+            },
+            {
+              "frame_id": "base_scan",
+              "stamp": 419.146,
+              "receipt_age_wall_s": 0.6207040529989172,
+              "scan_age_ros_s": 0.5539999999999736,
+              "eligibility": {
+                "eligible": false,
+                "reason": "scan_ros_time_outside_window"
+              }
+            },
+            {
+              "frame_id": "base_scan",
+              "stamp": 419.271,
+              "receipt_age_wall_s": 0.49488031600049,
+              "scan_age_ros_s": 0.4289999999999736,
+              "eligibility": {
+                "eligible": true,
+                "reason": "fresh_source_time_candidate"
+              }
+            },
+            {
+              "frame_id": "base_scan",
+              "stamp": 419.396,
+              "receipt_age_wall_s": 0.3654605050032842,
+              "scan_age_ros_s": 0.3039999999999736,
+              "eligibility": {
+                "eligible": true,
+                "reason": "fresh_source_time_candidate"
+              }
+            },
+            {
+              "frame_id": "base_scan",
+              "stamp": 419.521,
+              "receipt_age_wall_s": 0.24508692599920323,
+              "scan_age_ros_s": 0.17899999999997362,
+              "eligibility": {
+                "eligible": true,
+                "reason": "fresh_source_time_candidate"
+              }
+            },
+            {
+              "frame_id": "base_scan",
+              "stamp": 419.646,
+              "receipt_age_wall_s": 0.12157986999955028,
+              "scan_age_ros_s": 0.053999999999973625,
+              "eligibility": {
+                "eligible": true,
+                "reason": "fresh_source_time_candidate"
+              }
+            }
+          ],
+          "checked": [
+            {
+              "frame_id": "base_scan",
+              "stamp": 419.646,
+              "scan_stamp_ns": 419646000000,
+              "receipt_age_wall_s": 0.12157986999955028,
+              "scan_age_ros_s": 0.053999999999973625,
+              "eligibility": {
+                "eligible": true,
+                "reason": "fresh_source_time_candidate"
+              },
+              "base_footprint_from_base_scan": {
+                "ok": true,
+                "returned_stamp": 419.646
+              },
+              "result": "lookup_exception",
+              "exception_type": "ExtrapolationException",
+              "exception": "Lookup would require extrapolation into the future.  Requested time 419.646000 but the latest data is at time 419.602000, when looking up transform from frame [base_footprint] to frame [odom]",
+              "odom_from_base_footprint": {
+                "ok": false,
+                "exception_type": "ExtrapolationException",
+                "exception": "Lookup would require extrapolation into the future.  Requested time 419.646000 but the latest data is at time 419.602000, when looking up transform from frame [base_footprint] to frame [odom]"
+              }
+            },
+            {
+              "frame_id": "base_scan",
+              "stamp": 419.521,
+              "scan_stamp_ns": 419521000000,
+              "receipt_age_wall_s": 0.24508692599920323,
+              "scan_age_ros_s": 0.17899999999997362,
+              "eligibility": {
+                "eligible": true,
+                "reason": "fresh_source_time_candidate"
+              },
+              "base_footprint_from_base_scan": {
+                "ok": true,
+                "returned_stamp": 419.521
+              },
+              "odom_from_base_footprint": {
+                "ok": true,
+                "returned_stamp": 419.521
+              },
+              "result": "transformable"
+            }
+          ],
+          "status": "VALID",
+          "tf_query_executed": true,
+          "receipt_time_semantics": "monitor callback processing time; not DDS receive time",
+          "clock_status": "VALID",
+          "clock_receipt_age_wall_s": 0.06737638499907916,
+          "callback_delay_status": "UNKNOWN",
+          "query_realtime_ns": 1793964805948422295,
+          "query_monotonic_raw_ns": 42281156081500,
+          "query_boottime_ns": 42281189302495,
+          "same_process_tf_probe": {},
+          "tf_mirror_probe_enabled": false,
+          "tf_path_timing_enabled": false
+        },
+        "tf_context": {
+          "context_id": "native-001697",
+          "context_kind": "native_health",
+          "monotonic_ns": 42281189561393,
+          "map_to_base_link": {
+            "context_id": "native-001697",
+            "target": "map",
+            "source": "base_link",
+            "requested_time_ns": 0,
+            "requested_time_semantics": "rclpy Time() / latest common transform time",
+            "lookup_start_monotonic_ns": 42281189215896,
+            "lookup_end_monotonic_ns": 42281189282195,
+            "query_duration_ns": 66299,
+            "lookup_success": true,
+            "returned_stamp_ns": 419602000000,
+            "ros_now_ns": 419700000000,
+            "age_ns": 98000000,
+            "freshness_result": true,
+            "lookup_error": null
+          },
+          "scan_exact_stamp": {
+            "context_id": "native-001697",
+            "lookup_semantics": "exact scan header stamp",
+            "query_start_monotonic_ns": 42281189287295,
+            "queries": [
+              {
+                "target": "base_footprint",
+                "source": "base_scan",
+                "query_stamp_ns": 419646000000,
+                "returned_stamp_ns": 419646000000,
+                "lookup_success": true,
+                "query_start_monotonic_ns": 42281189334295,
+                "query_end_monotonic_ns": 42281189396094,
+                "query_duration_ns": 61799
+              },
+              {
+                "target": "odom",
+                "source": "base_footprint",
+                "query_stamp_ns": 419646000000,
+                "returned_stamp_ns": null,
+                "lookup_success": false,
+                "lookup_error": {
+                  "type": "ExtrapolationException",
+                  "message": "Lookup would require extrapolation into the future.  Requested time 419.646000 but the latest data is at time 419.602000, when looking up transform from frame [base_footprint] to frame [odom]"
+                },
+                "query_start_monotonic_ns": 42281189398794,
+                "query_end_monotonic_ns": 42281189442294,
+                "query_duration_ns": 43500
+              },
+              {
+                "target": "base_footprint",
+                "source": "base_scan",
+                "query_stamp_ns": 419521000000,
+                "returned_stamp_ns": 419521000000,
+                "lookup_success": true,
+                "query_start_monotonic_ns": 42281189456394,
+                "query_end_monotonic_ns": 42281189498794,
+                "query_duration_ns": 42400
+              },
+              {
+                "target": "odom",
+                "source": "base_footprint",
+                "query_stamp_ns": 419521000000,
+                "returned_stamp_ns": 419521000000,
+                "lookup_success": true,
+                "query_start_monotonic_ns": 42281189502094,
+                "query_end_monotonic_ns": 42281189540393,
+                "query_duration_ns": 38299
+              }
+            ],
+            "query_end_monotonic_ns": 42281189557193,
+            "query_duration_ns": 269898,
+            "result": true,
+            "selected_scan_stamp_ns": 419521000000,
+            "selected_candidate": {
+              "frame_id": "base_scan",
+              "stamp": 419.521,
+              "scan_stamp_ns": 419521000000,
+              "receipt_age_wall_s": 0.24508692599920323,
+              "scan_age_ros_s": 0.17899999999997362,
+              "eligibility": {
+                "eligible": true,
+                "reason": "fresh_source_time_candidate"
+              },
+              "base_footprint_from_base_scan": {
+                "ok": true,
+                "returned_stamp": 419.521
+              },
+              "odom_from_base_footprint": {
+                "ok": true,
+                "returned_stamp": 419.521
+              },
+              "result": "transformable"
+            }
+          },
+          "clock": {
+            "ros_now_ns": 419700000000,
+            "latest_clock_message_stamp_ns": 419700000000,
+            "clock_callback_received_monotonic_ns": 42281121912910,
+            "clock_callback_receipt_age_ns": 67658383,
+            "clock_samples": 4197,
+            "clock_group": "isolated_mutually_exclusive"
+          }
+        },
+        "info_age": 0.9466956609976478,
+        "match_age": 1.9216752049978822,
+        "stationary_since_match": true,
+        "stopped": true,
+        "native_small_movement": true,
+        "linear_update": 0.02,
+        "angular_update": 0.03,
+        "covariance": 0.005604232661426067,
+        "motion_started": null,
+        "motion_state": "STATIONARY",
+        "info": {
+          "stamp": [
+            418,
+            646000000
+          ],
+          "ref_id": 834,
+          "loop_closure_id": 0,
+          "proximity_detection_id": 0,
+          "stats": {
+            "Keypoint/Current_frame/words": 0.0,
+            "Keypoint/Dictionary_size/words": 0.0,
+            "Keypoint/Index_memory_usage/KB": 0.0,
+            "Keypoint/Indexed_words/words": 0.0,
+            "Loop/Accepted_hypothesis_id/": 0.0,
+            "Loop/Angular_variance/": 0.0,
+            "Loop/Distance_since_last_loc/m": 0.0,
+            "Loop/Highest_hypothesis_id/": 0.0,
+            "Loop/Highest_hypothesis_value/": 0.0,
+            "Loop/Hypothesis_ratio/": 0.0,
+            "Loop/Hypothesis_reactivated/": 0.0,
+            "Loop/Id/": 0.0,
+            "Loop/Landmark_detected/": 0.0,
+            "Loop/Landmark_detected_node_ref/": 0.0,
+            "Loop/Last_id/": 0.0,
+            "Loop/Linear_variance/": 0.0,
+            "Loop/MapToBase_lin_std/m": 0.07486142218112946,
+            "Loop/MapToBase_lin_var/m2": 0.005604232661426067,
+            "Loop/MapToBase_pitch/deg": 0.0,
+            "Loop/MapToBase_roll/deg": 0.0,
+            "Loop/MapToBase_x/m": 13.73648452758789,
+            "Loop/MapToBase_y/m": -6.823850154876709,
+            "Loop/MapToBase_yaw/deg": -0.5584580898284912,
+            "Loop/MapToBase_z/m": 0.0,
+            "Loop/Map_id/": -1.0,
+            "Loop/Optimization_error/": 0.0,
+            "Loop/Optimization_iterations/": 0.0,
+            "Loop/Optimization_max_ang_error/deg": 0.0,
+            "Loop/Optimization_max_ang_error_ratio/": 0.0,
+            "Loop/Optimization_max_error/m": 0.0,
+            "Loop/Optimization_max_error_ratio/": 0.0,
+            "Loop/Proximity_links_cleared/": 0.0,
+            "Loop/Reactivate_id/": 0.0,
+            "Loop/RejectedHypothesis/": 0.0,
+            "Loop/Suppressed_hypothesis_id/": 0.0,
+            "Loop/Visual_inliers/": 0.0,
+            "Loop/Visual_inliers_distribution/": 0.0,
+            "Loop/Visual_inliers_mean_dist/m": 0.0,
+            "Loop/Visual_inliers_ratio/": 0.0,
+            "Loop/Visual_matches/": 0.0,
+            "Loop/Vp_hypothesis/": 0.0,
+            "Memory/Closest_node_angle/rad": 0.025507036596536636,
+            "Memory/Closest_node_distance/m": 7.275513648986816,
+            "Memory/Database_memory_used/MB": 17.0,
+            "Memory/Distance_travelled/m": 81.02549743652344,
+            "Memory/Fast_movement/": 0.0,
+            "Memory/Immunized_globally/": 0.0,
+            "Memory/Immunized_locally/": 0.0,
+            "Memory/Immunized_locally_max/": 0.0,
+            "Memory/Local_graph_size/": 425.0,
+            "Memory/New_landmark/": 0.0,
+            "Memory/Odom_cache_links/": 19.0,
+            "Memory/Odom_cache_poses/": 10.0,
+            "Memory/Odometry_variance_ang/": 0.009999999776482582,
+            "Memory/Odometry_variance_lin/": 0.0010000000474974513,
+            "Memory/Short_time_memory_size/": 0.0,
+            "Memory/Signatures_removed/": 1.0,
+            "Memory/Signatures_retrieved/": 0.0,
+            "Memory/Small_movement/": 1.0,
+            "Memory/Working_memory_size/": 425.0,
+            "Proximity/Space_detections_added_icp_global/": 0.0,
+            "Proximity/Space_detections_added_icp_multi/": 0.0,
+            "Proximity/Space_detections_added_visually/": 0.0,
+            "Proximity/Space_last_detection_id/": 0.0,
+            "Proximity/Space_paths/": 0.0,
+            "Proximity/Space_scan_paths_checked/": 0.0,
+            "Proximity/Space_visual_paths_checked/": 0.0,
+            "Proximity/Time_detections/": 0.0,
+            "RtabmapROS/HasSubscribers/": 1.0,
+            "RtabmapROS/TimeMsgConversion/ms": 10.333776473999023,
+            "RtabmapROS/TimePublishing/ms": 0.15115737915039062,
+            "RtabmapROS/TimeRtabmap/ms": 34.57904052734375,
+            "RtabmapROS/TimeTotal/ms": 45.952796936035156,
+            "RtabmapROS/TimeUpdatingMaps/ms": 0.888824462890625,
+            "Timing/Add_loop_closure_link/ms": 0.0040531158447265625,
+            "Timing/Cleaning_neighbors/ms": 0.0,
+            "Timing/Emptying_trash/ms": 0.00095367431640625,
+            "Timing/Finalizing_statistics/ms": 0.7021427154541016,
+            "Timing/Forgetting/ms": 0.010967254638671875,
+            "Timing/Hypotheses_creation/ms": 0.0,
+            "Timing/Hypotheses_validation/ms": 0.0,
+            "Timing/Joining_trash/ms": 0.030040740966796875,
+            "Timing/Likelihood_computation/ms": 0.0,
+            "Timing/Map_optimization/ms": 0.0059604644775390625,
+            "Timing/Memory_cleanup/ms": 0.016927719116210938,
+            "Timing/Memory_update/ms": 4.275083541870117,
+            "Timing/Neighbor_link_refining/ms": 0.0,
+            "Timing/Posterior_computation/ms": 0.0,
+            "Timing/Proximity_by_space/ms": 0.0040531158447265625,
+            "Timing/Proximity_by_space_search/ms": 0.0,
+            "Timing/Proximity_by_space_visual/ms": 0.0,
+            "Timing/Proximity_by_time/ms": 0.16999244689941406,
+            "Timing/Reactivation/ms": 0.010967254638671875,
+            "Timing/Statistics_creation/ms": 0.07295608520507812,
+            "Timing/Total/ms": 4.595041275024414,
+            "TimingMem/Compressing_data/ms": 0.1850128173828125,
+            "TimingMem/Joining_dictionary_update/ms": 0.12993812561035156,
+            "TimingMem/Occupancy_grid/ms": 3.8199424743652344,
+            "TimingMem/Pre_update/ms": 0.00095367431640625,
+            "TimingMem/Scan_filtering/ms": 0.0040531158447265625,
+            "TimingMem/Signature_creation/ms": 4.158973693847656
+          },
+          "matches": 376
+        },
+        "reason": "accepted saved-node ICP match, native covariance and fresh inputs",
+        "ros_time": 419.7,
+        "campus_keepout_ready": true
+      }
+    }
+  },
+  "security": {
+    "samples": 845,
+    "after_first_good": 773,
+    "bad_after_first_good": [],
+    "last": {
+      "wall": 1793964805.9602304,
+      "value": {
+        "state": "READY",
+        "ready": true,
+        "missing": [],
+        "authorization_latched": false,
+        "recovery": "new fully validated session required",
+        "wall_time": 1793964805.9595437,
+        "ros_time": 419.7,
+        "map_name": "patrol_pillar_v1_mapping_v1",
+        "profile_sha256": "125e5859953e061df254d6766a0e29e05fedf8480bc76d7b5777c4e6f45bbb3d",
+        "facts": {
+          "assets": true,
+          "raw_map": true,
+          "map_server": true,
+          "map_yaml": true,
+          "mask": true,
+          "mask_server": true,
+          "info": true,
+          "info_server": true,
+          "subscriptions": true,
+          "global_active": true,
+          "local_active": true,
+          "global_params": true,
+          "local_params": true,
+          "global_core": true,
+          "local_core": true,
+          "global_updates": true,
+          "local_updates": true,
+          "native_tf": true,
+          "localization": true
+        },
+        "evidence": {
+          "final_cmd_vel": [
+            0.0,
+            0.0
+          ],
+          "final_cmd_wall": 42281.068533519,
+          "assets": {
+            "verified": true
+          },
+          "map_server": "active",
+          "mask_server": "active",
+          "info_server": "active",
+          "map_yaml": {
+            "yaml_filename": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/config/pillar_v1_patrol/raw_map_load.yaml",
+            "use_sim_time": true,
+            "topic": "/cleannav/localization/map",
+            "frame": "map"
+          },
+          "raw_rpc": {
+            "verified": true
+          },
+          "mask_rpc": {
+            "verified": true
+          },
+          "global_params": {
+            "filters": [
+              "campus_keepout",
+              "campus_keepout_inflation"
+            ],
+            "footprint": [
+              [
+                -0.55,
+                -0.34
+              ],
+              [
+                -0.55,
+                0.34
+              ],
+              [
+                0.55,
+                0.34
+              ],
+              [
+                0.55,
+                -0.34
+              ]
+            ],
+            "track_unknown": true,
+            "use_sim_time": true,
+            "enabled": true,
+            "unknown_layer": {
+              "plugin": "cleannav_simulation::CampusUnknownLayer",
+              "enabled": true,
+              "boundary_cells": 1,
+              "map_topic": "/cleannav/localization/map"
+            }
+          },
+          "local_params": {
+            "filters": [
+              "campus_keepout",
+              "campus_keepout_inflation"
+            ],
+            "footprint": [
+              [
+                -0.55,
+                -0.34
+              ],
+              [
+                -0.55,
+                0.34
+              ],
+              [
+                0.55,
+                0.34
+              ],
+              [
+                0.55,
+                -0.34
+              ]
+            ],
+            "track_unknown": true,
+            "use_sim_time": true,
+            "enabled": true,
+            "unknown_layer": {
+              "plugin": "cleannav_simulation::CampusUnknownLayer",
+              "enabled": true,
+              "boundary_cells": 1,
+              "map_topic": "/cleannav/localization/map"
+            }
+          },
+          "raw_map_topic": {
+            "verified": true
+          },
+          "mask_topic": {
+            "verified": true
+          },
+          "info_topic": {
+            "type": 0,
+            "base": 0.0,
+            "multiplier": 1.0,
+            "mask_topic": "/campus/keepout_mask",
+            "frame": ""
+          },
+          "global_params_all_parameter_values": [
+            {
+              "type": 9,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "",
+              "string_array_value": [
+                "campus_keepout",
+                "campus_keepout_inflation"
+              ]
+            },
+            {
+              "type": 4,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "nav2_costmap_2d::KeepoutFilter",
+              "string_array_value": []
+            },
+            {
+              "type": 4,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "/campus/costmap_filter_info",
+              "string_array_value": []
+            },
+            {
+              "type": 1,
+              "bool_value": true,
+              "integer_value": 0,
+              "string_value": "",
+              "string_array_value": []
+            },
+            {
+              "type": 4,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "[[-0.55, -0.34], [-0.55, 0.34], [0.55, 0.34], [0.55, -0.34]]",
+              "string_array_value": []
+            },
+            {
+              "type": 1,
+              "bool_value": true,
+              "integer_value": 0,
+              "string_value": "",
+              "string_array_value": []
+            },
+            {
+              "type": 1,
+              "bool_value": true,
+              "integer_value": 0,
+              "string_value": "",
+              "string_array_value": []
+            },
+            {
+              "type": 4,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "nav2_costmap_2d::InflationLayer",
+              "string_array_value": []
+            },
+            {
+              "type": 9,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "",
+              "string_array_value": [
+                "static_layer",
+                "obstacle_layer",
+                "voxel_layer",
+                "inflation_layer",
+                "navigation_boundary",
+                "campus_unknown"
+              ]
+            },
+            {
+              "type": 4,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "cleannav_simulation::CampusUnknownLayer",
+              "string_array_value": []
+            },
+            {
+              "type": 1,
+              "bool_value": true,
+              "integer_value": 0,
+              "string_value": "",
+              "string_array_value": []
+            },
+            {
+              "type": 2,
+              "bool_value": false,
+              "integer_value": 1,
+              "string_value": "",
+              "string_array_value": []
+            },
+            {
+              "type": 4,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "/cleannav/localization/map",
+              "string_array_value": []
+            }
+          ],
+          "local_params_all_parameter_values": [
+            {
+              "type": 9,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "",
+              "string_array_value": [
+                "campus_keepout",
+                "campus_keepout_inflation"
+              ]
+            },
+            {
+              "type": 4,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "nav2_costmap_2d::KeepoutFilter",
+              "string_array_value": []
+            },
+            {
+              "type": 4,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "/campus/costmap_filter_info",
+              "string_array_value": []
+            },
+            {
+              "type": 1,
+              "bool_value": true,
+              "integer_value": 0,
+              "string_value": "",
+              "string_array_value": []
+            },
+            {
+              "type": 4,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "[[-0.55, -0.34], [-0.55, 0.34], [0.55, 0.34], [0.55, -0.34]]",
+              "string_array_value": []
+            },
+            {
+              "type": 1,
+              "bool_value": true,
+              "integer_value": 0,
+              "string_value": "",
+              "string_array_value": []
+            },
+            {
+              "type": 1,
+              "bool_value": true,
+              "integer_value": 0,
+              "string_value": "",
+              "string_array_value": []
+            },
+            {
+              "type": 4,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "nav2_costmap_2d::InflationLayer",
+              "string_array_value": []
+            },
+            {
+              "type": 9,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "",
+              "string_array_value": [
+                "static_layer",
+                "obstacle_layer",
+                "voxel_layer",
+                "inflation_layer",
+                "navigation_boundary",
+                "campus_unknown"
+              ]
+            },
+            {
+              "type": 4,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "cleannav_simulation::CampusUnknownLayer",
+              "string_array_value": []
+            },
+            {
+              "type": 1,
+              "bool_value": true,
+              "integer_value": 0,
+              "string_value": "",
+              "string_array_value": []
+            },
+            {
+              "type": 2,
+              "bool_value": false,
+              "integer_value": 1,
+              "string_value": "",
+              "string_array_value": []
+            },
+            {
+              "type": 4,
+              "bool_value": false,
+              "integer_value": 0,
+              "string_value": "/cleannav/localization/map",
+              "string_array_value": []
+            }
+          ],
+          "global_core": {
+            "core_cells": 276486,
+            "lethal_cells": 276486,
+            "outside_mask": 0,
+            "unknown_cells": 4505,
+            "unknown_to_traversable": 0,
+            "costmap_cells": 337260,
+            "nonlethal_core_cells": 0,
+            "nonlethal_core_cost_histogram": {},
+            "nonlethal_core_sample": [],
+            "valid_geometry": true,
+            "passed": true,
+            "frame": "map",
+            "stamp_ns": 419200000000,
+            "stamp_age": 0.1,
+            "map_from_costmap": [
+              0.0,
+              0.0,
+              0.0
+            ],
+            "snapshot_source": "Nav2 Costmap2DPublisher costmap_raw topic"
+          },
+          "global_updates": {
+            "frame": "map",
+            "stamp_age": 0.10000000000001136,
+            "width": 511,
+            "height": 660
+          },
+          "local_core": {
+            "core_cells": 2368,
+            "lethal_cells": 2368,
+            "outside_mask": 0,
+            "unknown_cells": 1157,
+            "unknown_to_traversable": 0,
+            "costmap_cells": 10000,
+            "nonlethal_core_cells": 0,
+            "nonlethal_core_cost_histogram": {},
+            "nonlethal_core_sample": [],
+            "valid_geometry": true,
+            "passed": true,
+            "frame": "odom",
+            "stamp_ns": 419700000000,
+            "stamp_age": 0.0,
+            "map_from_costmap": [
+              0.305145263671875,
+              0.013982295989990234,
+              3.818236290944658e-05
+            ],
+            "snapshot_source": "Nav2 Costmap2DPublisher costmap_raw topic"
+          },
+          "local_updates": {
+            "frame": "odom",
+            "stamp_age": 2.273181642920008e-14,
+            "width": 100,
+            "height": 100
+          },
+          "task_state": 1,
+          "task_execution_id": "",
+          "task_message": "standard real-adapter simulation runtime idle",
+          "facade_statuses": [
+            4
+          ],
+          "controller_statuses": [
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            5,
+            4,
+            4,
+            4
+          ]
+        },
+        "safety_owner": "",
+        "safety_block_all": false,
+        "raw_map_gate": {
+          "topic_grid_verified": true,
+          "rpc_verified": true,
+          "rpc_observed_monotonic": 42281.197011136,
+          "rpc_age_monotonic_s": 0.0024224820008384995,
+          "rpc_fresh": true,
+          "publisher_count": 1,
+          "publisher_count_is_one": true,
+          "result": true,
+          "evaluation_monotonic": 42281.199433618,
+          "evaluation_monotonic_ns": 42281199434018,
+          "topic_grid_observed_monotonic": 41881.911494441,
+          "topic_grid_age_monotonic_s": 399.2879391769966,
+          "last_valid_response_monotonic": 42281.197011136,
+          "last_valid_response_age_monotonic_s": 0.0024224820008384995,
+          "getmap_request_id": "raw-map-getmap-000399",
+          "getmap_status": "RESPONSE_VALID",
+          "getmap_error": null,
+          "getmap_response_summary": {
+            "frame": "map",
+            "stamp_ns": 22000000000,
+            "width": 511,
+            "height": 660,
+            "data_length": 337260
+          },
+          "getmap_rpc_timing": {
+            "future_result_observed": {
+              "event_monotonic_ns": 42281195685246,
+              "future_result_observed_monotonic_ns": 42281195682646,
+              "future_result_call_start_monotonic_ns": 42281195681746,
+              "future_result_call_duration_ns": 900
+            },
+            "response_consumed": {
+              "event_monotonic_ns": 42281197023136,
+              "response_present": true,
+              "response_consume_start_monotonic_ns": 42281195729646,
+              "response_consumed_monotonic_ns": 42281197018436,
+              "consume_callback_duration_ns": 1288790,
+              "response_valid": true
+            }
+          },
+          "getmap_trace_write_error": null,
+          "pending_getmap_future": false,
+          "pending_monitor_future_count": 6,
+          "publisher_endpoints": [
+            {
+              "node_name": "map_server",
+              "node_namespace": "/",
+              "gid": [
+                1,
+                15,
+                8,
+                225,
+                30,
+                167,
+                94,
+                102,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                32,
+                3,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0
+              ]
+            }
+          ],
+          "publisher_endpoint_query_start_monotonic_ns": 42281199244719,
+          "publisher_endpoint_query_end_monotonic_ns": 42281199402418,
+          "publisher_endpoint_query_error": null,
+          "publisher_count_query_start_monotonic_ns": 42281199402518,
+          "publisher_count_query_end_monotonic_ns": 42281199433018,
+          "predicate": {
+            "topic_grid_verified": true,
+            "getmap_rpc_fresh": true,
+            "publisher_count_is_one": true,
+            "raw_map": true
+          }
+        },
+        "guard_cycle_id": "guard-001698",
+        "guard_native_tf_checks": {
+          "cycle_id": "guard-001698",
+          "map_to_odom": {
+            "status": "EVALUATED",
+            "context_id": "guard-001698",
+            "target": "map",
+            "source": "odom",
+            "requested_time_ns": 0,
+            "requested_time_semantics": "rclpy Time() / latest common transform time",
+            "lookup_start_monotonic_ns": 42281199779315,
+            "lookup_end_monotonic_ns": 42281199880114,
+            "query_duration_ns": 100799,
+            "lookup_success": true,
+            "returned_stamp_ns": 419800000000,
+            "ros_now_ns": 419700000000,
+            "age_ns": -100000000,
+            "freshness_result": true,
+            "lookup_error": null
+          },
+          "map_to_base_link": {
+            "status": "EVALUATED",
+            "context_id": "guard-001698",
+            "target": "map",
+            "source": "base_link",
+            "requested_time_ns": 0,
+            "requested_time_semantics": "rclpy Time() / latest common transform time",
+            "lookup_start_monotonic_ns": 42281199884714,
+            "lookup_end_monotonic_ns": 42281199943214,
+            "query_duration_ns": 58500,
+            "lookup_success": true,
+            "returned_stamp_ns": 419602000000,
+            "ros_now_ns": 419700000000,
+            "age_ns": 98000000,
+            "freshness_result": true,
+            "lookup_error": null
+          },
+          "scan_exact_stamp": {
+            "status": "EVALUATED",
+            "context_id": "guard-001698",
+            "lookup_semantics": "exact scan header stamp",
+            "query_start_monotonic_ns": 42281199947114,
+            "queries": [
+              {
+                "target": "base_footprint",
+                "source": "base_scan",
+                "query_stamp_ns": 419771000000,
+                "returned_stamp_ns": 419771000000,
+                "lookup_success": true,
+                "query_start_monotonic_ns": 42281199997213,
+                "query_end_monotonic_ns": 42281200117012,
+                "query_duration_ns": 119799
+              },
+              {
+                "target": "odom",
+                "source": "base_footprint",
+                "query_stamp_ns": 419771000000,
+                "returned_stamp_ns": null,
+                "lookup_success": false,
+                "lookup_error": {
+                  "type": "ExtrapolationException",
+                  "message": "Lookup would require extrapolation into the future.  Requested time 419.771000 but the latest data is at time 419.602000, when looking up transform from frame [base_footprint] to frame [odom]"
+                },
+                "query_start_monotonic_ns": 42281200120212,
+                "query_end_monotonic_ns": 42281200168412,
+                "query_duration_ns": 48200
+              },
+              {
+                "target": "base_footprint",
+                "source": "base_scan",
+                "query_stamp_ns": 419646000000,
+                "returned_stamp_ns": 419646000000,
+                "lookup_success": true,
+                "query_start_monotonic_ns": 42281200184212,
+                "query_end_monotonic_ns": 42281200244911,
+                "query_duration_ns": 60699
+              },
+              {
+                "target": "odom",
+                "source": "base_footprint",
+                "query_stamp_ns": 419646000000,
+                "returned_stamp_ns": null,
+                "lookup_success": false,
+                "lookup_error": {
+                  "type": "ExtrapolationException",
+                  "message": "Lookup would require extrapolation into the future.  Requested time 419.646000 but the latest data is at time 419.602000, when looking up transform from frame [base_footprint] to frame [odom]"
+                },
+                "query_start_monotonic_ns": 42281200248311,
+                "query_end_monotonic_ns": 42281200284611,
+                "query_duration_ns": 36300
+              },
+              {
+                "target": "base_footprint",
+                "source": "base_scan",
+                "query_stamp_ns": 419521000000,
+                "returned_stamp_ns": 419521000000,
+                "lookup_success": true,
+                "query_start_monotonic_ns": 42281200297611,
+                "query_end_monotonic_ns": 42281200340811,
+                "query_duration_ns": 43200
+              },
+              {
+                "target": "odom",
+                "source": "base_footprint",
+                "query_stamp_ns": 419521000000,
+                "returned_stamp_ns": 419521000000,
+                "lookup_success": true,
+                "query_start_monotonic_ns": 42281200344111,
+                "query_end_monotonic_ns": 42281200382910,
+                "query_duration_ns": 38799
+              }
+            ],
+            "query_end_monotonic_ns": 42281200393810,
+            "query_duration_ns": 446696,
+            "result": true,
+            "selected_scan_stamp_ns": 419521000000,
+            "selected_candidate": {
+              "frame_id": "base_scan",
+              "stamp": 419.521,
+              "scan_stamp_ns": 419521000000,
+              "receipt_age_wall_s": 0.25574804499774473,
+              "scan_age_ros_s": 0.17899999999997362,
+              "eligibility": {
+                "eligible": true,
+                "reason": "fresh_source_time_candidate"
+              },
+              "base_footprint_from_base_scan": {
+                "ok": true,
+                "returned_stamp": 419.521
+              },
+              "odom_from_base_footprint": {
+                "ok": true,
+                "returned_stamp": 419.521
+              },
+              "result": "transformable"
+            }
+          },
+          "result": true,
+          "query_order": [
+            "map_to_odom",
+            "map_to_base_link",
+            "scan_exact_stamp"
+          ],
+          "short_circuit_preserved": true,
+          "clock": {
+            "ros_now_ns": 419700000000,
+            "latest_clock_message_stamp_ns": 419700000000,
+            "clock_callback_received_monotonic_ns": 42281121912910,
+            "clock_callback_receipt_age_ns": 78498900,
+            "clock_samples": 4197,
+            "clock_group": "isolated_mutually_exclusive"
+          }
+        },
+        "native_health_tf_context": {
+          "context_id": "native-001697",
+          "context_kind": "native_health",
+          "monotonic_ns": 42281189561393,
+          "map_to_base_link": {
+            "context_id": "native-001697",
+            "target": "map",
+            "source": "base_link",
+            "requested_time_ns": 0,
+            "requested_time_semantics": "rclpy Time() / latest common transform time",
+            "lookup_start_monotonic_ns": 42281189215896,
+            "lookup_end_monotonic_ns": 42281189282195,
+            "query_duration_ns": 66299,
+            "lookup_success": true,
+            "returned_stamp_ns": 419602000000,
+            "ros_now_ns": 419700000000,
+            "age_ns": 98000000,
+            "freshness_result": true,
+            "lookup_error": null
+          },
+          "scan_exact_stamp": {
+            "context_id": "native-001697",
+            "lookup_semantics": "exact scan header stamp",
+            "query_start_monotonic_ns": 42281189287295,
+            "queries": [
+              {
+                "target": "base_footprint",
+                "source": "base_scan",
+                "query_stamp_ns": 419646000000,
+                "returned_stamp_ns": 419646000000,
+                "lookup_success": true,
+                "query_start_monotonic_ns": 42281189334295,
+                "query_end_monotonic_ns": 42281189396094,
+                "query_duration_ns": 61799
+              },
+              {
+                "target": "odom",
+                "source": "base_footprint",
+                "query_stamp_ns": 419646000000,
+                "returned_stamp_ns": null,
+                "lookup_success": false,
+                "lookup_error": {
+                  "type": "ExtrapolationException",
+                  "message": "Lookup would require extrapolation into the future.  Requested time 419.646000 but the latest data is at time 419.602000, when looking up transform from frame [base_footprint] to frame [odom]"
+                },
+                "query_start_monotonic_ns": 42281189398794,
+                "query_end_monotonic_ns": 42281189442294,
+                "query_duration_ns": 43500
+              },
+              {
+                "target": "base_footprint",
+                "source": "base_scan",
+                "query_stamp_ns": 419521000000,
+                "returned_stamp_ns": 419521000000,
+                "lookup_success": true,
+                "query_start_monotonic_ns": 42281189456394,
+                "query_end_monotonic_ns": 42281189498794,
+                "query_duration_ns": 42400
+              },
+              {
+                "target": "odom",
+                "source": "base_footprint",
+                "query_stamp_ns": 419521000000,
+                "returned_stamp_ns": 419521000000,
+                "lookup_success": true,
+                "query_start_monotonic_ns": 42281189502094,
+                "query_end_monotonic_ns": 42281189540393,
+                "query_duration_ns": 38299
+              }
+            ],
+            "query_end_monotonic_ns": 42281189557193,
+            "query_duration_ns": 269898,
+            "result": true,
+            "selected_scan_stamp_ns": 419521000000,
+            "selected_candidate": {
+              "frame_id": "base_scan",
+              "stamp": 419.521,
+              "scan_stamp_ns": 419521000000,
+              "receipt_age_wall_s": 0.24508692599920323,
+              "scan_age_ros_s": 0.17899999999997362,
+              "eligibility": {
+                "eligible": true,
+                "reason": "fresh_source_time_candidate"
+              },
+              "base_footprint_from_base_scan": {
+                "ok": true,
+                "returned_stamp": 419.521
+              },
+              "odom_from_base_footprint": {
+                "ok": true,
+                "returned_stamp": 419.521
+              },
+              "result": "transformable"
+            }
+          },
+          "clock": {
+            "ros_now_ns": 419700000000,
+            "latest_clock_message_stamp_ns": 419700000000,
+            "clock_callback_received_monotonic_ns": 42281121912910,
+            "clock_callback_receipt_age_ns": 67658383,
+            "clock_samples": 4197,
+            "clock_group": "isolated_mutually_exclusive"
+          }
+        },
+        "lifecycle_observation": {
+          "get_state_results": {
+            "map_server": "active",
+            "mask_server": "active",
+            "info_server": "active"
+          },
+          "change_state_response_send_warnings": [],
+          "get_state_trace_path": "/home/d1zzy/.ros/log/2026-11-06-19-26-16-963433-LAPTOP-E32NM2PD-173425/localization/keepout-lifecycle-state-timeline.jsonl",
+          "change_state_client_request_id": "UNOBSERVED_STOCK_NAV2_CLIENT"
+        },
+        "core_gate": {
+          "global_core": {
+            "fact": true,
+            "age_s": 0.4115071539999917,
+            "fresh": true,
+            "source_topic": "/global_costmap/costmap_raw",
+            "failure_latched": false,
+            "latest_verdict": {
+              "core_cells": 276486,
+              "lethal_cells": 276486,
+              "outside_mask": 0,
+              "unknown_cells": 4505,
+              "unknown_to_traversable": 0,
+              "costmap_cells": 337260,
+              "nonlethal_core_cells": 0,
+              "nonlethal_core_cost_histogram": {},
+              "nonlethal_core_sample": [],
+              "valid_geometry": true,
+              "passed": true,
+              "frame": "map",
+              "stamp_ns": 419200000000,
+              "stamp_age": 0.1,
+              "map_from_costmap": [
+                0.0,
+                0.0,
+                0.0
+              ],
+              "snapshot_source": "Nav2 Costmap2DPublisher costmap_raw topic"
+            }
+          },
+          "local_core": {
+            "fact": true,
+            "age_s": 0.03585052600101335,
+            "fresh": true,
+            "source_topic": "/local_costmap/costmap_raw",
+            "failure_latched": false,
+            "latest_verdict": {
+              "core_cells": 2368,
+              "lethal_cells": 2368,
+              "outside_mask": 0,
+              "unknown_cells": 1157,
+              "unknown_to_traversable": 0,
+              "costmap_cells": 10000,
+              "nonlethal_core_cells": 0,
+              "nonlethal_core_cost_histogram": {},
+              "nonlethal_core_sample": [],
+              "valid_geometry": true,
+              "passed": true,
+              "frame": "odom",
+              "stamp_ns": 419700000000,
+              "stamp_age": 0.0,
+              "map_from_costmap": [
+                0.305145263671875,
+                0.013982295989990234,
+                3.818236290944658e-05
+              ],
+              "snapshot_source": "Nav2 Costmap2DPublisher costmap_raw topic"
+            }
+          }
+        },
+        "parameter_gate": {
+          "global_params": {
+            "fact": true,
+            "last_observed_monotonic": 42281.198816022,
+            "age_s": 0.0006175960006657988,
+            "fresh": true,
+            "pending": false,
+            "latest_trace": {
+              "event": "response_consumed",
+              "event_monotonic_ns": 42281198823422,
+              "key": "global_params",
+              "request_id": "global_params-read-000394",
+              "operation": "GetParameters",
+              "response_present": true,
+              "response_consume_start_monotonic_ns": 42281198776623,
+              "response_consumed_monotonic_ns": 42281198821622,
+              "consume_callback_duration_ns": 44999
+            },
+            "actual_values": [
+              {
+                "type": 9,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "",
+                "string_array_value": [
+                  "campus_keepout",
+                  "campus_keepout_inflation"
+                ]
+              },
+              {
+                "type": 4,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "nav2_costmap_2d::KeepoutFilter",
+                "string_array_value": []
+              },
+              {
+                "type": 4,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "/campus/costmap_filter_info",
+                "string_array_value": []
+              },
+              {
+                "type": 1,
+                "bool_value": true,
+                "integer_value": 0,
+                "string_value": "",
+                "string_array_value": []
+              },
+              {
+                "type": 4,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "[[-0.55, -0.34], [-0.55, 0.34], [0.55, 0.34], [0.55, -0.34]]",
+                "string_array_value": []
+              },
+              {
+                "type": 1,
+                "bool_value": true,
+                "integer_value": 0,
+                "string_value": "",
+                "string_array_value": []
+              },
+              {
+                "type": 1,
+                "bool_value": true,
+                "integer_value": 0,
+                "string_value": "",
+                "string_array_value": []
+              },
+              {
+                "type": 4,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "nav2_costmap_2d::InflationLayer",
+                "string_array_value": []
+              },
+              {
+                "type": 9,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "",
+                "string_array_value": [
+                  "static_layer",
+                  "obstacle_layer",
+                  "voxel_layer",
+                  "inflation_layer",
+                  "navigation_boundary",
+                  "campus_unknown"
+                ]
+              },
+              {
+                "type": 4,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "cleannav_simulation::CampusUnknownLayer",
+                "string_array_value": []
+              },
+              {
+                "type": 1,
+                "bool_value": true,
+                "integer_value": 0,
+                "string_value": "",
+                "string_array_value": []
+              },
+              {
+                "type": 2,
+                "bool_value": false,
+                "integer_value": 1,
+                "string_value": "",
+                "string_array_value": []
+              },
+              {
+                "type": 4,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "/cleannav/localization/map",
+                "string_array_value": []
+              }
+            ]
+          },
+          "local_params": {
+            "fact": true,
+            "last_observed_monotonic": 42280.685645346,
+            "age_s": 0.5137882720009657,
+            "fresh": true,
+            "pending": true,
+            "latest_trace": {
+              "event": "request_submitted",
+              "event_monotonic_ns": 42281199169720,
+              "key": "local_params",
+              "request_id": "local_params-read-000391",
+              "operation": "GetParameters",
+              "client_entity_id": 130721012374288,
+              "request_sequence_number": 391,
+              "request_call_async_start_monotonic_ns": 42281199034921,
+              "request_call_async_return_monotonic_ns": 42281199162620,
+              "request_deadline_monotonic": 42283.19915652,
+              "request_time_semantics": "rclpy call_async invocation; not wire-send time"
+            },
+            "actual_values": [
+              {
+                "type": 9,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "",
+                "string_array_value": [
+                  "campus_keepout",
+                  "campus_keepout_inflation"
+                ]
+              },
+              {
+                "type": 4,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "nav2_costmap_2d::KeepoutFilter",
+                "string_array_value": []
+              },
+              {
+                "type": 4,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "/campus/costmap_filter_info",
+                "string_array_value": []
+              },
+              {
+                "type": 1,
+                "bool_value": true,
+                "integer_value": 0,
+                "string_value": "",
+                "string_array_value": []
+              },
+              {
+                "type": 4,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "[[-0.55, -0.34], [-0.55, 0.34], [0.55, 0.34], [0.55, -0.34]]",
+                "string_array_value": []
+              },
+              {
+                "type": 1,
+                "bool_value": true,
+                "integer_value": 0,
+                "string_value": "",
+                "string_array_value": []
+              },
+              {
+                "type": 1,
+                "bool_value": true,
+                "integer_value": 0,
+                "string_value": "",
+                "string_array_value": []
+              },
+              {
+                "type": 4,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "nav2_costmap_2d::InflationLayer",
+                "string_array_value": []
+              },
+              {
+                "type": 9,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "",
+                "string_array_value": [
+                  "static_layer",
+                  "obstacle_layer",
+                  "voxel_layer",
+                  "inflation_layer",
+                  "navigation_boundary",
+                  "campus_unknown"
+                ]
+              },
+              {
+                "type": 4,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "cleannav_simulation::CampusUnknownLayer",
+                "string_array_value": []
+              },
+              {
+                "type": 1,
+                "bool_value": true,
+                "integer_value": 0,
+                "string_value": "",
+                "string_array_value": []
+              },
+              {
+                "type": 2,
+                "bool_value": false,
+                "integer_value": 1,
+                "string_value": "",
+                "string_array_value": []
+              },
+              {
+                "type": 4,
+                "bool_value": false,
+                "integer_value": 0,
+                "string_value": "/cleannav/localization/map",
+                "string_array_value": []
+              }
+            ]
+          }
+        },
+        "poll_segments_ns": {
+          "costmap_topic_validation_ns": 31400,
+          "costmap_raw_topic_validation_ns": 193419621,
+          "service_response_consume_ns": 48999,
+          "grid_service_validation_ns": 2267083,
+          "getmap_response_consume_ns": 1286890,
+          "guard_tf_check_ns": 624995,
+          "campus_poll_total_ns": 10842417,
+          "client_future_and_request_work_ns": 9644526,
+          "getmap_future_result_call_ns": 900,
+          "getmap_response_consume_callback_ns": 1288790,
+          "graph_publisher_lookup_ns": 157699,
+          "publisher_count_lookup_ns": 30500,
+          "safety_status_processing_ns": 300
+        }
+      }
+    }
+  },
+  "facade_events": {
+    "PLANNER_GOAL_DISPATCHED": 1,
+    "INNER_GOAL_RESPONSE": 381,
+    "INNER_RESULT": 764,
+    "PATH_VALIDATED": 191,
+    "FOLLOW_GOAL_DISPATCHED": 190,
+    "INNER_FEEDBACK": 1864,
+    "REPLAN_STARTED": 190,
+    "REPLAN_UNCHANGED": 1,
+    "INNER_CANCEL_REQUEST": 189,
+    "INNER_CANCEL_RESPONSE": 189,
+    "FOLLOW_REPLACEMENT_TERMINAL": 189,
+    "PATH_REPLACED": 189,
+    "FOLLOW_RESULT_UNVERIFIED": 2,
+    "FOLLOW_ACTION_TERMINAL": 1,
+    "WAYPOINT_STOP_STABLE": 1,
+    "OUTER_TERMINAL": 1
+  },
+  "facade_errors": []
+}

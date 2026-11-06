@@ -1,0 +1,42 @@
+--- successful-A4/run_patrol_lap.sh
++++ R9-session/run_patrol_lap.sh
+@@ -2,7 +2,7 @@
+ # R8-A4: prepared only; requires a new explicit dynamic authorization. One POST, no retry.
+ set -eo pipefail
+ set -m
+-session=/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-dynamic-prep-20261106T025507Z/session-patrol-lap-1-r8-a4-20261106T025507Z
++session=/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r9-c-dynamic-20261106T112441Z/session-patrol-lap-1-r9-20261106T112441Z
+ root=/home/d1zzy/code/cleannav_modularization
+ candidate="/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z"
+ assets_candidate="/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z"
+@@ -10,9 +10,9 @@
+ e2e="$root/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z"
+ parent="$root/cleannav-experiments/cleannav-patrol-pillar-v1-nav2-prep-20261102T174300Z"
+ maps="$root/cleannav-experiments/cleannav-patrol-pillar-v1-route-20261102T163219Z/maps/patrol_pillar_v1_mapping_v1"
+-domain=228
+-port=11844
+-gateway_port=18144
++domain=224
++port=11845
++gateway_port=18145
+ cd "$session"
+ 
+ if pgrep -f gzserver >/dev/null; then
+@@ -343,7 +343,7 @@
+   localization_initial_pose:="0.30 0 0 0 0 0" \
+   localization_linear_update:=0.02 localization_angular_update:=0.03 \
+   nav2_params_file:=$assets_candidate/config/nav2_local_recovery.yaml \
+-  region_registry_file:=$assets_candidate/config/region_registry.yaml \
++  region_registry_file:=$session/assets/region_registry.yaml \
+   campus_security_profile:=$assets_candidate/config/pillar_v1_patrol/security-profile.json \
+   gui:=false start_rviz:=false \
+   enable_motion:=true auto_start_task:=false \
+@@ -422,7 +422,7 @@
+   -p map_topic:=/cleannav/localization/map \
+   -p bind_host:=127.0.0.1 \
+   -p port:=$gateway_port \
+-  -p region_registry_file:=$assets_candidate/config/region_registry.yaml \
++  -p region_registry_file:=$session/assets/region_registry.yaml \
+   -p idempotency_db_path:=$session/gateway-idempotency.sqlite \
+   > gateway.log 2>&1 &
+ gateway_pid=$!

@@ -1,0 +1,106 @@
+{
+  "result": "OFFLINE_METRICS_ONLY: acceptance decided from full action/mission/safety evidence",
+  "first_failure": null,
+  "keepout_recorded_policy": {
+    "global_core": {
+      "unique_snapshot_verdicts": 199,
+      "all_passed": true,
+      "core_cells_evaluated_sum": 55020714,
+      "lethal_core_cells_sum": 55020714,
+      "core_count_min": 276486,
+      "core_count_max": 276486,
+      "nonlethal_core_cells_sum": 0,
+      "nonlethal_cost_histogram": {},
+      "core_253_count": 0
+    },
+    "local_core": {
+      "unique_snapshot_verdicts": 652,
+      "all_passed": true,
+      "core_cells_evaluated_sum": 1572816,
+      "lethal_core_cells_sum": 1572816,
+      "core_count_min": 120,
+      "core_count_max": 3900,
+      "nonlethal_core_cells_sum": 0,
+      "nonlethal_cost_histogram": {},
+      "core_253_count": 0
+    }
+  },
+  "keepout_raw_bag_replay": {
+    "/local_costmap/costmap_raw": {
+      "samples": 642,
+      "header_update_mismatches": 0,
+      "wall_publish_hz": 1.6563350024483865,
+      "replay_counts": {
+        "PASS": 642
+      },
+      "replay_nonlethal_cells": 0,
+      "replay_254_core_cells": 1549136
+    },
+    "/global_costmap/costmap_raw": {
+      "samples": 196,
+      "header_update_mismatches": 0,
+      "wall_publish_hz": 0.5039202148704034,
+      "replay_counts": {
+        "PASS": 196
+      },
+      "replay_nonlethal_cells": 0,
+      "replay_254_core_cells": 54191256
+    }
+  },
+  "keepout_replay_method": "Installed strict policy; recorded map/mask, exact or interpolated stamped map<-odom TF; no latest/extrapolation. Offline inference, not direct Filter TF telemetry.",
+  "benchmark": {
+    "samples": 3714,
+    "p50_ms": 7.0,
+    "p95_ms": 14.0,
+    "p99_ms": 16.0,
+    "max_ms": 21.0,
+    "over_100ms": 0,
+    "wall_callback_frequency_hz": 9.853145537751754,
+    "max_callback_gap_s": 2.5748696327209473,
+    "control_loop_missed_count": 0,
+    "scope": "Native MPPI computeVelocityCommands integer-ms benchmark; excludes outer node scheduling/visualization/publish"
+  },
+  "cmd_vel_active": {
+    "samples": 3769,
+    "hz": 10.002545476314456,
+    "max_gap_s": 0.10458230972290039,
+    "zero_tail_duration_s": 3.0999722480773926
+  },
+  "odom_final": {
+    "linear_x": -0.0008275841972606937,
+    "angular_z": 0.00290687377735546,
+    "last_1s_distance_m": 0.00019230498473813426
+  },
+  "cpu_sampled": {
+    "status": "NOT_SAMPLED: no extra runtime CPU observer added"
+  },
+  "optimizer_failure_count": 0,
+  "none_type_status_count": 0,
+  "security_after_ready": [],
+  "security_final_stop_confirmed": "NOT_RECORDED_IN_THIS_TIMELINE_SCHEMA",
+  "topic_counts": {
+    "/campus/keepout_mask": 1,
+    "/cleannav/campus/security_readiness": 845,
+    "/cleannav/follow_path/_action/status": 3,
+    "/cleannav/localization/health": 844,
+    "/cleannav/navigation/admitted_path": 192,
+    "/cleannav/safety_status": 840,
+    "/cleannav/simulation/mission_runtime": 767,
+    "/cleannav/task_sequence_status": 9,
+    "/cleannav/task_status": 9066,
+    "/clock": 4201,
+    "/cmd_vel": 4232,
+    "/follow_path/_action/status": 573,
+    "/global_costmap/costmap_raw": 196,
+    "/joint_states": 40267,
+    "/local_costmap/costmap_raw": 642,
+    "/mapping/scan_fused": 3226,
+    "/odom": 4030,
+    "/plan": 191,
+    "/scan": 3225,
+    "/tf": 36136,
+    "/tf_static": 1
+  },
+  "runtime_preview_vref": "Not recorded; actual loaded R7 library and observed velocity/curvature demonstrate execution behavior, not direct proof of each internal preview/cost term",
+  "route_completion_fraction": 1.0104080791484713
+}

@@ -1,0 +1,14 @@
+{
+  "cwd": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r9-c-dynamic-20261106T112441Z/session-patrol-lap-1-r9-20261106T112441Z",
+  "argv": [
+    "bash",
+    "run_patrol_lap.sh"
+  ],
+  "shell": "bash",
+  "authorized_max_calls": 1,
+  "formal_calls_used": 1,
+  "outer_source_export": false,
+  "started_recorded_utc": "2026-11-06T11:26:12.029678+00:00",
+  "rc": 0,
+  "retry": "NOT_RUN_NOT_AUTHORIZED"
+}

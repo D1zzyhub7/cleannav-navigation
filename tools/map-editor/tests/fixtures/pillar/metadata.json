@@ -1,0 +1,11 @@
+{
+  "identity": {
+    "map_id": "patrol_pillar_v1_mapping_v1",
+    "revision": "2026-11-02T16:33:45.687945+00:00",
+    "sha256": "b09fd48018fa0e8b83aa24f66c76d8feec9dc5ab4d79633a2e1ea90743b4410f",
+    "frame_id": "map"
+  },
+  "source_profile_sha256": "125e5859953e061df254d6766a0e29e05fedf8480bc76d7b5777c4e6f45bbb3d",
+  "test_only": true,
+  "note": "Derived offline test fixture; no RTAB DB, no runtime authorization. Occupancy/mask bytes are exact source captures."
+}

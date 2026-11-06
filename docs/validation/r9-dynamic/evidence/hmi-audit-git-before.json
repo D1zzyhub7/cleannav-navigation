@@ -1,0 +1,27 @@
+{
+  "git rev-parse --show-toplevel": {
+    "rc": 0,
+    "stdout": "/home/d1zzy/code/cleannav_modularization/cleannav-hmi\n",
+    "stderr": ""
+  },
+  "git branch --show-current": {
+    "rc": 0,
+    "stdout": "main\n",
+    "stderr": ""
+  },
+  "git rev-parse HEAD": {
+    "rc": 0,
+    "stdout": "6ddff0f88e200136f2462e42e50aaaccab2d3aa6\n",
+    "stderr": ""
+  },
+  "git status --short": {
+    "rc": 0,
+    "stdout": " M README.md\n M cleannav_hmi_gateway/gateway_node.py\n M cleannav_hmi_gateway/http_server.py\n M cleannav_hmi_gateway/map_cache.py\n M cleannav_hmi_gateway/status_cache.py\n M package.xml\n M test/test_gateway.py\n?? cleannav_hmi_gateway/app_contract.py\n?? cleannav_hmi_gateway/idempotency_store.py\n?? cleannav_hmi_gateway/mission_bridge.py\n?? launch/\n?? test/test_app_review_fixes.py\n",
+    "stderr": ""
+  },
+  "git diff --cached --stat": {
+    "rc": 0,
+    "stdout": "",
+    "stderr": ""
+  }
+}

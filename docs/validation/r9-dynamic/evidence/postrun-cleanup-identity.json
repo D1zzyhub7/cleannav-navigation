@@ -1,0 +1,22 @@
+{
+  "rc": 0,
+  "owned_snapshot_count": 25,
+  "owned_snapshot_survivors": [],
+  "runner_pid_absent": true,
+  "readable_domain224_holders": [],
+  "unreadable_environments": 26,
+  "foreign_domain_scope": "UNKNOWN; readable domain holders0, not full all-UID proof",
+  "ports": {
+    "11845": "bind available after cleanup",
+    "18145": "bind available after cleanup"
+  },
+  "shared_lock_reacquired_and_released": true,
+  "install_files_checked": 818,
+  "install_file_changes": [],
+  "runtime_assets_checked": 27,
+  "runtime_asset_changes": [],
+  "map_db_before": "e16e672a46ebd237a607bf8c34fb968f3f0479ea00fd0de6b40ed5a1d5df9bbd",
+  "map_db_after": "e16e672a46ebd237a607bf8c34fb968f3f0479ea00fd0de6b40ed5a1d5df9bbd",
+  "original_cleanup_domain_count1": "Original scanner self-process inherits domain; independent post-run read found0",
+  "no_additional_dynamic": true
+}

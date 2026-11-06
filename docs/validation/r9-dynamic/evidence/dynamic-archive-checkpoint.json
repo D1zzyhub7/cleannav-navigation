@@ -1,0 +1,8 @@
+{
+  "status": "VERIFIED_R9_C_FIXED_START_FORWARD_SINGLE_LAP_DYNAMIC_PASS",
+  "receipt_sha256": "8c1195f62bf0d502da2d08a3a31e8c910efdd41a32f2206f5b4c909cd50b4a86",
+  "bag_sha256": "3adc0e8e2caf006f4e1922534159c3934a2497b21779576514e9063b82fa54b9",
+  "runtime_sha_manifest": "a7b11c0e14b615f30eb1c50138a108dc6a03e53f9889146eb8c3dda7fcb92e3c",
+  "report_sha256": "5ab9e2cd79672b4de13d16ce14075f1ac4a500d63fcd26000b7aae315eb9bf38",
+  "mode_audit_not_started_at_checkpoint": true
+}

@@ -1,0 +1,11 @@
+rc=0
+launch_pid=173425 launch_pgid=173425
+tracked_groups_alive=[]
+gzserver_left=0
+rtabmap_left=0
+ros2_launch_left=0
+gateway_left=0
+mission_left=0
+port_11845_in_use=0
+gateway_port_18145_in_use=0
+domain_224_holders=1

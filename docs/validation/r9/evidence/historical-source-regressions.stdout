@@ -1,0 +1,677 @@
+........................................................................ [ 40%]
+........................................................................ [ 81%]
+......................EEEEEEEEEE                                         [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of PerimeterPlannerTests.test_campus_does_not_claim_a_perimeter_loop_for_test_area _
+
+cls = <class 'test_core.PerimeterPlannerTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.demo = MapModel(DEMO_MAP)
+>       cls.campus = MapModel(DEFAULT_MAP)
+
+tools/map-editor/tests/test_core.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/map-editor/core.py:84: in __init__
+    assets.validate_map(directory)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+directory = PosixPath('/home/d1zzy/code/cleannav_modularization/cleannav-experiments/campus-curb-safety-20261012/maps/campus_curb_scan_20261012_083555_fd1b1b')
+require_ready = True
+
+    def validate_map(directory, require_ready=True):
+        directory = Path(directory)
+        manifest = json.loads((directory/'manifest.json').read_text())
+        if manifest.get('schema_version') != 1:
+            raise ValueError('unsupported map manifest version')
+        if require_ready and manifest.get('state') != 'ready':
+            raise ValueError('map has not been atomically published as ready')
+        if manifest.get('rtabmap_exit_code') != 0 or not manifest.get('database_closed_before_copy'):
+            raise ValueError('no normal RTAB database closure evidence')
+        for name in REQUIRED:
+            path = directory/name
+            if not path.is_file() or path.is_symlink():
+                raise ValueError(f'missing or unsafe map asset: {name}')
+            if manifest['sha256'].get(name) != digest(path):
+                raise ValueError(f'checksum mismatch: {name}')
+        info = yaml.safe_load((directory/'map.yaml').read_text())
+        if info.get('image') != 'map.pgm' or info.get('negate') != 0 or info.get('mode') != 'trinary':
+            raise ValueError('map YAML image/mode contract mismatch')
+        source = json.loads((directory/'occupancy_grid.json').read_text())
+        free_thresh = float(info.get('free_thresh', .25))
+        occupied_thresh = float(info.get('occupied_thresh', .65))
+        if not 0 < free_thresh < occupied_thresh < 1:
+            raise ValueError('map YAML trinary thresholds are invalid')
+        width, height, pixels = pgm(directory/'map.pgm')
+        if (width, height) != (source['width'], source['height']):
+            raise ValueError('image and OccupancyGrid dimensions differ')
+        if manifest['grid']['width'] != width or manifest['grid']['height'] != height:
+            raise ValueError('manifest map dimensions differ')
+        if not math.isclose(float(info['resolution']), source['resolution'], abs_tol=1e-8):
+            raise ValueError('YAML and source resolution differ')
+        if any(not math.isclose(float(a), float(b), abs_tol=1e-5)
+               for a, b in zip(info['origin'], source['origin'])) or len(info['origin']) != 3:
+            raise ValueError('YAML and source origin differ')
+        if source['frame_id'] != 'map' or not manifest['grid']['usable']:
+            raise ValueError('map frame/quality gate failed')
+        unknown = 127
+        if not free_thresh <= (255 - unknown) / 255 <= occupied_thresh:
+            unknown = round(255 * (1 - (free_thresh + occupied_thresh) / 2))
+        expected = bytearray()
+        for row in range(height-1, -1, -1):
+            for value in source['data'][row*width:(row+1)*width]:
+                expected.append(unknown if value < 0 or 25 < value < 65 else
+                                255 if value <= 25 else 0)
+        if bytes(expected) != pixels:
+>           raise ValueError('exported image differs from frozen OccupancyGrid')
+E           ValueError: exported image differs from frozen OccupancyGrid
+
+../../../../cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-navigation/cleannav_simulation/scripts/mapping_assets.py:289: ValueError
+_ ERROR at setup of PerimeterPlannerTests.test_clockwise_and_counterclockwise_are_generated _
+
+cls = <class 'test_core.PerimeterPlannerTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.demo = MapModel(DEMO_MAP)
+>       cls.campus = MapModel(DEFAULT_MAP)
+
+tools/map-editor/tests/test_core.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/map-editor/core.py:84: in __init__
+    assets.validate_map(directory)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+directory = PosixPath('/home/d1zzy/code/cleannav_modularization/cleannav-experiments/campus-curb-safety-20261012/maps/campus_curb_scan_20261012_083555_fd1b1b')
+require_ready = True
+
+    def validate_map(directory, require_ready=True):
+        directory = Path(directory)
+        manifest = json.loads((directory/'manifest.json').read_text())
+        if manifest.get('schema_version') != 1:
+            raise ValueError('unsupported map manifest version')
+        if require_ready and manifest.get('state') != 'ready':
+            raise ValueError('map has not been atomically published as ready')
+        if manifest.get('rtabmap_exit_code') != 0 or not manifest.get('database_closed_before_copy'):
+            raise ValueError('no normal RTAB database closure evidence')
+        for name in REQUIRED:
+            path = directory/name
+            if not path.is_file() or path.is_symlink():
+                raise ValueError(f'missing or unsafe map asset: {name}')
+            if manifest['sha256'].get(name) != digest(path):
+                raise ValueError(f'checksum mismatch: {name}')
+        info = yaml.safe_load((directory/'map.yaml').read_text())
+        if info.get('image') != 'map.pgm' or info.get('negate') != 0 or info.get('mode') != 'trinary':
+            raise ValueError('map YAML image/mode contract mismatch')
+        source = json.loads((directory/'occupancy_grid.json').read_text())
+        free_thresh = float(info.get('free_thresh', .25))
+        occupied_thresh = float(info.get('occupied_thresh', .65))
+        if not 0 < free_thresh < occupied_thresh < 1:
+            raise ValueError('map YAML trinary thresholds are invalid')
+        width, height, pixels = pgm(directory/'map.pgm')
+        if (width, height) != (source['width'], source['height']):
+            raise ValueError('image and OccupancyGrid dimensions differ')
+        if manifest['grid']['width'] != width or manifest['grid']['height'] != height:
+            raise ValueError('manifest map dimensions differ')
+        if not math.isclose(float(info['resolution']), source['resolution'], abs_tol=1e-8):
+            raise ValueError('YAML and source resolution differ')
+        if any(not math.isclose(float(a), float(b), abs_tol=1e-5)
+               for a, b in zip(info['origin'], source['origin'])) or len(info['origin']) != 3:
+            raise ValueError('YAML and source origin differ')
+        if source['frame_id'] != 'map' or not manifest['grid']['usable']:
+            raise ValueError('map frame/quality gate failed')
+        unknown = 127
+        if not free_thresh <= (255 - unknown) / 255 <= occupied_thresh:
+            unknown = round(255 * (1 - (free_thresh + occupied_thresh) / 2))
+        expected = bytearray()
+        for row in range(height-1, -1, -1):
+            for value in source['data'][row*width:(row+1)*width]:
+                expected.append(unknown if value < 0 or 25 < value < 65 else
+                                255 if value <= 25 else 0)
+        if bytes(expected) != pixels:
+>           raise ValueError('exported image differs from frozen OccupancyGrid')
+E           ValueError: exported image differs from frozen OccupancyGrid
+
+../../../../cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-navigation/cleannav_simulation/scripts/mapping_assets.py:289: ValueError
+_ ERROR at setup of PerimeterPlannerTests.test_coordinate_conversion_round_trip_with_rotated_origin _
+
+cls = <class 'test_core.PerimeterPlannerTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.demo = MapModel(DEMO_MAP)
+>       cls.campus = MapModel(DEFAULT_MAP)
+
+tools/map-editor/tests/test_core.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/map-editor/core.py:84: in __init__
+    assets.validate_map(directory)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+directory = PosixPath('/home/d1zzy/code/cleannav_modularization/cleannav-experiments/campus-curb-safety-20261012/maps/campus_curb_scan_20261012_083555_fd1b1b')
+require_ready = True
+
+    def validate_map(directory, require_ready=True):
+        directory = Path(directory)
+        manifest = json.loads((directory/'manifest.json').read_text())
+        if manifest.get('schema_version') != 1:
+            raise ValueError('unsupported map manifest version')
+        if require_ready and manifest.get('state') != 'ready':
+            raise ValueError('map has not been atomically published as ready')
+        if manifest.get('rtabmap_exit_code') != 0 or not manifest.get('database_closed_before_copy'):
+            raise ValueError('no normal RTAB database closure evidence')
+        for name in REQUIRED:
+            path = directory/name
+            if not path.is_file() or path.is_symlink():
+                raise ValueError(f'missing or unsafe map asset: {name}')
+            if manifest['sha256'].get(name) != digest(path):
+                raise ValueError(f'checksum mismatch: {name}')
+        info = yaml.safe_load((directory/'map.yaml').read_text())
+        if info.get('image') != 'map.pgm' or info.get('negate') != 0 or info.get('mode') != 'trinary':
+            raise ValueError('map YAML image/mode contract mismatch')
+        source = json.loads((directory/'occupancy_grid.json').read_text())
+        free_thresh = float(info.get('free_thresh', .25))
+        occupied_thresh = float(info.get('occupied_thresh', .65))
+        if not 0 < free_thresh < occupied_thresh < 1:
+            raise ValueError('map YAML trinary thresholds are invalid')
+        width, height, pixels = pgm(directory/'map.pgm')
+        if (width, height) != (source['width'], source['height']):
+            raise ValueError('image and OccupancyGrid dimensions differ')
+        if manifest['grid']['width'] != width or manifest['grid']['height'] != height:
+            raise ValueError('manifest map dimensions differ')
+        if not math.isclose(float(info['resolution']), source['resolution'], abs_tol=1e-8):
+            raise ValueError('YAML and source resolution differ')
+        if any(not math.isclose(float(a), float(b), abs_tol=1e-5)
+               for a, b in zip(info['origin'], source['origin'])) or len(info['origin']) != 3:
+            raise ValueError('YAML and source origin differ')
+        if source['frame_id'] != 'map' or not manifest['grid']['usable']:
+            raise ValueError('map frame/quality gate failed')
+        unknown = 127
+        if not free_thresh <= (255 - unknown) / 255 <= occupied_thresh:
+            unknown = round(255 * (1 - (free_thresh + occupied_thresh) / 2))
+        expected = bytearray()
+        for row in range(height-1, -1, -1):
+            for value in source['data'][row*width:(row+1)*width]:
+                expected.append(unknown if value < 0 or 25 < value < 65 else
+                                255 if value <= 25 else 0)
+        if bytes(expected) != pixels:
+>           raise ValueError('exported image differs from frozen OccupancyGrid')
+E           ValueError: exported image differs from frozen OccupancyGrid
+
+../../../../cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-navigation/cleannav_simulation/scripts/mapping_assets.py:289: ValueError
+_ ERROR at setup of PerimeterPlannerTests.test_demo_map_is_explicit_synthetic_fixture _
+
+cls = <class 'test_core.PerimeterPlannerTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.demo = MapModel(DEMO_MAP)
+>       cls.campus = MapModel(DEFAULT_MAP)
+
+tools/map-editor/tests/test_core.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/map-editor/core.py:84: in __init__
+    assets.validate_map(directory)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+directory = PosixPath('/home/d1zzy/code/cleannav_modularization/cleannav-experiments/campus-curb-safety-20261012/maps/campus_curb_scan_20261012_083555_fd1b1b')
+require_ready = True
+
+    def validate_map(directory, require_ready=True):
+        directory = Path(directory)
+        manifest = json.loads((directory/'manifest.json').read_text())
+        if manifest.get('schema_version') != 1:
+            raise ValueError('unsupported map manifest version')
+        if require_ready and manifest.get('state') != 'ready':
+            raise ValueError('map has not been atomically published as ready')
+        if manifest.get('rtabmap_exit_code') != 0 or not manifest.get('database_closed_before_copy'):
+            raise ValueError('no normal RTAB database closure evidence')
+        for name in REQUIRED:
+            path = directory/name
+            if not path.is_file() or path.is_symlink():
+                raise ValueError(f'missing or unsafe map asset: {name}')
+            if manifest['sha256'].get(name) != digest(path):
+                raise ValueError(f'checksum mismatch: {name}')
+        info = yaml.safe_load((directory/'map.yaml').read_text())
+        if info.get('image') != 'map.pgm' or info.get('negate') != 0 or info.get('mode') != 'trinary':
+            raise ValueError('map YAML image/mode contract mismatch')
+        source = json.loads((directory/'occupancy_grid.json').read_text())
+        free_thresh = float(info.get('free_thresh', .25))
+        occupied_thresh = float(info.get('occupied_thresh', .65))
+        if not 0 < free_thresh < occupied_thresh < 1:
+            raise ValueError('map YAML trinary thresholds are invalid')
+        width, height, pixels = pgm(directory/'map.pgm')
+        if (width, height) != (source['width'], source['height']):
+            raise ValueError('image and OccupancyGrid dimensions differ')
+        if manifest['grid']['width'] != width or manifest['grid']['height'] != height:
+            raise ValueError('manifest map dimensions differ')
+        if not math.isclose(float(info['resolution']), source['resolution'], abs_tol=1e-8):
+            raise ValueError('YAML and source resolution differ')
+        if any(not math.isclose(float(a), float(b), abs_tol=1e-5)
+               for a, b in zip(info['origin'], source['origin'])) or len(info['origin']) != 3:
+            raise ValueError('YAML and source origin differ')
+        if source['frame_id'] != 'map' or not manifest['grid']['usable']:
+            raise ValueError('map frame/quality gate failed')
+        unknown = 127
+        if not free_thresh <= (255 - unknown) / 255 <= occupied_thresh:
+            unknown = round(255 * (1 - (free_thresh + occupied_thresh) / 2))
+        expected = bytearray()
+        for row in range(height-1, -1, -1):
+            for value in source['data'][row*width:(row+1)*width]:
+                expected.append(unknown if value < 0 or 25 < value < 65 else
+                                255 if value <= 25 else 0)
+        if bytes(expected) != pixels:
+>           raise ValueError('exported image differs from frozen OccupancyGrid')
+E           ValueError: exported image differs from frozen OccupancyGrid
+
+../../../../cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-navigation/cleannav_simulation/scripts/mapping_assets.py:289: ValueError
+_ ERROR at setup of PerimeterPlannerTests.test_fixture_generates_closed_radius_bounded_safe_loop _
+
+cls = <class 'test_core.PerimeterPlannerTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.demo = MapModel(DEMO_MAP)
+>       cls.campus = MapModel(DEFAULT_MAP)
+
+tools/map-editor/tests/test_core.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/map-editor/core.py:84: in __init__
+    assets.validate_map(directory)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+directory = PosixPath('/home/d1zzy/code/cleannav_modularization/cleannav-experiments/campus-curb-safety-20261012/maps/campus_curb_scan_20261012_083555_fd1b1b')
+require_ready = True
+
+    def validate_map(directory, require_ready=True):
+        directory = Path(directory)
+        manifest = json.loads((directory/'manifest.json').read_text())
+        if manifest.get('schema_version') != 1:
+            raise ValueError('unsupported map manifest version')
+        if require_ready and manifest.get('state') != 'ready':
+            raise ValueError('map has not been atomically published as ready')
+        if manifest.get('rtabmap_exit_code') != 0 or not manifest.get('database_closed_before_copy'):
+            raise ValueError('no normal RTAB database closure evidence')
+        for name in REQUIRED:
+            path = directory/name
+            if not path.is_file() or path.is_symlink():
+                raise ValueError(f'missing or unsafe map asset: {name}')
+            if manifest['sha256'].get(name) != digest(path):
+                raise ValueError(f'checksum mismatch: {name}')
+        info = yaml.safe_load((directory/'map.yaml').read_text())
+        if info.get('image') != 'map.pgm' or info.get('negate') != 0 or info.get('mode') != 'trinary':
+            raise ValueError('map YAML image/mode contract mismatch')
+        source = json.loads((directory/'occupancy_grid.json').read_text())
+        free_thresh = float(info.get('free_thresh', .25))
+        occupied_thresh = float(info.get('occupied_thresh', .65))
+        if not 0 < free_thresh < occupied_thresh < 1:
+            raise ValueError('map YAML trinary thresholds are invalid')
+        width, height, pixels = pgm(directory/'map.pgm')
+        if (width, height) != (source['width'], source['height']):
+            raise ValueError('image and OccupancyGrid dimensions differ')
+        if manifest['grid']['width'] != width or manifest['grid']['height'] != height:
+            raise ValueError('manifest map dimensions differ')
+        if not math.isclose(float(info['resolution']), source['resolution'], abs_tol=1e-8):
+            raise ValueError('YAML and source resolution differ')
+        if any(not math.isclose(float(a), float(b), abs_tol=1e-5)
+               for a, b in zip(info['origin'], source['origin'])) or len(info['origin']) != 3:
+            raise ValueError('YAML and source origin differ')
+        if source['frame_id'] != 'map' or not manifest['grid']['usable']:
+            raise ValueError('map frame/quality gate failed')
+        unknown = 127
+        if not free_thresh <= (255 - unknown) / 255 <= occupied_thresh:
+            unknown = round(255 * (1 - (free_thresh + occupied_thresh) / 2))
+        expected = bytearray()
+        for row in range(height-1, -1, -1):
+            for value in source['data'][row*width:(row+1)*width]:
+                expected.append(unknown if value < 0 or 25 < value < 65 else
+                                255 if value <= 25 else 0)
+        if bytes(expected) != pixels:
+>           raise ValueError('exported image differs from frozen OccupancyGrid')
+E           ValueError: exported image differs from frozen OccupancyGrid
+
+../../../../cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-navigation/cleannav_simulation/scripts/mapping_assets.py:289: ValueError
+_ ERROR at setup of PerimeterPlannerTests.test_gazebo_world_projection_binds_world_map_and_mission_regions _
+
+cls = <class 'test_core.PerimeterPlannerTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.demo = MapModel(DEMO_MAP)
+>       cls.campus = MapModel(DEFAULT_MAP)
+
+tools/map-editor/tests/test_core.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/map-editor/core.py:84: in __init__
+    assets.validate_map(directory)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+directory = PosixPath('/home/d1zzy/code/cleannav_modularization/cleannav-experiments/campus-curb-safety-20261012/maps/campus_curb_scan_20261012_083555_fd1b1b')
+require_ready = True
+
+    def validate_map(directory, require_ready=True):
+        directory = Path(directory)
+        manifest = json.loads((directory/'manifest.json').read_text())
+        if manifest.get('schema_version') != 1:
+            raise ValueError('unsupported map manifest version')
+        if require_ready and manifest.get('state') != 'ready':
+            raise ValueError('map has not been atomically published as ready')
+        if manifest.get('rtabmap_exit_code') != 0 or not manifest.get('database_closed_before_copy'):
+            raise ValueError('no normal RTAB database closure evidence')
+        for name in REQUIRED:
+            path = directory/name
+            if not path.is_file() or path.is_symlink():
+                raise ValueError(f'missing or unsafe map asset: {name}')
+            if manifest['sha256'].get(name) != digest(path):
+                raise ValueError(f'checksum mismatch: {name}')
+        info = yaml.safe_load((directory/'map.yaml').read_text())
+        if info.get('image') != 'map.pgm' or info.get('negate') != 0 or info.get('mode') != 'trinary':
+            raise ValueError('map YAML image/mode contract mismatch')
+        source = json.loads((directory/'occupancy_grid.json').read_text())
+        free_thresh = float(info.get('free_thresh', .25))
+        occupied_thresh = float(info.get('occupied_thresh', .65))
+        if not 0 < free_thresh < occupied_thresh < 1:
+            raise ValueError('map YAML trinary thresholds are invalid')
+        width, height, pixels = pgm(directory/'map.pgm')
+        if (width, height) != (source['width'], source['height']):
+            raise ValueError('image and OccupancyGrid dimensions differ')
+        if manifest['grid']['width'] != width or manifest['grid']['height'] != height:
+            raise ValueError('manifest map dimensions differ')
+        if not math.isclose(float(info['resolution']), source['resolution'], abs_tol=1e-8):
+            raise ValueError('YAML and source resolution differ')
+        if any(not math.isclose(float(a), float(b), abs_tol=1e-5)
+               for a, b in zip(info['origin'], source['origin'])) or len(info['origin']) != 3:
+            raise ValueError('YAML and source origin differ')
+        if source['frame_id'] != 'map' or not manifest['grid']['usable']:
+            raise ValueError('map frame/quality gate failed')
+        unknown = 127
+        if not free_thresh <= (255 - unknown) / 255 <= occupied_thresh:
+            unknown = round(255 * (1 - (free_thresh + occupied_thresh) / 2))
+        expected = bytearray()
+        for row in range(height-1, -1, -1):
+            for value in source['data'][row*width:(row+1)*width]:
+                expected.append(unknown if value < 0 or 25 < value < 65 else
+                                255 if value <= 25 else 0)
+        if bytes(expected) != pixels:
+>           raise ValueError('exported image differs from frozen OccupancyGrid')
+E           ValueError: exported image differs from frozen OccupancyGrid
+
+../../../../cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-navigation/cleannav_simulation/scripts/mapping_assets.py:289: ValueError
+_ ERROR at setup of PerimeterPlannerTests.test_narrow_region_and_bad_polygon_are_rejected _
+
+cls = <class 'test_core.PerimeterPlannerTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.demo = MapModel(DEMO_MAP)
+>       cls.campus = MapModel(DEFAULT_MAP)
+
+tools/map-editor/tests/test_core.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/map-editor/core.py:84: in __init__
+    assets.validate_map(directory)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+directory = PosixPath('/home/d1zzy/code/cleannav_modularization/cleannav-experiments/campus-curb-safety-20261012/maps/campus_curb_scan_20261012_083555_fd1b1b')
+require_ready = True
+
+    def validate_map(directory, require_ready=True):
+        directory = Path(directory)
+        manifest = json.loads((directory/'manifest.json').read_text())
+        if manifest.get('schema_version') != 1:
+            raise ValueError('unsupported map manifest version')
+        if require_ready and manifest.get('state') != 'ready':
+            raise ValueError('map has not been atomically published as ready')
+        if manifest.get('rtabmap_exit_code') != 0 or not manifest.get('database_closed_before_copy'):
+            raise ValueError('no normal RTAB database closure evidence')
+        for name in REQUIRED:
+            path = directory/name
+            if not path.is_file() or path.is_symlink():
+                raise ValueError(f'missing or unsafe map asset: {name}')
+            if manifest['sha256'].get(name) != digest(path):
+                raise ValueError(f'checksum mismatch: {name}')
+        info = yaml.safe_load((directory/'map.yaml').read_text())
+        if info.get('image') != 'map.pgm' or info.get('negate') != 0 or info.get('mode') != 'trinary':
+            raise ValueError('map YAML image/mode contract mismatch')
+        source = json.loads((directory/'occupancy_grid.json').read_text())
+        free_thresh = float(info.get('free_thresh', .25))
+        occupied_thresh = float(info.get('occupied_thresh', .65))
+        if not 0 < free_thresh < occupied_thresh < 1:
+            raise ValueError('map YAML trinary thresholds are invalid')
+        width, height, pixels = pgm(directory/'map.pgm')
+        if (width, height) != (source['width'], source['height']):
+            raise ValueError('image and OccupancyGrid dimensions differ')
+        if manifest['grid']['width'] != width or manifest['grid']['height'] != height:
+            raise ValueError('manifest map dimensions differ')
+        if not math.isclose(float(info['resolution']), source['resolution'], abs_tol=1e-8):
+            raise ValueError('YAML and source resolution differ')
+        if any(not math.isclose(float(a), float(b), abs_tol=1e-5)
+               for a, b in zip(info['origin'], source['origin'])) or len(info['origin']) != 3:
+            raise ValueError('YAML and source origin differ')
+        if source['frame_id'] != 'map' or not manifest['grid']['usable']:
+            raise ValueError('map frame/quality gate failed')
+        unknown = 127
+        if not free_thresh <= (255 - unknown) / 255 <= occupied_thresh:
+            unknown = round(255 * (1 - (free_thresh + occupied_thresh) / 2))
+        expected = bytearray()
+        for row in range(height-1, -1, -1):
+            for value in source['data'][row*width:(row+1)*width]:
+                expected.append(unknown if value < 0 or 25 < value < 65 else
+                                255 if value <= 25 else 0)
+        if bytes(expected) != pixels:
+>           raise ValueError('exported image differs from frozen OccupancyGrid')
+E           ValueError: exported image differs from frozen OccupancyGrid
+
+../../../../cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-navigation/cleannav_simulation/scripts/mapping_assets.py:289: ValueError
+_ ERROR at setup of PerimeterPlannerTests.test_registry_is_json_schema_and_mission_loader_compatible _
+
+cls = <class 'test_core.PerimeterPlannerTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.demo = MapModel(DEMO_MAP)
+>       cls.campus = MapModel(DEFAULT_MAP)
+
+tools/map-editor/tests/test_core.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/map-editor/core.py:84: in __init__
+    assets.validate_map(directory)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+directory = PosixPath('/home/d1zzy/code/cleannav_modularization/cleannav-experiments/campus-curb-safety-20261012/maps/campus_curb_scan_20261012_083555_fd1b1b')
+require_ready = True
+
+    def validate_map(directory, require_ready=True):
+        directory = Path(directory)
+        manifest = json.loads((directory/'manifest.json').read_text())
+        if manifest.get('schema_version') != 1:
+            raise ValueError('unsupported map manifest version')
+        if require_ready and manifest.get('state') != 'ready':
+            raise ValueError('map has not been atomically published as ready')
+        if manifest.get('rtabmap_exit_code') != 0 or not manifest.get('database_closed_before_copy'):
+            raise ValueError('no normal RTAB database closure evidence')
+        for name in REQUIRED:
+            path = directory/name
+            if not path.is_file() or path.is_symlink():
+                raise ValueError(f'missing or unsafe map asset: {name}')
+            if manifest['sha256'].get(name) != digest(path):
+                raise ValueError(f'checksum mismatch: {name}')
+        info = yaml.safe_load((directory/'map.yaml').read_text())
+        if info.get('image') != 'map.pgm' or info.get('negate') != 0 or info.get('mode') != 'trinary':
+            raise ValueError('map YAML image/mode contract mismatch')
+        source = json.loads((directory/'occupancy_grid.json').read_text())
+        free_thresh = float(info.get('free_thresh', .25))
+        occupied_thresh = float(info.get('occupied_thresh', .65))
+        if not 0 < free_thresh < occupied_thresh < 1:
+            raise ValueError('map YAML trinary thresholds are invalid')
+        width, height, pixels = pgm(directory/'map.pgm')
+        if (width, height) != (source['width'], source['height']):
+            raise ValueError('image and OccupancyGrid dimensions differ')
+        if manifest['grid']['width'] != width or manifest['grid']['height'] != height:
+            raise ValueError('manifest map dimensions differ')
+        if not math.isclose(float(info['resolution']), source['resolution'], abs_tol=1e-8):
+            raise ValueError('YAML and source resolution differ')
+        if any(not math.isclose(float(a), float(b), abs_tol=1e-5)
+               for a, b in zip(info['origin'], source['origin'])) or len(info['origin']) != 3:
+            raise ValueError('YAML and source origin differ')
+        if source['frame_id'] != 'map' or not manifest['grid']['usable']:
+            raise ValueError('map frame/quality gate failed')
+        unknown = 127
+        if not free_thresh <= (255 - unknown) / 255 <= occupied_thresh:
+            unknown = round(255 * (1 - (free_thresh + occupied_thresh) / 2))
+        expected = bytearray()
+        for row in range(height-1, -1, -1):
+            for value in source['data'][row*width:(row+1)*width]:
+                expected.append(unknown if value < 0 or 25 < value < 65 else
+                                255 if value <= 25 else 0)
+        if bytes(expected) != pixels:
+>           raise ValueError('exported image differs from frozen OccupancyGrid')
+E           ValueError: exported image differs from frozen OccupancyGrid
+
+../../../../cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-navigation/cleannav_simulation/scripts/mapping_assets.py:289: ValueError
+_ ERROR at setup of PerimeterPlannerTests.test_saved_smac_path_checks_collision_region_corridor_and_curvature _
+
+cls = <class 'test_core.PerimeterPlannerTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.demo = MapModel(DEMO_MAP)
+>       cls.campus = MapModel(DEFAULT_MAP)
+
+tools/map-editor/tests/test_core.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/map-editor/core.py:84: in __init__
+    assets.validate_map(directory)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+directory = PosixPath('/home/d1zzy/code/cleannav_modularization/cleannav-experiments/campus-curb-safety-20261012/maps/campus_curb_scan_20261012_083555_fd1b1b')
+require_ready = True
+
+    def validate_map(directory, require_ready=True):
+        directory = Path(directory)
+        manifest = json.loads((directory/'manifest.json').read_text())
+        if manifest.get('schema_version') != 1:
+            raise ValueError('unsupported map manifest version')
+        if require_ready and manifest.get('state') != 'ready':
+            raise ValueError('map has not been atomically published as ready')
+        if manifest.get('rtabmap_exit_code') != 0 or not manifest.get('database_closed_before_copy'):
+            raise ValueError('no normal RTAB database closure evidence')
+        for name in REQUIRED:
+            path = directory/name
+            if not path.is_file() or path.is_symlink():
+                raise ValueError(f'missing or unsafe map asset: {name}')
+            if manifest['sha256'].get(name) != digest(path):
+                raise ValueError(f'checksum mismatch: {name}')
+        info = yaml.safe_load((directory/'map.yaml').read_text())
+        if info.get('image') != 'map.pgm' or info.get('negate') != 0 or info.get('mode') != 'trinary':
+            raise ValueError('map YAML image/mode contract mismatch')
+        source = json.loads((directory/'occupancy_grid.json').read_text())
+        free_thresh = float(info.get('free_thresh', .25))
+        occupied_thresh = float(info.get('occupied_thresh', .65))
+        if not 0 < free_thresh < occupied_thresh < 1:
+            raise ValueError('map YAML trinary thresholds are invalid')
+        width, height, pixels = pgm(directory/'map.pgm')
+        if (width, height) != (source['width'], source['height']):
+            raise ValueError('image and OccupancyGrid dimensions differ')
+        if manifest['grid']['width'] != width or manifest['grid']['height'] != height:
+            raise ValueError('manifest map dimensions differ')
+        if not math.isclose(float(info['resolution']), source['resolution'], abs_tol=1e-8):
+            raise ValueError('YAML and source resolution differ')
+        if any(not math.isclose(float(a), float(b), abs_tol=1e-5)
+               for a, b in zip(info['origin'], source['origin'])) or len(info['origin']) != 3:
+            raise ValueError('YAML and source origin differ')
+        if source['frame_id'] != 'map' or not manifest['grid']['usable']:
+            raise ValueError('map frame/quality gate failed')
+        unknown = 127
+        if not free_thresh <= (255 - unknown) / 255 <= occupied_thresh:
+            unknown = round(255 * (1 - (free_thresh + occupied_thresh) / 2))
+        expected = bytearray()
+        for row in range(height-1, -1, -1):
+            for value in source['data'][row*width:(row+1)*width]:
+                expected.append(unknown if value < 0 or 25 < value < 65 else
+                                255 if value <= 25 else 0)
+        if bytes(expected) != pixels:
+>           raise ValueError('exported image differs from frozen OccupancyGrid')
+E           ValueError: exported image differs from frozen OccupancyGrid
+
+../../../../cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-navigation/cleannav_simulation/scripts/mapping_assets.py:289: ValueError
+_ ERROR at setup of PerimeterPlannerTests.test_smac_curvature_uses_geometry_not_quantized_heading_delta _
+
+cls = <class 'test_core.PerimeterPlannerTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.demo = MapModel(DEMO_MAP)
+>       cls.campus = MapModel(DEFAULT_MAP)
+
+tools/map-editor/tests/test_core.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tools/map-editor/core.py:84: in __init__
+    assets.validate_map(directory)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+directory = PosixPath('/home/d1zzy/code/cleannav_modularization/cleannav-experiments/campus-curb-safety-20261012/maps/campus_curb_scan_20261012_083555_fd1b1b')
+require_ready = True
+
+    def validate_map(directory, require_ready=True):
+        directory = Path(directory)
+        manifest = json.loads((directory/'manifest.json').read_text())
+        if manifest.get('schema_version') != 1:
+            raise ValueError('unsupported map manifest version')
+        if require_ready and manifest.get('state') != 'ready':
+            raise ValueError('map has not been atomically published as ready')
+        if manifest.get('rtabmap_exit_code') != 0 or not manifest.get('database_closed_before_copy'):
+            raise ValueError('no normal RTAB database closure evidence')
+        for name in REQUIRED:
+            path = directory/name
+            if not path.is_file() or path.is_symlink():
+                raise ValueError(f'missing or unsafe map asset: {name}')
+            if manifest['sha256'].get(name) != digest(path):
+                raise ValueError(f'checksum mismatch: {name}')
+        info = yaml.safe_load((directory/'map.yaml').read_text())
+        if info.get('image') != 'map.pgm' or info.get('negate') != 0 or info.get('mode') != 'trinary':
+            raise ValueError('map YAML image/mode contract mismatch')
+        source = json.loads((directory/'occupancy_grid.json').read_text())
+        free_thresh = float(info.get('free_thresh', .25))
+        occupied_thresh = float(info.get('occupied_thresh', .65))
+        if not 0 < free_thresh < occupied_thresh < 1:
+            raise ValueError('map YAML trinary thresholds are invalid')
+        width, height, pixels = pgm(directory/'map.pgm')
+        if (width, height) != (source['width'], source['height']):
+            raise ValueError('image and OccupancyGrid dimensions differ')
+        if manifest['grid']['width'] != width or manifest['grid']['height'] != height:
+            raise ValueError('manifest map dimensions differ')
+        if not math.isclose(float(info['resolution']), source['resolution'], abs_tol=1e-8):
+            raise ValueError('YAML and source resolution differ')
+        if any(not math.isclose(float(a), float(b), abs_tol=1e-5)
+               for a, b in zip(info['origin'], source['origin'])) or len(info['origin']) != 3:
+            raise ValueError('YAML and source origin differ')
+        if source['frame_id'] != 'map' or not manifest['grid']['usable']:
+            raise ValueError('map frame/quality gate failed')
+        unknown = 127
+        if not free_thresh <= (255 - unknown) / 255 <= occupied_thresh:
+            unknown = round(255 * (1 - (free_thresh + occupied_thresh) / 2))
+        expected = bytearray()
+        for row in range(height-1, -1, -1):
+            for value in source['data'][row*width:(row+1)*width]:
+                expected.append(unknown if value < 0 or 25 < value < 65 else
+                                255 if value <= 25 else 0)
+        if bytes(expected) != pixels:
+>           raise ValueError('exported image differs from frozen OccupancyGrid')
+E           ValueError: exported image differs from frozen OccupancyGrid
+
+../../../../cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-navigation/cleannav_simulation/scripts/mapping_assets.py:289: ValueError
+- generated xml file: /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r9-path-generation-20261106T092401Z/evidence/source-regressions.xml -
+=========================== short test summary info ============================
+ERROR tools/map-editor/tests/test_core.py::PerimeterPlannerTests::test_campus_does_not_claim_a_perimeter_loop_for_test_area
+ERROR tools/map-editor/tests/test_core.py::PerimeterPlannerTests::test_clockwise_and_counterclockwise_are_generated
+ERROR tools/map-editor/tests/test_core.py::PerimeterPlannerTests::test_coordinate_conversion_round_trip_with_rotated_origin
+ERROR tools/map-editor/tests/test_core.py::PerimeterPlannerTests::test_demo_map_is_explicit_synthetic_fixture
+ERROR tools/map-editor/tests/test_core.py::PerimeterPlannerTests::test_fixture_generates_closed_radius_bounded_safe_loop
+ERROR tools/map-editor/tests/test_core.py::PerimeterPlannerTests::test_gazebo_world_projection_binds_world_map_and_mission_regions
+ERROR tools/map-editor/tests/test_core.py::PerimeterPlannerTests::test_narrow_region_and_bad_polygon_are_rejected
+ERROR tools/map-editor/tests/test_core.py::PerimeterPlannerTests::test_registry_is_json_schema_and_mission_loader_compatible
+ERROR tools/map-editor/tests/test_core.py::PerimeterPlannerTests::test_saved_smac_path_checks_collision_region_corridor_and_curvature
+ERROR tools/map-editor/tests/test_core.py::PerimeterPlannerTests::test_smac_curvature_uses_geometry_not_quantized_heading_delta
+166 passed, 10 errors in 3.47s

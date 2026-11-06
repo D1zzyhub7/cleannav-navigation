@@ -1,0 +1,8 @@
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_global_planner/../../build/cleannav_global_planner/share/cleannav_global_planner/hook/pythonpath_develop.sh"
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_interfaces/share/cleannav_interfaces/local_setup.bash"
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_mission_manager/../../build/cleannav_mission_manager/share/cleannav_mission_manager/hook/pythonpath_develop.sh"
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_path_executor/../../build/cleannav_path_executor/share/cleannav_path_executor/hook/pythonpath_develop.sh"
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_rtabmap/share/cleannav_rtabmap/local_setup.bash"
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_safety_supervisor/../../build/cleannav_safety_supervisor/share/cleannav_safety_supervisor/hook/pythonpath_develop.sh"
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_navigation/share/cleannav_navigation/local_setup.bash"
+not found: "/home/d1zzy/code/cleannav_modularization/cleannav-build/pc-sim-v2/install/cleannav_simulation/share/cleannav_simulation/local_setup.bash"

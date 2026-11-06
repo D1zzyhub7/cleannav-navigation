@@ -1,0 +1,6 @@
+owned static planner PIDs [('planner', 165651), ('tf', 165652), ('lifecycle', 165653)]
+A SUCCEEDED goal_error 0.009665830352076516 body_clear True margin_clear True
+B SUCCEEDED goal_error 0.01187019473850259 body_clear True margin_clear True
+C SUCCEEDED goal_error 0.016662041294746032 body_clear True margin_clear True
+D SUCCEEDED goal_error 0.011870196319011015 body_clear True margin_clear True
+E SUCCEEDED goal_error 0.011870197372683836 body_clear True margin_clear True

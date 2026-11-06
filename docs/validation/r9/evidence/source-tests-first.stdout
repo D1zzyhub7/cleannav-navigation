@@ -1,0 +1,85 @@
+............EEEEEE...................................................... [ 39%]
+........................................................................ [ 78%]
+........................................                                 [100%]
+==================================== ERRORS ====================================
+_ ERROR at setup of RegularSiteTests.test_actual_source_reproduces_C_geometry __
+
+cls = <class 'test_regular_site.RegularSiteTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.model = load_site('pillar')
+        cls.reference = json.loads(captured('pillar/C-route.json.gz'))
+>       cls.boundary = cls.reference['boundary_map']
+E       KeyError: 'boundary_map'
+
+tools/map-editor/tests/test_regular_site.py:37: KeyError
+_ ERROR at setup of RegularSiteTests.test_closure_spacing_and_conservative_sweeps _
+
+cls = <class 'test_regular_site.RegularSiteTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.model = load_site('pillar')
+        cls.reference = json.loads(captured('pillar/C-route.json.gz'))
+>       cls.boundary = cls.reference['boundary_map']
+E       KeyError: 'boundary_map'
+
+tools/map-editor/tests/test_regular_site.py:37: KeyError
+_ ERROR at setup of RegularSiteTests.test_fixed_forward_A4_split_and_goal_heading _
+
+cls = <class 'test_regular_site.RegularSiteTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.model = load_site('pillar')
+        cls.reference = json.loads(captured('pillar/C-route.json.gz'))
+>       cls.boundary = cls.reference['boundary_map']
+E       KeyError: 'boundary_map'
+
+tools/map-editor/tests/test_regular_site.py:37: KeyError
+_ ERROR at setup of RegularSiteTests.test_four_corners_radius_tangency_and_curvature_distribution _
+
+cls = <class 'test_regular_site.RegularSiteTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.model = load_site('pillar')
+        cls.reference = json.loads(captured('pillar/C-route.json.gz'))
+>       cls.boundary = cls.reference['boundary_map']
+E       KeyError: 'boundary_map'
+
+tools/map-editor/tests/test_regular_site.py:37: KeyError
+_ ERROR at setup of RegularSiteTests.test_legacy_Campus_export_mismatch_is_preserved_and_reproducible _
+
+cls = <class 'test_regular_site.RegularSiteTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.model = load_site('pillar')
+        cls.reference = json.loads(captured('pillar/C-route.json.gz'))
+>       cls.boundary = cls.reference['boundary_map']
+E       KeyError: 'boundary_map'
+
+tools/map-editor/tests/test_regular_site.py:37: KeyError
+_ ERROR at setup of RegularSiteTests.test_owner_registry_entry_matches_generated_route _
+
+cls = <class 'test_regular_site.RegularSiteTests'>
+
+    @classmethod
+    def setUpClass(cls):
+        cls.model = load_site('pillar')
+        cls.reference = json.loads(captured('pillar/C-route.json.gz'))
+>       cls.boundary = cls.reference['boundary_map']
+E       KeyError: 'boundary_map'
+
+tools/map-editor/tests/test_regular_site.py:37: KeyError
+- generated xml file: /home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r9-regular-release-20261106T103918Z/evidence/source-tests-first.xml -
+=========================== short test summary info ============================
+ERROR tools/map-editor/tests/test_regular_site.py::RegularSiteTests::test_actual_source_reproduces_C_geometry
+ERROR tools/map-editor/tests/test_regular_site.py::RegularSiteTests::test_closure_spacing_and_conservative_sweeps
+ERROR tools/map-editor/tests/test_regular_site.py::RegularSiteTests::test_fixed_forward_A4_split_and_goal_heading
+ERROR tools/map-editor/tests/test_regular_site.py::RegularSiteTests::test_four_corners_radius_tangency_and_curvature_distribution
+ERROR tools/map-editor/tests/test_regular_site.py::RegularSiteTests::test_legacy_Campus_export_mismatch_is_preserved_and_reproducible
+ERROR tools/map-editor/tests/test_regular_site.py::RegularSiteTests::test_owner_registry_entry_matches_generated_route
+178 passed, 6 errors in 7.20s

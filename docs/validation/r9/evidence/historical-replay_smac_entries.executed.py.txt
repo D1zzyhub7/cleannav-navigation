@@ -1,0 +1,134 @@
+"""Adapt the existing exact-Smac replay to five real R9 entry poses. Offline only."""
+from pathlib import Path
+import fcntl
+import hashlib
+import importlib.util
+import json
+import math
+import os
+import subprocess
+import sys
+import time
+
+import numpy as np
+import yaml
+
+OUT = Path(__file__).resolve().parents[1]
+ROOT = OUT.parents[1]
+EVIDENCE = OUT / 'evidence/smac'
+EVIDENCE.mkdir(exist_ok=True)
+sys.dont_write_bytecode = True
+
+
+def load(path,name):
+    spec=importlib.util.spec_from_file_location(name,path)
+    module=importlib.util.module_from_spec(spec);sys.modules[name]=module;spec.loader.exec_module(module)
+    return module
+
+
+def save(name,data):
+    (EVIDENCE/name).write_text(json.dumps(data,indent=2)+'\n')
+
+
+def main():
+    # Preserve the existing diagnostic's shared-lock, resource and exclusive-process contract.
+    lock=(ROOT/'cleannav-build/locks/build.lock').open('a')
+    fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
+    mem={x.split(':')[0]:int(x.split(':')[1].split()[0]) for x in Path('/proc/meminfo').read_text().splitlines()}
+    psi={x.split()[0]:dict(y.split('=') for y in x.split()[1:]) for x in Path('/proc/pressure/memory').read_text().splitlines()}
+    blocked=[]
+    known={'gzserver','gzclient','gazebo','rviz2','planner_server','lifecycle_manager','cc1plus','cc1','colcon','make','gmake','cmake','ninja'}
+    for proc in Path('/proc').iterdir():
+        if not proc.name.isdigit():continue
+        try:
+            args=[x.decode(errors='replace') for x in (proc/'cmdline').read_bytes().split(b'\0') if x]
+            if args and Path(args[0]).name in known:blocked.append([int(proc.name),args[:3]])
+        except OSError:pass
+    save('resources-before.json',dict(memory=mem,psi=psi,blocked=blocked,domain_visibility='foreign unreadable environments remain UNKNOWN'))
+    assert not blocked,blocked
+    assert mem['MemAvailable']>=2.5*1024*1024 and mem['SwapTotal']-mem['SwapFree']<1024*1024 and float(psi['full']['avg10'])<1.
+    from ament_index_python.packages import get_package_prefix
+    assert get_package_prefix('nav2_costmap_2d')==str(ROOT/'cleannav-build/step3-2-f/review-fixes-r7-a2-costmap-timestamp-20261105T104829Z/install/nav2_costmap_2d')
+    source=ROOT/'cleannav-experiments/cleannav-patrol-route-feasibility-20261016T190215Z/tools/exact_smac_route_validation.py'
+    replay=load(source,'existing_exact_smac')
+    cleanup=load(ROOT/'cleannav-experiments/cleannav-patrol-waypoint-handoff-20261017T135110Z/tools/process_cleanup.py','existing_group_cleanup')
+    meta=json.loads((OUT/'evidence/frozen-global-costmap.json').read_text())
+    raw=(OUT/'evidence/frozen-global-costmap.bin').read_bytes()
+    grid=np.frombuffer(raw,dtype=np.uint8).reshape(meta['height'],meta['width'])
+    res=meta['resolution'];wm=math.ceil(meta['width']*res);hm=math.ceil(meta['height']*res)
+    width=int(wm/res);height=int(hm/res)
+    # Costmap2DROS requires integer metre dimensions. Preserve all original cells,
+    # exact resolution/origin, pad only unknown (not traversable) beyond them.
+    padded=np.full((height,width),255,dtype=np.uint8);padded[:grid.shape[0],:grid.shape[1]]=grid
+    replay.EVIDENCE=EVIDENCE;replay.CURRENT_GRID=EVIDENCE/'current-master.bin'
+    replay.PARAMS=EVIDENCE/'planner-params.yaml';replay.LIFECYCLE_PARAMS=EVIDENCE/'lifecycle-params.yaml'
+    replay.WIDTH=width;replay.HEIGHT=height
+    replay.write_grid_atomic(padded.tobytes())
+    replay.make_params(replay.CURRENT_GRID,meta,.5)
+    params=yaml.safe_load(replay.PARAMS.read_text())
+    frozen=yaml.safe_load((ROOT/'cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/config/nav2_local_recovery.yaml').read_text())
+    params['planner_server']['ros__parameters']['GridBased']=frozen['planner_server']['ros__parameters']['GridBased']
+    cm=params['global_costmap']['global_costmap']['ros__parameters']
+    cm.update(width=wm,height=hm,resolution=res)
+    cm['exact_snapshot'].update(width=width,height=height,resolution=res)
+    replay.PARAMS.write_text(yaml.safe_dump(params,sort_keys=False))
+    expected=hashlib.sha256(padded.tobytes()).hexdigest()
+    save('input-provenance.json',dict(original=meta,padded_width=width,padded_height=height,padded_sha256=expected,
+        original_cells_preserved=True,padding='255 unknown, allow_unknown=false; no added free cells',
+        source=str(source),source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
+        original_planner_parameters=frozen['planner_server']['ros__parameters']['GridBased']))
+    import rclpy
+    rclpy.init()
+    client=None;processes=[];handles=[];rows=[];stop=[]
+    try:
+        client=replay.ReplayClient()
+        commands=[('planner',['/opt/ros/humble/lib/nav2_planner/planner_server','--ros-args','--params-file',str(replay.PARAMS)]),
+                  ('tf',['/opt/ros/humble/lib/tf2_ros/static_transform_publisher','0.3','0','0','0','0','0','map','base_link']),
+                  ('lifecycle',['/opt/ros/humble/lib/nav2_lifecycle_manager/lifecycle_manager','--ros-args','--params-file',str(replay.LIFECYCLE_PARAMS)])]
+        for name,argv in commands:
+            stream=(EVIDENCE/(name+'.log')).open('w');handles.append(stream)
+            proc=subprocess.Popen(argv,stdout=stream,stderr=subprocess.STDOUT,start_new_session=True)
+            processes.append((name,proc))
+        save('processes.json',[dict(name=n,pid=z.pid,cwd=os.getcwd(),log=str(EVIDENCE/(n+'.log'))) for n,z in processes])
+        print('owned static planner PIDs',[(n,z.pid) for n,z in processes],flush=True)
+        deadline=time.monotonic()+40
+        while time.monotonic()<deadline:
+            assert all(z.poll() is None for _,z in processes),'static planner process exited'
+            if client.plan.wait_for_server(timeout_sec=.5):break
+        else:raise TimeoutError('static PlannerServer activation timed out')
+        _,exact=client.exact_costmap(expected)
+        live=client.runtime_parameters();save('effective-parameters.json',live)
+        v=live['planner_server']['values']
+        assert v['GridBased.minimum_turning_radius']==1.12 and v['GridBased.angle_quantization_bins']==144
+        assert v['GridBased.motion_model_for_search']=='DUBIN' and v['GridBased.allow_unknown'] is False and v['GridBased.smooth_path'] is False
+        save('exact-input-readback.json',exact)
+        sys.path[:0]=[str(ROOT/'cleannav-tools/map-editor/.deps'),str(OUT/'src/cleannav-navigation/tools/map-editor')]
+        core=load(OUT/'src/cleannav-navigation/tools/map-editor/core.py','r9_smac_geometry')
+        model=core.MapModel(ROOT/'cleannav-experiments/cleannav-patrol-pillar-v1-route-20261102T163219Z/maps/patrol_pillar_v1_mapping_v1',
+                            profile=ROOT/'cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/config/pillar_v1_patrol/security-profile.json')
+        for label in 'ABCDE':
+            reg=yaml.safe_load((OUT/'candidates'/label/'region_registry.yaml').read_text())
+            entry=reg['regions'][0]['entry_pose'];goal=(entry['x'],entry['y'],entry['yaw'])
+            rec=client.plan_pair((.3,0.,0.),goal,expected);path=rec.pop('path',None)
+            rec['label']=label
+            if path:
+                poses=replay.path_poses(path);rec['path_xy_yaw']=poses
+                rec['body_sweep_in_allowed_free']=bool(model.free.covers(core._swept_oriented_footprint(poses,model,0.)))
+                rec['padded_015_sweep_in_allowed_free']=bool(model.free.covers(core._swept_oriented_footprint(poses,model,.15)))
+                rec['terminal_xy_error_m']=math.dist(poses[-1][:2],goal[:2])
+                rec['terminal_yaw_error_rad']=math.remainder(poses[-1][2]-goal[2],2*math.pi)
+                rec['length_m']=sum(math.dist(a[:2],b[:2]) for a,b in zip(poses,poses[1:]))
+            rows.append(rec);save('entry-results.json',rows)
+            print(label,rec['status'],'goal_error',rec.get('terminal_xy_error_m'),'body_clear',rec.get('body_sweep_in_allowed_free'),'margin_clear',rec.get('padded_015_sweep_in_allowed_free'),flush=True)
+    finally:
+        for name,proc in reversed(processes):stop.append(cleanup.stop_process_group(proc,label=name))
+        if client is not None:client.destroy_node()
+        rclpy.shutdown()
+        for stream in handles:stream.close()
+        survivors=[proc.pid for _,proc in processes if Path('/proc'/str(proc.pid)).exists()]
+        save('cleanup.json',dict(processes=stop,survivors=survivors,no_Gazebo_MM_Safety_Lease_velocity=True))
+        fcntl.flock(lock,fcntl.LOCK_UN);lock.close()
+        assert not survivors,survivors
+
+
+if __name__=='__main__':main()

@@ -1,0 +1,20 @@
+[
+  {
+    "source": "cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-navigation/cleannav_simulation/scripts/mapping_assets.py",
+    "git_path": "tools/map-editor/support/mapping_assets.py",
+    "sha256": "f1b0359987f9ffe87984a5eb9f2f6a09e1929b06e33f6f771c88734f65513ae8",
+    "scope": "verbatim existing offline helper; no runtime package/interface change"
+  },
+  {
+    "source": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/domain/region_registry.py",
+    "git_path": "tools/map-editor/support/region_registry.py",
+    "sha256": "c5aa9fc84808d7bff83edea210bb8065ee7825533e53feea859326bfcd98d268",
+    "scope": "verbatim existing offline helper; no runtime package/interface change"
+  },
+  {
+    "source": "cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-interfaces/config/region_registry.schema.json",
+    "git_path": "tools/map-editor/support/region_registry.schema.json",
+    "sha256": "dc0bb058bdb271c2684d3e086967f3dbd03e9991d98154a271af43e195e970eb",
+    "scope": "verbatim existing offline helper; no runtime package/interface change"
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "launch_pid": 173425,
+  "launch_pgid": 173425,
+  "runner_pid": 173169,
+  "runner_argv": "bash run_patrol_lap.sh ",
+  "runner_cwd": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r9-c-dynamic-20261106T112441Z/session-patrol-lap-1-r9-20261106T112441Z",
+  "runner_start_ticks": 4184729,
+  "runner_sid": 173169,
+  "launch_fd9": "/home/d1zzy/code/cleannav_modularization/cleannav-build/locks/build.lock",
+  "no_signals_sent_by_agent": true
+}

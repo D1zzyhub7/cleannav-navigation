@@ -1,0 +1,29 @@
+{
+  "planner_server": {
+    "available": true,
+    "values": {
+      "GridBased.minimum_turning_radius": 1.12,
+      "GridBased.angle_quantization_bins": 144,
+      "GridBased.motion_model_for_search": "DUBIN",
+      "GridBased.allow_unknown": false,
+      "GridBased.tolerance": 0.5,
+      "GridBased.smooth_path": false,
+      "GridBased.downsample_costmap": false,
+      "GridBased.downsampling_factor": 1
+    }
+  },
+  "global_costmap": {
+    "available": true,
+    "values": {
+      "resolution": 0.05000000074505806,
+      "width": 26,
+      "height": 34,
+      "footprint": "[[-0.55,-0.34],[-0.55,0.34],[0.55,0.34],[0.55,-0.34]]",
+      "footprint_padding": 0.009999999776482582,
+      "robot_radius": 0.1,
+      "plugins": [
+        "exact_snapshot"
+      ]
+    }
+  }
+}

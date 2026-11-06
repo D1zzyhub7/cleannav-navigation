@@ -86,3 +86,36 @@ The recorded historical dynamic env chose A4 Navigation, RC MPPI, A2 Costmap and
 ## Contribution and freeze
 
 Use an isolated worktree, preserve existing dirty/untracked files, review paths/secrets/sizes/links and stage explicit files. No git add . / -A, reset --hard, clean -fd, force push or main overwrite. Source/build and documentation commits are separate. R8-A4's tag records this source recovery and its provenance; future R9 geometry work must have a separate change and validation scope.
+
+## R9 offline editor development
+
+Use `tools/map-editor/requirements.txt` in a Python3.10 environment. No third-party
+backend install or C++ rebuild is required for this Python-only change. From this
+checkout run:
+
+```bash
+python3 -B -m pytest -q -p no:cacheprovider tests/patrol tools/map-editor/tests
+```
+
+The166 source A4 tests remain unchanged. Twelve editor tests use explicitly bound
+portable fixtures (including loopback editor HTTP tests, not Gateway tasks); six
+new real-Pillar tests cover geometry, complete sweep, source-generated C, entry,
+Registry, fixed-start split and the old Campus unknown-cell encoding regression.
+No ROS init, simulator, Safety Lease or velocity publisher is used by this suite.
+An independent checkout outside the local workspace is tested separately.
+
+Exact gzip captures have decompressed source SHA in
+`tools/map-editor/tests/fixtures/SOURCES.json`; fixtures do not contain a runtime
+RTAB DB and are explicitly test-only. `support/SOURCES.json` records verbatim
+existing map validator, Registry loader and schema provenance. The actual vehicle
+YAML already in this repository is byte-identical to the frozen RC reference; it
+is read, not tuned. Do not regenerate frozen real maps to satisfy unit tests.
+
+The existing PlannerServer-only static replay is a separate environment-dependent
+check using the historical exact final costmap, not the unit suite and not a lap.
+The current result records action statuses, actual parameters, input/readback SHA,
+coordinator rc and original cleanup receipt separately. A prior receipt-path typo
+was fixed only in the independent diagnostic copy; no runtime runner was changed.
+
+Future irregular-site work is only the isolated typed contract. It must not be
+imported into core/UI or registered in ROS without a new integration task.

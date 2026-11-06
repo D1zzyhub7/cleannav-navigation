@@ -1,0 +1,4059 @@
+{
+  "rc": 0,
+  "failure": "",
+  "preflight": {
+    "checked": true,
+    "costmap": {
+      "frame": "map",
+      "width": 511,
+      "height": 660,
+      "resolution": 0.05000000074505806,
+      "origin_x": -8.924291610717773,
+      "origin_y": -8.59818172454834
+    },
+    "keepout": {
+      "width": 1300,
+      "height": 739,
+      "lethal": 899822
+    },
+    "follow_server": true,
+    "mission_service": true,
+    "real_adapters_ready": true,
+    "security_state": "READY"
+  },
+  "health": {
+    "localized": true,
+    "native_parameters_verified": true,
+    "frozen_map": true,
+    "map_server_active": true,
+    "assets_unchanged": true,
+    "sensors_fresh": true,
+    "map_tf_valid": true,
+    "scan_tf_valid": true,
+    "scan_tf_diagnostics": {
+      "result": true,
+      "query_wall_monotonic": 42279.176673185,
+      "ros_now": 417.7,
+      "freshness_bounds": {
+        "receipt_age_wall_s": [
+          0.0,
+          2.5
+        ],
+        "scan_age_ros_s": [
+          -0.5,
+          0.5
+        ]
+      },
+      "header_window": [
+        {
+          "frame_id": "base_scan",
+          "stamp": 416.771,
+          "receipt_age_wall_s": 0.9874215489980998,
+          "scan_age_ros_s": 0.9289999999999736,
+          "eligibility": {
+            "eligible": false,
+            "reason": "scan_ros_time_outside_window"
+          }
+        },
+        {
+          "frame_id": "base_scan",
+          "stamp": 416.896,
+          "receipt_age_wall_s": 0.861925509001594,
+          "scan_age_ros_s": 0.8039999999999736,
+          "eligibility": {
+            "eligible": false,
+            "reason": "scan_ros_time_outside_window"
+          }
+        },
+        {
+          "frame_id": "base_scan",
+          "stamp": 417.021,
+          "receipt_age_wall_s": 0.7350568789988756,
+          "scan_age_ros_s": 0.6789999999999736,
+          "eligibility": {
+            "eligible": false,
+            "reason": "scan_ros_time_outside_window"
+          }
+        },
+        {
+          "frame_id": "base_scan",
+          "stamp": 417.146,
+          "receipt_age_wall_s": 0.5991995180011145,
+          "scan_age_ros_s": 0.5539999999999736,
+          "eligibility": {
+            "eligible": false,
+            "reason": "scan_ros_time_outside_window"
+          }
+        },
+        {
+          "frame_id": "base_scan",
+          "stamp": 417.271,
+          "receipt_age_wall_s": 0.483820100002049,
+          "scan_age_ros_s": 0.4289999999999736,
+          "eligibility": {
+            "eligible": true,
+            "reason": "fresh_source_time_candidate"
+          }
+        },
+        {
+          "frame_id": "base_scan",
+          "stamp": 417.396,
+          "receipt_age_wall_s": 0.3572376680021989,
+          "scan_age_ros_s": 0.3039999999999736,
+          "eligibility": {
+            "eligible": true,
+            "reason": "fresh_source_time_candidate"
+          }
+        },
+        {
+          "frame_id": "base_scan",
+          "stamp": 417.521,
+          "receipt_age_wall_s": 0.23717198600206757,
+          "scan_age_ros_s": 0.17899999999997362,
+          "eligibility": {
+            "eligible": true,
+            "reason": "fresh_source_time_candidate"
+          }
+        },
+        {
+          "frame_id": "base_scan",
+          "stamp": 417.646,
+          "receipt_age_wall_s": 0.11221224199834978,
+          "scan_age_ros_s": 0.053999999999973625,
+          "eligibility": {
+            "eligible": true,
+            "reason": "fresh_source_time_candidate"
+          }
+        }
+      ],
+      "checked": [
+        {
+          "frame_id": "base_scan",
+          "stamp": 417.646,
+          "scan_stamp_ns": 417646000000,
+          "receipt_age_wall_s": 0.11221224199834978,
+          "scan_age_ros_s": 0.053999999999973625,
+          "eligibility": {
+            "eligible": true,
+            "reason": "fresh_source_time_candidate"
+          },
+          "base_footprint_from_base_scan": {
+            "ok": true,
+            "returned_stamp": 417.646
+          },
+          "result": "lookup_exception",
+          "exception_type": "ExtrapolationException",
+          "exception": "Lookup would require extrapolation into the future.  Requested time 417.646000 but the latest data is at time 417.602000, when looking up transform from frame [base_footprint] to frame [odom]",
+          "odom_from_base_footprint": {
+            "ok": false,
+            "exception_type": "ExtrapolationException",
+            "exception": "Lookup would require extrapolation into the future.  Requested time 417.646000 but the latest data is at time 417.602000, when looking up transform from frame [base_footprint] to frame [odom]"
+          }
+        },
+        {
+          "frame_id": "base_scan",
+          "stamp": 417.521,
+          "scan_stamp_ns": 417521000000,
+          "receipt_age_wall_s": 0.23717198600206757,
+          "scan_age_ros_s": 0.17899999999997362,
+          "eligibility": {
+            "eligible": true,
+            "reason": "fresh_source_time_candidate"
+          },
+          "base_footprint_from_base_scan": {
+            "ok": true,
+            "returned_stamp": 417.521
+          },
+          "odom_from_base_footprint": {
+            "ok": true,
+            "returned_stamp": 417.521
+          },
+          "result": "transformable"
+        }
+      ],
+      "status": "VALID",
+      "tf_query_executed": true,
+      "receipt_time_semantics": "monitor callback processing time; not DDS receive time",
+      "clock_status": "VALID",
+      "clock_receipt_age_wall_s": 0.057633759002783336,
+      "callback_delay_status": "UNKNOWN",
+      "query_realtime_ns": 1793964803935803285,
+      "query_monotonic_raw_ns": 42279143447200,
+      "query_boottime_ns": 42279176683685,
+      "same_process_tf_probe": {},
+      "tf_mirror_probe_enabled": false,
+      "tf_path_timing_enabled": false
+    },
+    "tf_context": {
+      "context_id": "native-001689",
+      "context_kind": "native_health",
+      "monotonic_ns": 42279176918283,
+      "map_to_base_link": {
+        "context_id": "native-001689",
+        "target": "map",
+        "source": "base_link",
+        "requested_time_ns": 0,
+        "requested_time_semantics": "rclpy Time() / latest common transform time",
+        "lookup_start_monotonic_ns": 42279176605286,
+        "lookup_end_monotonic_ns": 42279176664285,
+        "query_duration_ns": 58999,
+        "lookup_success": true,
+        "returned_stamp_ns": 417602000000,
+        "ros_now_ns": 417700000000,
+        "age_ns": 98000000,
+        "freshness_result": true,
+        "lookup_error": null
+      },
+      "scan_exact_stamp": {
+        "context_id": "native-001689",
+        "lookup_semantics": "exact scan header stamp",
+        "query_start_monotonic_ns": 42279176668885,
+        "queries": [
+          {
+            "target": "base_footprint",
+            "source": "base_scan",
+            "query_stamp_ns": 417646000000,
+            "returned_stamp_ns": 417646000000,
+            "lookup_success": true,
+            "query_start_monotonic_ns": 42279176715085,
+            "query_end_monotonic_ns": 42279176771184,
+            "query_duration_ns": 56099
+          },
+          {
+            "target": "odom",
+            "source": "base_footprint",
+            "query_stamp_ns": 417646000000,
+            "returned_stamp_ns": null,
+            "lookup_success": false,
+            "lookup_error": {
+              "type": "ExtrapolationException",
+              "message": "Lookup would require extrapolation into the future.  Requested time 417.646000 but the latest data is at time 417.602000, when looking up transform from frame [base_footprint] to frame [odom]"
+            },
+            "query_start_monotonic_ns": 42279176773784,
+            "query_end_monotonic_ns": 42279176813784,
+            "query_duration_ns": 40000
+          },
+          {
+            "target": "base_footprint",
+            "source": "base_scan",
+            "query_stamp_ns": 417521000000,
+            "returned_stamp_ns": 417521000000,
+            "lookup_success": true,
+            "query_start_monotonic_ns": 42279176826784,
+            "query_end_monotonic_ns": 42279176863584,
+            "query_duration_ns": 36800
+          },
+          {
+            "target": "odom",
+            "source": "base_footprint",
+            "query_stamp_ns": 417521000000,
+            "returned_stamp_ns": 417521000000,
+            "lookup_success": true,
+            "query_start_monotonic_ns": 42279176866084,
+            "query_end_monotonic_ns": 42279176898583,
+            "query_duration_ns": 32499
+          }
+        ],
+        "query_end_monotonic_ns": 42279176913983,
+        "query_duration_ns": 245098,
+        "result": true,
+        "selected_scan_stamp_ns": 417521000000,
+        "selected_candidate": {
+          "frame_id": "base_scan",
+          "stamp": 417.521,
+          "scan_stamp_ns": 417521000000,
+          "receipt_age_wall_s": 0.23717198600206757,
+          "scan_age_ros_s": 0.17899999999997362,
+          "eligibility": {
+            "eligible": true,
+            "reason": "fresh_source_time_candidate"
+          },
+          "base_footprint_from_base_scan": {
+            "ok": true,
+            "returned_stamp": 417.521
+          },
+          "odom_from_base_footprint": {
+            "ok": true,
+            "returned_stamp": 417.521
+          },
+          "result": "transformable"
+        }
+      },
+      "clock": {
+        "ros_now_ns": 417700000000,
+        "latest_clock_message_stamp_ns": 417700000000,
+        "clock_callback_received_monotonic_ns": 42279119037426,
+        "clock_callback_receipt_age_ns": 57890257,
+        "clock_samples": 4177,
+        "clock_group": "isolated_mutually_exclusive"
+      }
+    },
+    "info_age": 0.9067175660020439,
+    "match_age": 0.9067175660020439,
+    "stationary_since_match": false,
+    "stopped": false,
+    "native_small_movement": false,
+    "linear_update": 0.02,
+    "angular_update": 0.03,
+    "covariance": 0.005655096378177404,
+    "motion_started": 42278.676621409,
+    "motion_state": "MOVING",
+    "info": {
+      "stamp": [
+        416,
+        646000000
+      ],
+      "ref_id": 832,
+      "loop_closure_id": 0,
+      "proximity_detection_id": 85,
+      "stats": {
+        "Keypoint/Current_frame/words": 0.0,
+        "Keypoint/Dictionary_size/words": 0.0,
+        "Keypoint/Index_memory_usage/KB": 0.0,
+        "Keypoint/Indexed_words/words": 0.0,
+        "Loop/Accepted_hypothesis_id/": 0.0,
+        "Loop/Angular_variance/": 0.0,
+        "Loop/Distance_since_last_loc/m": 0.0553131103515625,
+        "Loop/Highest_hypothesis_id/": 0.0,
+        "Loop/Highest_hypothesis_value/": 0.0,
+        "Loop/Hypothesis_ratio/": 0.0,
+        "Loop/Hypothesis_reactivated/": 1.0,
+        "Loop/Id/": 85.0,
+        "Loop/Landmark_detected/": 0.0,
+        "Loop/Landmark_detected_node_ref/": 0.0,
+        "Loop/Last_id/": 0.0,
+        "Loop/Linear_variance/": 0.0,
+        "Loop/MapToBase_lin_std/m": 0.07520037889480591,
+        "Loop/MapToBase_lin_var/m2": 0.005655096378177404,
+        "Loop/MapToBase_pitch/deg": -0.0,
+        "Loop/MapToBase_roll/deg": 0.0,
+        "Loop/MapToBase_x/m": 13.680867195129395,
+        "Loop/MapToBase_y/m": -6.823188304901123,
+        "Loop/MapToBase_yaw/deg": -0.5129395127296448,
+        "Loop/MapToBase_z/m": 0.0,
+        "Loop/MapToOdom_angle/deg": 0.04477841034531593,
+        "Loop/MapToOdom_norm/m": 0.29905977845191956,
+        "Loop/MapToOdom_pitch/deg": -0.0,
+        "Loop/MapToOdom_roll/deg": 0.0,
+        "Loop/MapToOdom_x/m": 0.29903125762939453,
+        "Loop/MapToOdom_y/m": 0.004129886627197266,
+        "Loop/MapToOdom_yaw/deg": 0.044778406620025635,
+        "Loop/MapToOdom_z/m": 0.0,
+        "Loop/Map_id/": 0.0,
+        "Loop/Odom_correction_angle/deg": 0.05305942893028259,
+        "Loop/Odom_correction_norm/m": 0.0006655739853158593,
+        "Loop/Odom_correction_pitch/deg": -0.0,
+        "Loop/Odom_correction_roll/deg": 0.0,
+        "Loop/Odom_correction_x/m": -0.00039005279541015625,
+        "Loop/Odom_correction_y/m": 0.0005393028259277344,
+        "Loop/Odom_correction_yaw/deg": 0.053059425204992294,
+        "Loop/Odom_correction_z/m": 0.0,
+        "Loop/Optimization_error/": 0.0028388032224029303,
+        "Loop/Optimization_iterations/": 2.0,
+        "Loop/Optimization_max_ang_error/deg": 0.05820463225245476,
+        "Loop/Optimization_max_ang_error_ratio/": 0.041398923844099045,
+        "Loop/Optimization_max_error/m": 0.002799510955810547,
+        "Loop/Optimization_max_error_ratio/": 0.03607749193906784,
+        "Loop/Proximity_links_cleared/": 0.0,
+        "Loop/Reactivate_id/": 0.0,
+        "Loop/RejectedHypothesis/": 0.0,
+        "Loop/Suppressed_hypothesis_id/": 0.0,
+        "Loop/Visual_inliers/": 0.0,
+        "Loop/Visual_inliers_distribution/": 0.0,
+        "Loop/Visual_inliers_mean_dist/m": 0.0,
+        "Loop/Visual_inliers_ratio/": 0.0,
+        "Loop/Visual_matches/": 0.0,
+        "Loop/Visual_words/": 0.0,
+        "Loop/Vp_hypothesis/": 0.0,
+        "Memory/Closest_node_angle/rad": 0.025638651102781296,
+        "Memory/Closest_node_distance/m": 7.259850978851318,
+        "Memory/Database_memory_used/MB": 17.0,
+        "Memory/Distance_travelled/m": 80.97112274169922,
+        "Memory/Fast_movement/": 0.0,
+        "Memory/Immunized_globally/": 0.0,
+        "Memory/Immunized_locally/": 0.0,
+        "Memory/Immunized_locally_max/": 0.0,
+        "Memory/Local_graph_size/": 425.0,
+        "Memory/New_landmark/": 0.0,
+        "Memory/Odom_cache_links/": 21.0,
+        "Memory/Odom_cache_poses/": 11.0,
+        "Memory/Odometry_variance_ang/": 0.009999999776482582,
+        "Memory/Odometry_variance_lin/": 0.0010000000474974513,
+        "Memory/Short_time_memory_size/": 0.0,
+        "Memory/Signatures_removed/": 1.0,
+        "Memory/Signatures_retrieved/": 0.0,
+        "Memory/Small_movement/": 0.0,
+        "Memory/Working_memory_size/": 425.0,
+        "Proximity/Space_detections_added_icp_global/": 0.0,
+        "Proximity/Space_detections_added_icp_multi/": 1.0,
+        "Proximity/Space_detections_added_visually/": 0.0,
+        "Proximity/Space_last_detection_id/": 85.0,
+        "Proximity/Space_paths/": 1.0,
+        "Proximity/Space_scan_paths_checked/": 1.0,
+        "Proximity/Space_visual_paths_checked/": 0.0,
+        "Proximity/Time_detections/": 0.0,
+        "RtabmapROS/HasSubscribers/": 1.0,
+        "RtabmapROS/TimeMsgConversion/ms": 0.2110004425048828,
+        "RtabmapROS/TimePublishing/ms": 0.1468658447265625,
+        "RtabmapROS/TimeRtabmap/ms": 35.40015411376953,
+        "RtabmapROS/TimeTotal/ms": 37.07599639892578,
+        "RtabmapROS/TimeUpdatingMaps/ms": 1.3179779052734375,
+        "Timing/Add_loop_closure_link/ms": 0.031948089599609375,
+        "Timing/Cleaning_neighbors/ms": 0.0,
+        "Timing/Emptying_trash/ms": 0.0011920928955078125,
+        "Timing/Finalizing_statistics/ms": 0.6239414215087891,
+        "Timing/Forgetting/ms": 0.06508827209472656,
+        "Timing/Hypotheses_creation/ms": 0.0,
+        "Timing/Hypotheses_validation/ms": 0.0,
+        "Timing/Joining_trash/ms": 0.03409385681152344,
+        "Timing/Likelihood_computation/ms": 0.0,
+        "Timing/Map_optimization/ms": 1.2049674987792969,
+        "Timing/Memory_cleanup/ms": 0.04100799560546875,
+        "Timing/Memory_update/ms": 5.015134811401367,
+        "Timing/Neighbor_link_refining/ms": 0.0,
+        "Timing/Posterior_computation/ms": 0.0,
+        "Timing/Proximity_by_space/ms": 28.22089195251465,
+        "Timing/Proximity_by_space_search/ms": 0.2579689025878906,
+        "Timing/Proximity_by_space_visual/ms": 0.09417533874511719,
+        "Timing/Proximity_by_time/ms": 0.15687942504882812,
+        "Timing/Reactivation/ms": 0.012874603271484375,
+        "Timing/Statistics_creation/ms": 0.2300739288330078,
+        "Timing/Total/ms": 35.330055236816406,
+        "TimingMem/Compressing_data/ms": 0.3070831298828125,
+        "TimingMem/Joining_dictionary_update/ms": 0.1709461212158203,
+        "TimingMem/Occupancy_grid/ms": 4.397869110107422,
+        "TimingMem/Pre_update/ms": 0.0021457672119140625,
+        "TimingMem/Scan_filtering/ms": 0.0050067901611328125,
+        "TimingMem/Signature_creation/ms": 4.895925521850586
+      },
+      "matches": 375
+    },
+    "reason": "accepted saved-node ICP match, native covariance and fresh inputs",
+    "ros_time": 417.7,
+    "campus_keepout_ready": true
+  },
+  "safety": {
+    "emergency_stop_active": false,
+    "block_all": false,
+    "lease_owner_execution_id": "",
+    "message": "autonomous disabled"
+  },
+  "sequence": {
+    "sequence_id": "pillar-v1-e2e-lap1-r9-20261106T112441Z",
+    "state": 3,
+    "state_name": "SUCCEEDED",
+    "current_step_id": "patrol",
+    "current_step_index": 2,
+    "step_count": 2,
+    "completed_steps": 2,
+    "operation": 2,
+    "region_id": "pillar_v1",
+    "route_id": "pillar_v1_outer_loop_auto",
+    "current_lap": 1,
+    "total_laps": 1,
+    "current_segment": 1,
+    "total_segments": 1,
+    "reason_code": 0,
+    "message": "all business steps succeeded and resources were released",
+    "execution_id": ""
+  },
+  "submit": {
+    "http": 202,
+    "body": {
+      "ok": true,
+      "accepted": true,
+      "replayed": false,
+      "command_id": "pillar-v1-e2e-lap1-r9-20261106T112441Z-cmd",
+      "sequence_id": "pillar-v1-e2e-lap1-r9-20261106T112441Z",
+      "current_execution_id": "ros-execution-1",
+      "reason_code": 3,
+      "message": "complete sequence accepted",
+      "status_url": "/api/v1/sequences/pillar-v1-e2e-lap1-r9-20261106T112441Z"
+    }
+  },
+  "clock_gate": {
+    "phase": "passed",
+    "wall_time": "2026-11-06T19:27:06+0800",
+    "settle_target_sec": 3.0,
+    "settle_elapsed_sec": 3.002,
+    "stable_elapsed_sec": 3.01,
+    "mission_ready_at_monotonic": 41898.457,
+    "clock": {
+      "source": "/clock (rosgraph_msgs/Clock)",
+      "latest_sim_sec": 40.7,
+      "window_first_sim_sec": 37.7,
+      "samples_total": 407,
+      "samples_in_window": 30,
+      "gap_max_sec_total": 0.6256,
+      "gap_max_sec_window": 0.115,
+      "backwards_total": 0,
+      "backwards_in_window": 0
+    },
+    "mission_manager_clock": {
+      "source": "/cleannav/task_status TaskStatus.header.stamp (idle heartbeat)",
+      "latest_sim_sec": 40.7,
+      "window_first_sim_sec": 37.7,
+      "samples_total": 8,
+      "samples_in_window": 7,
+      "backwards_in_window": 0,
+      "lag_vs_clock_min_sec": 0.0832,
+      "lag_vs_clock_max_sec": 0.0979,
+      "lag_vs_clock_latest_sec": 0.0832,
+      "last_status_age_wall_sec": 0.0102,
+      "tolerance_sec": 0.25,
+      "max_status_gap_sec": 0.75,
+      "confirmed": true
+    },
+    "gateway": {
+      "health": {
+        "ok": true,
+        "api_version": "1.0",
+        "gateway": "CONNECTED",
+        "mission_task_topic_ready": true,
+        "mission_sequence_service_ready": true,
+        "ros_clock_ready": true,
+        "estop_active": false
+      },
+      "ros_clock_ready": true,
+      "numeric_ros_time": "NOT_EXPOSED_BY_API",
+      "clock_proxy_sim_sec": 40.7
+    },
+    "submit_plan": {
+      "sequence_id": "pillar-v1-e2e-lap1-r9-20261106T112441Z",
+      "command_id": "pillar-v1-e2e-lap1-r9-20261106T112441Z-cmd",
+      "sequence_timestamp_source": "gateway get_clock().now() at request build (mission_bridge.py:228); not echoed by the submit response",
+      "expected_sequence_timestamp_sim_sec": 40.7
+    },
+    "blocked_reason": ""
+  },
+  "app_status": {
+    "ok": true,
+    "sequence": {
+      "sequence_id": "pillar-v1-e2e-lap1-r9-20261106T112441Z",
+      "command_id": "pillar-v1-e2e-lap1-r9-20261106T112441Z-cmd",
+      "state": "SUCCEEDED",
+      "state_code": 3,
+      "current_execution_id": "",
+      "current_step_id": "patrol",
+      "current_step_index": 2,
+      "step_count": 2,
+      "completed_steps": 2,
+      "operation": "PATROL_REGION",
+      "operation_code": 2,
+      "region_id": "pillar_v1",
+      "charger_id": "",
+      "route_id": "pillar_v1_outer_loop_auto",
+      "current_lap": 1,
+      "total_laps": 1,
+      "current_segment": 1,
+      "total_segments": 1,
+      "reason_code": 0,
+      "message": "all business steps succeeded and resources were released",
+      "timestamp": {
+        "sec": 417,
+        "nanosec": 100000000
+      },
+      "received_age_sec": 2.7514779600023758
+    }
+  },
+  "plan_max_poses": 293,
+  "plan_message_count": 191,
+  "plan_first": {
+    "goto": {
+      "poses": 171,
+      "since_step_start_sec": 0.034
+    }
+  },
+  "admitted_max_poses": 1637,
+  "local_plan_count": 0,
+  "local_plan_max_gap_sec": 0.0,
+  "cmd_vel_nonzero": 2387,
+  "cmd_vel_nonzero_during_patrol": 594,
+  "cmd_vel_speed_max_mps": 0.2823,
+  "cmd_vel_yaw_rate_max_radps": 0.1832,
+  "entry_min_m": 0.156,
+  "entry_at_patrol_m": 0.55,
+  "route_deviation_max_m": 0.229,
+  "route_deviation_samples": 2824,
+  "estop_seen": false,
+  "lease_seen": "ros-execution-2",
+  "lease_final": "",
+  "inner_follow_succeeded_during_patrol": 2,
+  "outer_follow_succeeded_during_patrol": 1,
+  "final_pose": [
+    13.624,
+    -6.822
+  ],
+  "security": {
+    "records": 474,
+    "state_counts": {
+      "WAITING": 48,
+      "VALIDATING": 24,
+      "READY": 402
+    },
+    "transitions": [
+      {
+        "ros_time": 0.0,
+        "wall_time": 1793964383.4389613,
+        "state": "WAITING",
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "patrol_started": false
+      },
+      {
+        "ros_time": 23.2,
+        "wall_time": 1793964407.9457588,
+        "state": "VALIDATING",
+        "missing": [
+          "map_server",
+          "mask_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "patrol_started": false
+      },
+      {
+        "ros_time": 34.7,
+        "wall_time": 1793964419.951942,
+        "state": "READY",
+        "missing": [],
+        "patrol_started": false
+      }
+    ],
+    "nonlethal_core_cells_max": {
+      "global_core": 0,
+      "local_core": 0
+    },
+    "failure_latched_counts": {},
+    "core_age_max_s": {
+      "global_core": 1.9962268239978584,
+      "local_core": 0.7815088909992483
+    },
+    "raw_map_age_max_s": 0.5608,
+    "raw_map_age_max_s_all": 1.2974,
+    "not_ready_samples": [
+      {
+        "ros_time": 0.0,
+        "wall_time": 1793964383.4389613,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0010289150013704784,
+        "raw_map_ok": false,
+        "safety_block_all": null,
+        "safety_owner": null,
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 0.2,
+        "wall_time": 1793964383.931363,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0003253050017519854,
+        "raw_map_ok": false,
+        "safety_block_all": null,
+        "safety_owner": null,
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 0.7,
+        "wall_time": 1793964384.4313815,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.00032880499929888174,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 1.2,
+        "wall_time": 1793964384.9314218,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.000403106001613196,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 1.7,
+        "wall_time": 1793964385.431001,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0003271039968240075,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 2.2,
+        "wall_time": 1793964385.931115,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0003503059997456148,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 2.7,
+        "wall_time": 1793964386.4310448,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.000331504998030141,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 3.3,
+        "wall_time": 1793964387.014163,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0003442050001467578,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 3.7,
+        "wall_time": 1793964387.4311502,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0003213050003978424,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 4.2,
+        "wall_time": 1793964387.9316857,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0007637119997525588,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 4.7,
+        "wall_time": 1793964388.4312503,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0003244039980927482,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 5.2,
+        "wall_time": 1793964388.931444,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0004725069957203232,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 5.7,
+        "wall_time": 1793964389.4310706,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.00041480600339127705,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 6.2,
+        "wall_time": 1793964389.931037,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0003276050047134049,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 6.7,
+        "wall_time": 1793964390.4315498,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.00032880500657483935,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 7.2,
+        "wall_time": 1793964390.931543,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.000566409005841706,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 7.7,
+        "wall_time": 1793964391.4317985,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0006960109967621975,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 8.3,
+        "wall_time": 1793964392.0221384,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.00036780599475605413,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 8.7,
+        "wall_time": 1793964392.431344,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.00032190400088438764,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 9.2,
+        "wall_time": 1793964392.931405,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.00037080499896546826,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 9.7,
+        "wall_time": 1793964393.431816,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.000553607998881489,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 10.2,
+        "wall_time": 1793964393.9319344,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0006104089989094064,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 10.7,
+        "wall_time": 1793964394.4317572,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0004585069982567802,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 11.2,
+        "wall_time": 1793964394.931329,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.00033230400003958493,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 11.7,
+        "wall_time": 1793964395.4314706,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.000421706004999578,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 12.2,
+        "wall_time": 1793964395.931413,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.00033530499786138535,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 12.7,
+        "wall_time": 1793964396.4316354,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.00047040700155775994,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 13.2,
+        "wall_time": 1793964396.9313457,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0003346049998071976,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 13.8,
+        "wall_time": 1793964397.5181572,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0003256049967603758,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 14.2,
+        "wall_time": 1793964397.9324422,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.00038390600093407556,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 14.7,
+        "wall_time": 1793964398.431335,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0003363049981999211,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 15.2,
+        "wall_time": 1793964398.9316332,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0007257110046339221,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 15.7,
+        "wall_time": 1793964399.4317925,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0005291080015012994,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 16.2,
+        "wall_time": 1793964399.9312031,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.00031880399910733104,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 16.7,
+        "wall_time": 1793964400.4407067,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0006655100005446002,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 17.0,
+        "wall_time": 1793964400.9319432,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0004229059995850548,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 17.2,
+        "wall_time": 1793964401.4334967,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.00040440599696012214,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 17.7,
+        "wall_time": 1793964401.93166,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.00043680599628714845,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 18.3,
+        "wall_time": 1793964402.5564253,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0003516060023684986,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      },
+      {
+        "ros_time": 18.7,
+        "wall_time": 1793964402.9320295,
+        "state": "WAITING",
+        "ready": false,
+        "missing": [
+          "raw_map",
+          "map_server",
+          "map_yaml",
+          "mask",
+          "mask_server",
+          "info",
+          "info_server",
+          "subscriptions",
+          "global_active",
+          "local_active",
+          "global_params",
+          "local_params",
+          "global_core",
+          "local_core",
+          "global_updates",
+          "local_updates",
+          "native_tf",
+          "localization"
+        ],
+        "failed_predicates": null,
+        "raw_map_age_s": 0.0005667079967679456,
+        "raw_map_ok": false,
+        "safety_block_all": true,
+        "safety_owner": "",
+        "authorization_latched": false,
+        "nonlethal_core_cells": {
+          "global_core": null,
+          "local_core": null
+        },
+        "failure_latched": {
+          "global_core": false,
+          "local_core": false
+        },
+        "core_age_s": {
+          "global_core": null,
+          "local_core": null
+        },
+        "outside_mask": {
+          "global_core": null,
+          "local_core": null
+        }
+      }
+    ]
+  },
+  "events": [
+    {
+      "t": 1793964383.553,
+      "name": "security_state",
+      "state": "WAITING",
+      "missing": [
+        "raw_map",
+        "map_server",
+        "map_yaml",
+        "mask",
+        "mask_server",
+        "info",
+        "info_server",
+        "subscriptions",
+        "global_active",
+        "local_active",
+        "global_params",
+        "local_params",
+        "global_core",
+        "local_core",
+        "global_updates",
+        "local_updates",
+        "native_tf",
+        "localization"
+      ],
+      "ros_time": 0.0
+    },
+    {
+      "t": 1793964407.948,
+      "name": "security_state",
+      "state": "VALIDATING",
+      "missing": [
+        "map_server",
+        "mask_server",
+        "subscriptions",
+        "global_active",
+        "local_active",
+        "global_params",
+        "local_params",
+        "global_core",
+        "local_core",
+        "global_updates",
+        "local_updates",
+        "native_tf",
+        "localization"
+      ],
+      "ros_time": 23.2
+    },
+    {
+      "t": 1793964419.959,
+      "name": "security_state",
+      "state": "READY",
+      "missing": [],
+      "ros_time": 34.7
+    },
+    {
+      "t": 1793964423.216,
+      "name": "clock_settle_start",
+      "clock_sim_sec": 37.7,
+      "mm_sim_sec": 0.0
+    },
+    {
+      "t": 1793964426.227,
+      "name": "clock_gate",
+      "phase": "passed",
+      "elapsed": 3.002,
+      "mm_lag_min": 0.0832,
+      "blocked": ""
+    },
+    {
+      "t": 1793964426.271,
+      "name": "submit",
+      "http": 202,
+      "accepted": true
+    },
+    {
+      "t": 1793964426.277,
+      "name": "step",
+      "sequence_id": "pillar-v1-e2e-lap1-r9-20261106T112441Z",
+      "state": 2,
+      "state_name": "ACTIVE",
+      "current_step_id": "goto",
+      "current_step_index": 1,
+      "step_count": 2,
+      "completed_steps": 0,
+      "operation": 1,
+      "region_id": "pillar_v1",
+      "route_id": "",
+      "current_lap": 0,
+      "total_laps": 0,
+      "current_segment": 1,
+      "total_segments": 1,
+      "reason_code": 0,
+      "message": "business step navigation active",
+      "execution_id": "ros-execution-1"
+    },
+    {
+      "t": 1793964426.311,
+      "name": "plan_first",
+      "step": "goto",
+      "poses": 171
+    },
+    {
+      "t": 1793964428.073,
+      "name": "inner_follow",
+      "goal": "73adb01fc3bf",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964429.014,
+      "name": "inner_follow",
+      "goal": "d80a6cacedc2",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964430.008,
+      "name": "inner_follow",
+      "goal": "7007b48c3bc2",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964431.033,
+      "name": "inner_follow",
+      "goal": "a5eb32c17f97",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964432.04,
+      "name": "inner_follow",
+      "goal": "19fb29180227",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964433.06,
+      "name": "inner_follow",
+      "goal": "0fdba22efad0",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964434.074,
+      "name": "inner_follow",
+      "goal": "c0b3a47786ba",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964435.006,
+      "name": "inner_follow",
+      "goal": "4a722f28f0ee",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964436.107,
+      "name": "inner_follow",
+      "goal": "f74e09f2b3c3",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964437.028,
+      "name": "inner_follow",
+      "goal": "e20d42b7f26b",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964438.037,
+      "name": "inner_follow",
+      "goal": "cb4bd45f854e",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964439.049,
+      "name": "inner_follow",
+      "goal": "602e0f366e4d",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964440.071,
+      "name": "inner_follow",
+      "goal": "539f2fc1d977",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964441.016,
+      "name": "inner_follow",
+      "goal": "179ec7461001",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964442.004,
+      "name": "inner_follow",
+      "goal": "aa8f250190a4",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964443.015,
+      "name": "inner_follow",
+      "goal": "14ee0c5d1992",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964444.038,
+      "name": "inner_follow",
+      "goal": "613e8567a3a0",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964445.041,
+      "name": "inner_follow",
+      "goal": "1e203b27c3dd",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964446.054,
+      "name": "inner_follow",
+      "goal": "e9d75677d4ea",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964447.076,
+      "name": "inner_follow",
+      "goal": "8baad85e7d2b",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964447.997,
+      "name": "inner_follow",
+      "goal": "a0912592e647",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964449.005,
+      "name": "inner_follow",
+      "goal": "3be0b0c26906",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964450.014,
+      "name": "inner_follow",
+      "goal": "67f82de4b739",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964451.045,
+      "name": "inner_follow",
+      "goal": "10176cfd5512",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964452.042,
+      "name": "inner_follow",
+      "goal": "08870c1bd9d6",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964453.056,
+      "name": "inner_follow",
+      "goal": "a154125b8b55",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964454.078,
+      "name": "inner_follow",
+      "goal": "87e868e37b61",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964455.083,
+      "name": "inner_follow",
+      "goal": "202ad7df99fe",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964456.01,
+      "name": "inner_follow",
+      "goal": "bc4ffd33e636",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964457.034,
+      "name": "inner_follow",
+      "goal": "d66104280e4a",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964458.045,
+      "name": "inner_follow",
+      "goal": "c8908c1eaef5",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964459.058,
+      "name": "inner_follow",
+      "goal": "63441c9efc05",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964460.074,
+      "name": "inner_follow",
+      "goal": "843f11684379",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964460.999,
+      "name": "inner_follow",
+      "goal": "cde18820afbd",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964462.007,
+      "name": "inner_follow",
+      "goal": "83c6a420d4d9",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964463.009,
+      "name": "inner_follow",
+      "goal": "116d929763d0",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964464.042,
+      "name": "inner_follow",
+      "goal": "b808962afe37",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964465.044,
+      "name": "inner_follow",
+      "goal": "5ab98a4edf25",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964466.047,
+      "name": "inner_follow",
+      "goal": "1295d6c81c85",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964467.058,
+      "name": "inner_follow",
+      "goal": "e31dbf35aff6",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964467.984,
+      "name": "inner_follow",
+      "goal": "6cb4c006a3fd",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964468.981,
+      "name": "inner_follow",
+      "goal": "c60849aafccf",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964469.993,
+      "name": "inner_follow",
+      "goal": "b9a3dc6b0e7d",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964471.004,
+      "name": "inner_follow",
+      "goal": "8a773ece0f61",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964472.016,
+      "name": "inner_follow",
+      "goal": "9af7e05a4229",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964472.941,
+      "name": "inner_follow",
+      "goal": "dd79f2714028",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964473.951,
+      "name": "inner_follow",
+      "goal": "417370f507b5",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964474.951,
+      "name": "inner_follow",
+      "goal": "5dd7d0913fd9",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964475.967,
+      "name": "inner_follow",
+      "goal": "9b3bbe4acc0e",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964476.973,
+      "name": "inner_follow",
+      "goal": "b41d1d0f8e09",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964477.981,
+      "name": "inner_follow",
+      "goal": "766156c7b85d",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964478.986,
+      "name": "inner_follow",
+      "goal": "898a72f6156d",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964479.998,
+      "name": "inner_follow",
+      "goal": "9f339bdd1b79",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964480.922,
+      "name": "inner_follow",
+      "goal": "4b7606cdb01d",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964482.031,
+      "name": "inner_follow",
+      "goal": "67cf4d35cc15",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964482.938,
+      "name": "inner_follow",
+      "goal": "3fd955e76556",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964483.944,
+      "name": "inner_follow",
+      "goal": "71815770c8dd",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964484.949,
+      "name": "inner_follow",
+      "goal": "1957b986ff75",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964485.963,
+      "name": "inner_follow",
+      "goal": "87df9926fcac",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964486.964,
+      "name": "inner_follow",
+      "goal": "b710f98f05b2",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964487.976,
+      "name": "inner_follow",
+      "goal": "8aee71239cf4",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964488.996,
+      "name": "inner_follow",
+      "goal": "ca021a626b0c",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964489.995,
+      "name": "inner_follow",
+      "goal": "5b30112a83cb",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964490.899,
+      "name": "inner_follow",
+      "goal": "2b3bc39247e4",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964492.401,
+      "name": "inner_follow",
+      "goal": "5099ff2f41f0",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964493.35,
+      "name": "inner_follow",
+      "goal": "505ec3a9fe04",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964494.358,
+      "name": "inner_follow",
+      "goal": "d783d8ea4202",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964495.385,
+      "name": "inner_follow",
+      "goal": "ea85bf07cc68",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964496.412,
+      "name": "inner_follow",
+      "goal": "9d32a2c2167f",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964497.365,
+      "name": "inner_follow",
+      "goal": "2145ee7ee0d7",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964498.387,
+      "name": "inner_follow",
+      "goal": "114fc2344089",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964499.344,
+      "name": "inner_follow",
+      "goal": "1d091f97fb0c",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964500.352,
+      "name": "inner_follow",
+      "goal": "4362896a038d",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964501.382,
+      "name": "inner_follow",
+      "goal": "6846d6723f12",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964502.399,
+      "name": "inner_follow",
+      "goal": "2d411e9fd7bd",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964503.329,
+      "name": "inner_follow",
+      "goal": "d79b6f5b8cf7",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964504.348,
+      "name": "inner_follow",
+      "goal": "e139d95a2895",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964505.369,
+      "name": "inner_follow",
+      "goal": "aecec65598c8",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964506.298,
+      "name": "inner_follow",
+      "goal": "d46acc0474e1",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964507.321,
+      "name": "inner_follow",
+      "goal": "4527cbdc4b4b",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964508.341,
+      "name": "inner_follow",
+      "goal": "6cfcddc330c7",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964509.38,
+      "name": "inner_follow",
+      "goal": "d587d0f55e8a",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964510.311,
+      "name": "inner_follow",
+      "goal": "0f51df08e324",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964511.336,
+      "name": "inner_follow",
+      "goal": "93b4b43dfef0",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964512.347,
+      "name": "inner_follow",
+      "goal": "a3cb94a0a9a0",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964513.278,
+      "name": "inner_follow",
+      "goal": "85da5d89aeee",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964514.292,
+      "name": "inner_follow",
+      "goal": "df1b2b8a9bf1",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964515.26,
+      "name": "inner_follow",
+      "goal": "22f63fc2c0f6",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964516.258,
+      "name": "inner_follow",
+      "goal": "a2128836dcdd",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964517.268,
+      "name": "inner_follow",
+      "goal": "f6c9f188e346",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964518.289,
+      "name": "inner_follow",
+      "goal": "9d460528142a",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964519.311,
+      "name": "inner_follow",
+      "goal": "b66500cd023e",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964520.263,
+      "name": "inner_follow",
+      "goal": "2e566b2b2a36",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964521.259,
+      "name": "inner_follow",
+      "goal": "4031a1c8713d",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964522.211,
+      "name": "inner_follow",
+      "goal": "ac111e3da3f3",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964523.224,
+      "name": "inner_follow",
+      "goal": "e6ace481b416",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964524.229,
+      "name": "inner_follow",
+      "goal": "0f5ba5e98dfc",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964525.244,
+      "name": "inner_follow",
+      "goal": "95eff17c3039",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964526.197,
+      "name": "inner_follow",
+      "goal": "e4c4c2464d80",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964527.196,
+      "name": "inner_follow",
+      "goal": "6196ecbc7a7c",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964528.217,
+      "name": "inner_follow",
+      "goal": "7386ea0f56ec",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964529.247,
+      "name": "inner_follow",
+      "goal": "2104da6ca922",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964530.269,
+      "name": "inner_follow",
+      "goal": "0c0ab78bf326",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964531.2,
+      "name": "inner_follow",
+      "goal": "c0556aa68df8",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964532.209,
+      "name": "inner_follow",
+      "goal": "4e5ec5a92b66",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964533.159,
+      "name": "inner_follow",
+      "goal": "81bb9e22fd95",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964534.191,
+      "name": "inner_follow",
+      "goal": "d0e047bbdea8",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964535.092,
+      "name": "inner_follow",
+      "goal": "1685c04a122c",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964536.108,
+      "name": "inner_follow",
+      "goal": "5be584e5f2d8",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964537.081,
+      "name": "inner_follow",
+      "goal": "596c52fa7ce4",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964538.102,
+      "name": "inner_follow",
+      "goal": "3b87cfcd181c",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964539.102,
+      "name": "inner_follow",
+      "goal": "20819a8c26c3",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964540.121,
+      "name": "inner_follow",
+      "goal": "cabf96b2bc1b",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964541.142,
+      "name": "inner_follow",
+      "goal": "4ca13ab30136",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964542.063,
+      "name": "inner_follow",
+      "goal": "97960e528fb8",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964543.082,
+      "name": "inner_follow",
+      "goal": "22e1e17c520b",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964544.102,
+      "name": "inner_follow",
+      "goal": "66264750e3c2",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964545.052,
+      "name": "inner_follow",
+      "goal": "6cf47ebe4d53",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964546.049,
+      "name": "inner_follow",
+      "goal": "8c05ff79bb0a",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964547.068,
+      "name": "inner_follow",
+      "goal": "8e234905cbf0",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964548.085,
+      "name": "inner_follow",
+      "goal": "28de246c3eb2",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964549.042,
+      "name": "inner_follow",
+      "goal": "f68c3676eeec",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964550.055,
+      "name": "inner_follow",
+      "goal": "792eabcadc6d",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964551.068,
+      "name": "inner_follow",
+      "goal": "f3f16f2d96cb",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964552.013,
+      "name": "inner_follow",
+      "goal": "cadf81bb66f1",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964553.031,
+      "name": "inner_follow",
+      "goal": "526d9036e604",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964554.037,
+      "name": "inner_follow",
+      "goal": "60c277d0b759",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964555.058,
+      "name": "inner_follow",
+      "goal": "7e4fbc017622",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964556.069,
+      "name": "inner_follow",
+      "goal": "cea113226c00",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964557.006,
+      "name": "inner_follow",
+      "goal": "c3360e2bfc3f",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964558.013,
+      "name": "inner_follow",
+      "goal": "7fb03222442c",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964559.042,
+      "name": "inner_follow",
+      "goal": "039c9ef0958f",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964560.047,
+      "name": "inner_follow",
+      "goal": "ebc518bd2e6c",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964561.055,
+      "name": "inner_follow",
+      "goal": "8c27b2f20795",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964562.069,
+      "name": "inner_follow",
+      "goal": "02f59d9c628e",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964563.015,
+      "name": "inner_follow",
+      "goal": "8f2ebc89680d",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964564.006,
+      "name": "inner_follow",
+      "goal": "cc6fefea4233",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964565.018,
+      "name": "inner_follow",
+      "goal": "ed092a18b9c9",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964569.045,
+      "name": "inner_follow",
+      "goal": "0dfac6697eca",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964569.178,
+      "name": "inner_follow",
+      "goal": "12ad443f2cba",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964569.271,
+      "name": "inner_follow",
+      "goal": "3708fb9bda62",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964569.336,
+      "name": "inner_follow",
+      "goal": "200439634715",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964569.998,
+      "name": "inner_follow",
+      "goal": "ff616d539d8a",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964571.013,
+      "name": "inner_follow",
+      "goal": "634eab23a692",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964574.419,
+      "name": "inner_follow",
+      "goal": "8f3b736cf14b",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964574.544,
+      "name": "inner_follow",
+      "goal": "f07cc6fd7eb2",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964574.645,
+      "name": "inner_follow",
+      "goal": "02d107a5d432",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964575.069,
+      "name": "inner_follow",
+      "goal": "4d6e8dcdba7e",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964578.87,
+      "name": "inner_follow",
+      "goal": "8025ba70a5cc",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964579.015,
+      "name": "inner_follow",
+      "goal": "442c92be9e0a",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964579.105,
+      "name": "inner_follow",
+      "goal": "cfdb54262dde",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964579.169,
+      "name": "inner_follow",
+      "goal": "0c983a2984fe",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964580.045,
+      "name": "inner_follow",
+      "goal": "8b4f3baaf063",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964583.574,
+      "name": "inner_follow",
+      "goal": "2aceec3c0efe",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964583.688,
+      "name": "inner_follow",
+      "goal": "27a0b9aaa4f1",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964583.769,
+      "name": "inner_follow",
+      "goal": "f70e798ee315",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964584.01,
+      "name": "inner_follow",
+      "goal": "3feddc56bb62",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964587.232,
+      "name": "inner_follow",
+      "goal": "9a370a7784e8",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964587.343,
+      "name": "inner_follow",
+      "goal": "67da560ed3f7",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964587.424,
+      "name": "inner_follow",
+      "goal": "a82c48efd67d",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964588.037,
+      "name": "inner_follow",
+      "goal": "ab8fabd23f4b",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964591.155,
+      "name": "inner_follow",
+      "goal": "db2233404295",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964591.267,
+      "name": "inner_follow",
+      "goal": "5afbf838d609",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964591.361,
+      "name": "inner_follow",
+      "goal": "e31c59370b9c",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964591.985,
+      "name": "inner_follow",
+      "goal": "36c9e0b79e06",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964595.867,
+      "name": "inner_follow",
+      "goal": "5838e6f6ce28",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964596.003,
+      "name": "inner_follow",
+      "goal": "1781637ff427",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964596.09,
+      "name": "inner_follow",
+      "goal": "d1812f7a6412",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964596.156,
+      "name": "inner_follow",
+      "goal": "a219ace2ff14",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964599.97,
+      "name": "inner_follow",
+      "goal": "48974ec207e6",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964600.117,
+      "name": "inner_follow",
+      "goal": "a0f9a12d0700",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964600.212,
+      "name": "inner_follow",
+      "goal": "5de026a455a8",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964600.279,
+      "name": "inner_follow",
+      "goal": "4b8e10f33490",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964600.981,
+      "name": "inner_follow",
+      "goal": "283ca6dcd05c",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964604.178,
+      "name": "inner_follow",
+      "goal": "1167fedc08d7",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964604.287,
+      "name": "inner_follow",
+      "goal": "31aebf642fcc",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964604.373,
+      "name": "inner_follow",
+      "goal": "eaa0b57ea473",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964607.557,
+      "name": "inner_follow",
+      "goal": "005f0e6516c5",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964607.682,
+      "name": "inner_follow",
+      "goal": "18a7935b5ba7",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964607.769,
+      "name": "inner_follow",
+      "goal": "b81f3d9e4b99",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964610.972,
+      "name": "inner_follow",
+      "goal": "e4d30939e197",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964611.1,
+      "name": "inner_follow",
+      "goal": "6f94e1796a96",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964611.192,
+      "name": "inner_follow",
+      "goal": "72e06d81cce2",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964611.255,
+      "name": "inner_follow",
+      "goal": "9153f628aa53",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964614.533,
+      "name": "inner_follow",
+      "goal": "e65d1dda4cd5",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964614.651,
+      "name": "inner_follow",
+      "goal": "5948933558a8",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964614.75,
+      "name": "inner_follow",
+      "goal": "5050a037377e",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964617.974,
+      "name": "inner_follow",
+      "goal": "e43e06f8a3a0",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964618.107,
+      "name": "inner_follow",
+      "goal": "1b32334b205f",
+      "status": 5,
+      "step": "goto"
+    },
+    {
+      "t": 1793964618.182,
+      "name": "inner_follow",
+      "goal": "7c1a7b34ecd5",
+      "status": 4,
+      "step": "goto"
+    },
+    {
+      "t": 1793964621.253,
+      "name": "step",
+      "sequence_id": "pillar-v1-e2e-lap1-r9-20261106T112441Z",
+      "state": 2,
+      "state_name": "ACTIVE",
+      "current_step_id": "patrol",
+      "current_step_index": 2,
+      "step_count": 2,
+      "completed_steps": 1,
+      "operation": 2,
+      "region_id": "pillar_v1",
+      "route_id": "pillar_v1_outer_loop_auto",
+      "current_lap": 1,
+      "total_laps": 1,
+      "current_segment": 1,
+      "total_segments": 1,
+      "reason_code": 0,
+      "message": "business step navigation active",
+      "execution_id": "ros-execution-2"
+    },
+    {
+      "t": 1793964728.196,
+      "name": "inner_follow",
+      "goal": "50703b8b125e",
+      "status": 4,
+      "step": "patrol"
+    },
+    {
+      "t": 1793964806.037,
+      "name": "inner_follow",
+      "goal": "28aec686dd7f",
+      "status": 4,
+      "step": "patrol"
+    },
+    {
+      "t": 1793964806.042,
+      "name": "outer_follow",
+      "goal": "8a4e04afd9a6",
+      "status": 4,
+      "step": "patrol"
+    }
+  ]
+}

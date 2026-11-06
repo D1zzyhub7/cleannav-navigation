@@ -1,0 +1,6 @@
+[WARN] [1793962071.916581233] []: Old-style arguments are deprecated; see --help for new-style arguments
+[INFO] [1793962071.956267317] [static_transform_publisher_utv3Cd11mF59Q3c9]: Spinning until stopped - publishing transform
+translation: ('0.300000', '0.000000', '0.000000')
+rotation: ('0.000000', '0.000000', '0.000000', '1.000000')
+from 'map' to 'base_link'
+[INFO] [1793962084.431445758] [rclcpp]: signal_handler(SIGINT/SIGTERM)

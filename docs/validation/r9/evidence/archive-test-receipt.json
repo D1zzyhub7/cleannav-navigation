@@ -1,0 +1,20 @@
+{
+  "cwd": "/tmp/cleannav-r9-source-usnkyjcx",
+  "commit": "368adb8d5e511b8ff0a4a27b2f5a17fef59d6ce3",
+  "argv": [
+    "python3",
+    "-B",
+    "-m",
+    "pytest",
+    "-q",
+    "-p",
+    "no:cacheprovider",
+    "--junitxml=/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r9-regular-release-20261106T103918Z/evidence/archive-tests.xml"
+  ],
+  "env_overrides": {
+    "PYTHONPATH": "/home/d1zzy/code/cleannav_modularization/cleannav-tools/map-editor/.deps",
+    "PYTHONDONTWRITEBYTECODE": "1"
+  },
+  "scope": "Git archive outside workspace; only third-party Python dependencies supplied; no install/ROS runtime modules",
+  "rc": 0
+}

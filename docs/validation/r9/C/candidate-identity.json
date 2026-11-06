@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "name": "R9-C-regular-fixed-start-forward",
+  "status": "OFFLINE_CANDIDATE_DYNAMIC_NOT_RUN",
+  "parent_dynamic_identity": "6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5",
+  "git_base_main": "044e1842981df77ba0a03842dedccafd774872d9",
+  "git_branch": "r9/regular-patrol-and-future-extension-20261106",
+  "design_radius_m": 1.344,
+  "vehicle_min_radius_m": 1.12,
+  "radius_factor": 1.2,
+  "buffer_m": 0.8166065264130885,
+  "safety_margin_m": 0.15,
+  "accepted_direction": "ccw",
+  "accepted_start": [
+    13.815102233908052,
+    -6.831575183979148,
+    0.0
+  ],
+  "fixed_forward_split": [
+    [
+      0,
+      939
+    ],
+    [
+      938,
+      1637
+    ]
+  ],
+  "source_sha256": {
+    "tools/map-editor/core.py": "ca9d3a3f74f85a0128f0dbe5c3fe436b9324392248db63fdf769f20edff33e28",
+    "tools/map-editor/map_codec.py": "4a6715d9652f406ce787ae0940d4ccfbdcee5fb8b3b9f888d4cbb4a2dd9fdbf3",
+    "tools/map-editor/support/mapping_assets.py": "f1b0359987f9ffe87984a5eb9f2f6a09e1929b06e33f6f771c88734f65513ae8",
+    "tools/map-editor/support/region_registry.py": "c5aa9fc84808d7bff83edea210bb8065ee7825533e53feea859326bfcd98d268",
+    "tools/map-editor/support/region_registry.schema.json": "dc0bb058bdb271c2684d3e086967f3dbd03e9991d98154a271af43e195e970eb",
+    "cleannav_navigation/config/nav2_local_recovery.yaml": "389dbb6136d6b418d4e141368e1b4d6892e408107ac9465b0b3c763a44dee3ea",
+    "cleannav_navigation/patrol_path_segments.py": "870e5de1e5e75facdfea3d901b872b7ed40e434422d68ba65e3969a3511803bd"
+  },
+  "route_sha256": "4d5f24a19600790eae561c4b17fc2ddbf032ed4d830efa81a42b257902cd03ea",
+  "registry_sha256": "0aa2bcd552b8c87e54598f26751dde5a2ca315382018f5f1e2be3f36e3405032",
+  "asset_provenance": {
+    "map": {
+      "map_id": "patrol_pillar_v1_mapping_v1",
+      "revision": "2026-11-02T16:33:45.687945+00:00",
+      "sha256": "b09fd48018fa0e8b83aa24f66c76d8feec9dc5ab4d79633a2e1ea90743b4410f",
+      "frame_id": "map"
+    },
+    "profile": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/config/pillar_v1_patrol/security-profile.json",
+    "profile_sha": "125e5859953e061df254d6766a0e29e05fedf8480bc76d7b5777c4e6f45bbb3d",
+    "occupancy_sha": "b09fd48018fa0e8b83aa24f66c76d8feec9dc5ab4d79633a2e1ea90743b4410f",
+    "vehicle": {
+      "footprint": [
+        [
+          -0.55,
+          -0.34
+        ],
+        [
+          -0.55,
+          0.34
+        ],
+        [
+          0.55,
+          0.34
+        ],
+        [
+          0.55,
+          -0.34
+        ]
+      ],
+      "turning_radius": 1.12,
+      "disk_radius": 0.6466065264130885,
+      "source": "cleannav_navigation/config/nav2_local_recovery.yaml",
+      "source_sha256": "389dbb6136d6b418d4e141368e1b4d6892e408107ac9465b0b3c763a44dee3ea"
+    },
+    "frozen_parameters_sha": "389dbb6136d6b418d4e141368e1b4d6892e408107ac9465b0b3c763a44dee3ea",
+    "keepout_sha": {
+      "pillar_v1_patrol_mask.pgm": "f304a1dd109ec42ff49e8e19b8b615b33a760d30cc952b0e83033f10c839fbcc",
+      "pillar_v1_patrol_mask.yaml": "b4037b2328ef4bd9e395edec8a23866985cda2e754b8ea278a13afbfa1aece18",
+      "raw_map_load.yaml": "9993f49cd894d2f825ec0dcc82f47473b5f947041ee1a240767a1fb9566f3cf3",
+      "../nav2_local_recovery.yaml": "389dbb6136d6b418d4e141368e1b4d6892e408107ac9465b0b3c763a44dee3ea"
+    },
+    "original_route_sha": "6d48ad03ac3bfe3650e7c85e736f3389b453fe52a0ed341598c08f66d8255b73",
+    "original_registry_sha": "34357cf0cb204646b4030d60412bef29ecbe924a40feb4edf2d39b17def10d4a",
+    "registry_generator": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-r9-regular-release-20261106T103918Z/src/cleannav-navigation/tools/map-editor/core.py",
+    "checkpoint_sampler": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-runtime-resume-20261016T101858Z/tools/make_dense_route_checkpoints.py",
+    "runtime_registry_loader_sha": "c5aa9fc84808d7bff83edea210bb8065ee7825533e53feea859326bfcd98d268",
+    "phase_cases": 660,
+    "phase_failures": 364
+  },
+  "out_of_scope": [
+    "arbitrary start",
+    "reverse route",
+    "dynamic tracking",
+    "irregular-site implementation"
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "processes": [
+    {
+      "label": "lifecycle",
+      "process_group_id": 165163,
+      "signals_sent": [
+        "SIGINT",
+        "SIGTERM",
+        "SIGKILL"
+      ],
+      "status": "STOPPED",
+      "leader_returncode": 0
+    },
+    {
+      "label": "tf",
+      "process_group_id": 165162,
+      "signals_sent": [
+        "SIGINT",
+        "SIGTERM",
+        "SIGKILL"
+      ],
+      "status": "STOPPED",
+      "leader_returncode": 0
+    },
+    {
+      "label": "planner",
+      "process_group_id": 165161,
+      "signals_sent": [
+        "SIGINT",
+        "SIGTERM",
+        "SIGKILL"
+      ],
+      "status": "STOPPED",
+      "leader_returncode": 0
+    }
+  ],
+  "survivors": [],
+  "no_Gazebo_MM_Safety_Lease_velocity": true
+}

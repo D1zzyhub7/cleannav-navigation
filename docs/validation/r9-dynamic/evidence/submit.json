@@ -1,0 +1,14 @@
+{
+  "http": 202,
+  "body": {
+    "ok": true,
+    "accepted": true,
+    "replayed": false,
+    "command_id": "pillar-v1-e2e-lap1-r9-20261106T112441Z-cmd",
+    "sequence_id": "pillar-v1-e2e-lap1-r9-20261106T112441Z",
+    "current_execution_id": "ros-execution-1",
+    "reason_code": 3,
+    "message": "complete sequence accepted",
+    "status_url": "/api/v1/sequences/pillar-v1-e2e-lap1-r9-20261106T112441Z"
+  }
+}

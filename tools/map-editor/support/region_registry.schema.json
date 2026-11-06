@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CleanNav Map-Bound Region Registry v1",
+  "type": "object",
+  "required": ["schema_version", "map", "regions", "chargers"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "map": {
+      "type": "object",
+      "required": ["map_id", "revision", "sha256", "frame_id"],
+      "properties": {
+        "map_id": {"type": "string", "maxLength": 64},
+        "revision": {"type": "string", "maxLength": 64},
+        "sha256": {"type": "string", "anyOf": [{"const": ""}, {"pattern": "^[a-fA-F0-9]{64}$"}]},
+        "frame_id": {"const": "map"}
+      },
+      "additionalProperties": false
+    },
+    "regions": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "required": ["region_id", "boundary", "entry_pose", "routes"],
+        "properties": {
+          "region_id": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[A-Za-z0-9._:-]+$"},
+          "display_name": {"type": "string", "maxLength": 128},
+          "aliases": {"type": "array", "maxItems": 16, "items": {"type": "string", "maxLength": 128}},
+          "boundary": {"type": "array", "minItems": 3, "maxItems": 256, "items": {"$ref": "#/$defs/point"}},
+          "entry_pose": {"$ref": "#/$defs/pose"},
+          "routes": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "object",
+              "required": ["route_id", "waypoints"],
+              "properties": {
+                "route_id": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[A-Za-z0-9._:-]+$"},
+                "waypoints": {"type": "array", "minItems": 3, "maxItems": 64, "items": {"$ref": "#/$defs/pose"}}
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "chargers": {
+      "type": "array",
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "required": ["charger_id", "staging_pose"],
+        "properties": {
+          "charger_id": {"type": "string", "minLength": 1, "maxLength": 64, "pattern": "^[A-Za-z0-9._:-]+$"},
+          "display_name": {"type": "string", "maxLength": 128},
+          "staging_pose": {"$ref": "#/$defs/pose"}
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "point": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"type": "number"}},
+    "pose": {
+      "type": "object",
+      "required": ["x", "y", "yaw"],
+      "properties": {"x": {"type": "number"}, "y": {"type": "number"}, "yaw": {"type": "number"}},
+      "additionalProperties": false
+    }
+  }
+}

@@ -1,0 +1,40 @@
+[INFO] [1793961981.928173716] [planner_server]: 
+	planner_server lifecycle node launched. 
+	Waiting on external lifecycle transitions to activate
+	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[INFO] [1793961981.989021412] [planner_server]: Creating
+[INFO] [1793961981.996610923] [global_costmap.global_costmap]: 
+	global_costmap lifecycle node launched. 
+	Waiting on external lifecycle transitions to activate
+	See https://design.ros2.org/articles/node_lifecycle.html for more information.
+[INFO] [1793961982.010265424] [global_costmap.global_costmap]: Creating Costmap
+[INFO] [1793961982.077704817] [planner_server]: Configuring
+[INFO] [1793961982.077751017] [global_costmap.global_costmap]: Configuring
+[INFO] [1793961982.082447686] [global_costmap.global_costmap]: Using plugin "exact_snapshot"
+[ERROR] [1793961982.082577688] [global_costmap.global_costmap]: Caught exception in callback for transition 10
+[ERROR] [1793961982.082623089] [global_costmap.global_costmap]: Original error: According to the loaded plugin descriptions the class cleannav_nav2_offline_probe/ExactSnapshotLayer with base class type nav2_costmap_2d::Layer does not exist. Declared types are  cleannav_navigation::NavigationBoundaryLayer cleannav_simulation::CampusUnknownLayer nav2_costmap_2d::BinaryFilter nav2_costmap_2d::DenoiseLayer nav2_costmap_2d::InflationLayer nav2_costmap_2d::KeepoutFilter nav2_costmap_2d::ObstacleLayer nav2_costmap_2d::RangeSensorLayer nav2_costmap_2d::SpeedFilter nav2_costmap_2d::StaticLayer nav2_costmap_2d::VoxelLayer
+[WARN] [1793961982.082643289] [global_costmap.global_costmap]: Callback returned ERROR during the transition: configure
+[FATAL] [1793961982.082651889] [global_costmap.global_costmap]: Lifecycle node global_costmap does not have error state implemented
+[INFO] [1793961982.114915564] [planner_server]: Created global planner plugin GridBased of type nav2_smac_planner/SmacPlannerHybrid
+[INFO] [1793961982.114970365] [planner_server]: Configuring GridBased of type SmacPlannerHybrid
+[INFO] [1793961982.115545873] [planner_server]: Even sized heuristic lookup table size set 400.000000, increasing size by 1 to make odd
+[WARN] [1793961982.115567674] [computeCircumscribedCost]: No inflation layer found in costmap configuration. If this is an SE2-collision checking plugin, it cannot use costmap potential field to speed up collision checking by only checking the full footprint when robot is within possibly-inscribed radius of an obstacle. This may significantly slow down planning times!
+[INFO] [1793961985.933031750] [planner_server]: Configured plugin GridBased of type SmacPlannerHybrid with maximum iterations 1000000, max on approach iterations 1000, and not allowing unknown traversal. Tolerance 0.50.Using motion model: Dubin.
+[INFO] [1793961985.933094851] [planner_server]: Planner Server has GridBased  planners available.
+[INFO] [1793961985.946566049] [planner_server]: Activating
+[WARN] [1793961985.946600050] [rcl_lifecycle]: No transition matching 3 found for current state unconfigured
+[INFO] [1793961985.946608150] [planner_server]: Activating plugin GridBased of type SmacPlannerHybrid
+[INFO] [1793961985.947262659] [planner_server]: Creating bond (planner_server) to lifecycle manager.
+[INFO] [1793962018.160455030] [rclcpp]: signal_handler(SIGINT/SIGTERM)
+[INFO] [1793962018.160528131] [planner_server]: Running Nav2 LifecycleNode rcl preshutdown (planner_server)
+[INFO] [1793962018.160595832] [planner_server]: Deactivating
+[WARN] [1793962018.160612233] [rcl_lifecycle]: No transition matching 4 found for current state unconfigured
+[INFO] [1793962018.160619033] [planner_server]: Deactivating plugin GridBased of type SmacPlannerHybrid
+[INFO] [1793962018.160627333] [planner_server]: Destroying bond (planner_server) to lifecycle manager.
+[INFO] [1793962018.170849384] [planner_server]: Cleaning up
+[WARN] [1793962018.174119732] [rcl_lifecycle]: No transition matching 2 found for current state unconfigured
+[INFO] [1793962018.174141532] [planner_server]: Cleaning up plugin GridBased of type SmacPlannerHybrid
+[INFO] [1793962018.174235334] [planner_server]: Destroying plugin GridBased of type SmacPlannerHybrid
+[INFO] [1793962018.174406236] [planner_server]: Destroying bond (planner_server) to lifecycle manager.
+[INFO] [1793962018.178175392] [global_costmap.global_costmap]: Destroying
+[INFO] [1793962018.182575857] [planner_server]: Destroying

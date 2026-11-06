@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "authorization": "Current user: exactly one formal dynamic attempt; no retry or product change",
+  "max_formal_calls": 1,
+  "formal_calls_used": 1,
+  "session": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r9-c-dynamic-20261106T112441Z/session-patrol-lap-1-r9-20261106T112441Z",
+  "cwd": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r9-c-dynamic-20261106T112441Z/session-patrol-lap-1-r9-20261106T112441Z",
+  "argv": [
+    "bash",
+    "run_patrol_lap.sh"
+  ],
+  "shell": "bash",
+  "runtime_install_candidate_identity": "6785d5a3b98447606d52b2cdb9b4600d5fb2b7416f852f3dcef37cd8033e68f5",
+  "runtime_install_candidate_manifest": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z/candidate-run/runtime-candidate.json",
+  "path_candidate_identity": "25239cb9dec7c29e2939a7a6cc745f0a7b6daa355d030c43265dcd8f07404c4c",
+  "path_candidate_manifest": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r9-c-dynamic-20261106T112441Z/session-patrol-lap-1-r9-20261106T112441Z/assets/candidate-identity.json",
+  "runtime_packages": {
+    "cleannav_simulation": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mask-lifecycle-freshness-fix-20261104T031832Z/install/cleannav_simulation",
+    "cleannav_mission_manager": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager",
+    "nav2_costmap_2d": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-a2-costmap-timestamp-20261105T104829Z/install/nav2_costmap_2d",
+    "nav2_mppi_controller": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-r7-rc-20261105T022949Z/install/nav2_mppi_controller",
+    "cleannav_navigation": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z/install/cleannav_navigation",
+    "cleannav_hmi_gateway": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_hmi_gateway",
+    "cleannav_safety_supervisor": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_safety_supervisor",
+    "cleannav_global_planner": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_global_planner",
+    "cleannav_path_executor": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_path_executor",
+    "cleannav_rtabmap": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-20261103T044800Z/install/cleannav_rtabmap",
+    "cleannav_interfaces": "/home/d1zzy/code/cleannav_modularization/cleannav-build/step3-2-f/review-fixes-patrol-goal-checker-interfaces-r1/install/cleannav_interfaces"
+  },
+  "nav2_config": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/config/nav2_local_recovery.yaml",
+  "security_profile": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/config/pillar_v1_patrol/security-profile.json",
+  "registry": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r9-c-dynamic-20261106T112441Z/session-patrol-lap-1-r9-20261106T112441Z/assets/region_registry.yaml",
+  "route": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r9-c-dynamic-20261106T112441Z/session-patrol-lap-1-r9-20261106T112441Z/assets/route.json",
+  "route_sha256": "4d5f24a19600790eae561c4b17fc2ddbf032ed4d830efa81a42b257902cd03ea",
+  "registry_sha256": "0aa2bcd552b8c87e54598f26751dde5a2ca315382018f5f1e2be3f36e3405032",
+  "domain": 224,
+  "gazebo_port": 11845,
+  "gateway_port": 18145,
+  "sequence_id": "pillar-v1-e2e-lap1-r9-20261106T112441Z",
+  "command_id": "pillar-v1-e2e-lap1-r9-20261106T112441Z-cmd",
+  "idempotency_db": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r9-c-dynamic-20261106T112441Z/session-patrol-lap-1-r9-20261106T112441Z/gateway-idempotency.sqlite",
+  "idempotency_db_exists_before": false,
+  "runner_logic_reverts_exactly": true,
+  "observer_logic_reverts_exactly": true,
+  "installed_split_reconstruction": {
+    "module": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-r8-a4-path-split-20261106T020914Z/install/cleannav_navigation/lib/cleannav_navigation/patrol_path_segments.py",
+    "sha256": "870e5de1e5e75facdfea3d901b872b7ed40e434422d68ba65e3969a3511803bd",
+    "poses": 1637,
+    "splits": [
+      [
+        0,
+        939
+      ],
+      [
+        938,
+        1637
+      ]
+    ]
+  },
+  "formal_runner_sha256": "7e9c01d06fe5f0562a3bb2b9d3dd2d5d4c3cc570590a5d9aea04019930828dab",
+  "observer_sha256": "202774583b19605df9385088b3e3ae48389f0e204e1538d7954b637187d42a91",
+  "profile_patrol_metadata_scope": "Frozen profile contains historical original-route tube-construction provenance (1649/original SHA); runtime prepare_profile/check_assets do not select route from this metadata. Actual R9 route independently bound through Registry; mask/profile unchanged.",
+  "attempt_state": "FORMAL_RUN_FINISHED_RC0_PENDING_EVIDENCE_AUDIT",
+  "call_recorded_utc": "2026-11-06T11:26:12.029678+00:00"
+}

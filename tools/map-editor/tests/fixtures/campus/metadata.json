@@ -1,0 +1,11 @@
+{
+  "identity": {
+    "map_id": "campus_curb_scan_20261012_083555_fd1b1b",
+    "revision": "2026-10-12T00:35:58.873172+00:00",
+    "sha256": "4cda80bb525e87936553e28a1800571ab2fe1161d08d5c6f8e320ef42d8fd237",
+    "frame_id": "map"
+  },
+  "source_profile_sha256": "cb6467d9edad46068592222a0e72ee63b93eddcc60717daa9a04c70cb78a6835",
+  "test_only": true,
+  "note": "Derived offline test fixture; no RTAB DB, no runtime authorization. Occupancy/mask bytes are exact source captures."
+}

@@ -1,0 +1,87 @@
+[
+  {
+    "label": "A",
+    "entry": [
+      14.005502233908052,
+      -6.831575183979148,
+      0.0
+    ],
+    "route_id": "pillar_v1_outer_loop_auto",
+    "dense_count": 1649,
+    "checkpoint_count": 16,
+    "path_poses_exactly_match_route": true,
+    "entry_exact_equal": true,
+    "entry_translation_to_dense_m": 0.0,
+    "first_checkpoint_exact_equal": true,
+    "loader": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/domain/region_registry.py",
+    "loader_sha256": "c5aa9fc84808d7bff83edea210bb8065ee7825533e53feea859326bfcd98d268"
+  },
+  {
+    "label": "B",
+    "entry": [
+      13.909102233908051,
+      -6.831575183979148,
+      0.0
+    ],
+    "route_id": "pillar_v1_outer_loop_auto",
+    "dense_count": 1641,
+    "checkpoint_count": 16,
+    "path_poses_exactly_match_route": true,
+    "entry_exact_equal": true,
+    "entry_translation_to_dense_m": 0.0,
+    "first_checkpoint_exact_equal": true,
+    "loader": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/domain/region_registry.py",
+    "loader_sha256": "c5aa9fc84808d7bff83edea210bb8065ee7825533e53feea859326bfcd98d268"
+  },
+  {
+    "label": "C",
+    "entry": [
+      13.815102233908052,
+      -6.831575183979148,
+      0.0
+    ],
+    "route_id": "pillar_v1_outer_loop_auto",
+    "dense_count": 1637,
+    "checkpoint_count": 16,
+    "path_poses_exactly_match_route": true,
+    "entry_exact_equal": true,
+    "entry_translation_to_dense_m": 0.0,
+    "first_checkpoint_exact_equal": true,
+    "loader": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/domain/region_registry.py",
+    "loader_sha256": "c5aa9fc84808d7bff83edea210bb8065ee7825533e53feea859326bfcd98d268"
+  },
+  {
+    "label": "D",
+    "entry": [
+      13.75910223390805,
+      -6.831575183979148,
+      0.0
+    ],
+    "route_id": "pillar_v1_outer_loop_auto",
+    "dense_count": 1629,
+    "checkpoint_count": 16,
+    "path_poses_exactly_match_route": true,
+    "entry_exact_equal": false,
+    "entry_translation_to_dense_m": 8.881784197001252e-16,
+    "first_checkpoint_exact_equal": true,
+    "loader": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/domain/region_registry.py",
+    "loader_sha256": "c5aa9fc84808d7bff83edea210bb8065ee7825533e53feea859326bfcd98d268"
+  },
+  {
+    "label": "E",
+    "entry": [
+      13.659102233908051,
+      -6.831575183979148,
+      0.0
+    ],
+    "route_id": "pillar_v1_outer_loop_auto",
+    "dense_count": 1625,
+    "checkpoint_count": 16,
+    "path_poses_exactly_match_route": true,
+    "entry_exact_equal": true,
+    "entry_translation_to_dense_m": 0.0,
+    "first_checkpoint_exact_equal": true,
+    "loader": "/home/d1zzy/code/cleannav_modularization/cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/domain/region_registry.py",
+    "loader_sha256": "c5aa9fc84808d7bff83edea210bb8065ee7825533e53feea859326bfcd98d268"
+  }
+]

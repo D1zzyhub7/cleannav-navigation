@@ -1,0 +1,11 @@
+{
+  "name": "DEMO-perimeter-15m",
+  "created_at": "fixture-2026-10-14-v1",
+  "sha256": {
+    "occupancy_grid.json": "664190b3e8387329fab659a95f5950e3b81a583fcee558c45eef41bcff7ac9fc"
+  },
+  "editor_fixture": true,
+  "simulation_only": true,
+  "test_only": true,
+  "note": "Synthetic map fixture; contains no RTAB-Map database or physical survey."
+}

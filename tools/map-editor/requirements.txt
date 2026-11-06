@@ -1,0 +1,6 @@
+numpy>=1.21,<2
+Pillow>=9
+PyYAML>=5.4
+shapely==2.0.7
+jsonschema==4.23.0
+pytest>=6.2

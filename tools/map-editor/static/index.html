@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>CleanNav 地图区域与边缘巡航编辑器</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header>
+    <div><strong>CleanNav 地图标注</strong><small>区域边缘巡航 · 离线规划工具</small></div>
+    <label>地图 <select id="mapSelect"></select></label>
+    <div class="header-actions">
+      <button id="undoBtn" title="Ctrl+Z">撤销</button><button id="redoBtn" title="Ctrl+Y">重做</button>
+      <button id="saveProjectBtn">保存编辑项目</button><button id="loadProjectBtn">打开项目 / Registry</button>
+      <button id="exportBtn" class="primary">导出 Mission Registry</button>
+      <input id="fileInput" type="file" accept="application/json,.json" hidden>
+    </div>
+  </header>
+  <div id="banner" class="banner hidden"></div>
+  <main>
+    <aside class="panel left">
+      <div class="section-head"><h2>区域</h2><button id="newRegionBtn" class="primary small">＋ 新区域</button></div>
+      <p class="hint">依次圈出边界顶点，再点击“完成边界”。完成后可拖动顶点调整，Shift+左击顶点删除。</p>
+      <div id="regionList" class="item-list"></div>
+      <div class="section-head charger-head"><h2>充电位置</h2><button id="addChargerBtn" class="small">＋ 标注</button></div>
+      <p class="hint">点击位置，再点击朝向。只保存导航staging pose。</p>
+      <div id="chargerList" class="item-list"></div>
+      <div class="legend">
+        <span><i class="free"></i>已知空闲</span><span><i class="occupied"></i>障碍</span>
+        <span><i class="unknown"></i>未知</span><span><i class="keepout"></i>正式Keepout</span>
+        <span><i class="route"></i>自动环线</span>
+      </div>
+    </aside>
+    <section class="map-wrap">
+      <div class="map-toolbar">
+        <span id="mapStatus">读取地图…</span>
+        <div><button id="finishBoundaryBtn" class="hidden">完成边界 (Enter)</button>
+          <button id="cancelDrawBtn" class="hidden">取消绘制 (Esc)</button>
+          <button id="fitBtn" title="适应窗口">适应地图</button></div>
+      </div>
+      <canvas id="mapCanvas" aria-label="地图编辑画布"></canvas>
+      <div class="map-footer"><span id="coords">光标坐标：—</span><span>滚轮缩放 · 右键拖动平移 · 拖动顶点调整</span></div>
+    </section>
+    <aside class="panel right">
+      <div id="emptySelection" class="empty"><div class="empty-icon">⌖</div><h2>圈选一个区域</h2><p>地图上的障碍、未知区域、Keepout、车辆尺寸和转弯半径都会参与路线检查。</p></div>
+      <div id="regionEditor" class="hidden">
+        <div class="section-head"><h2>区域设置</h2><button id="deleteRegionBtn" class="danger small">删除</button></div>
+        <label>区域 ID<input id="regionId" maxlength="64"></label>
+        <label>显示名称<input id="regionName" maxlength="128"></label>
+        <label>路线 ID<input id="routeId" maxlength="64" value="perimeter"></label>
+        <div class="form-row"><label>安全裕度 (m)<input id="margin" type="number" min="0.05" max="0.6" step="0.05" value="0.15"></label>
+          <label>方向<select id="direction"><option value="ccw">逆时针</option><option value="cw">顺时针</option></select></label></div>
+        <label>预览轮数<input id="laps" type="number" min="1" max="10" step="1" value="3"></label>
+        <button id="planBtn" class="primary full">自动生成安全边缘环线</button>
+        <div id="planResult" class="result neutral">尚未规划</div>
+      </div>
+      <div id="chargerEditor" class="hidden">
+        <div class="section-head"><h2>充电位置</h2><button id="deleteChargerBtn" class="danger small">删除</button></div>
+        <label>充电点 ID<input id="chargerId" maxlength="64"></label>
+        <label>显示名称<input id="chargerName" maxlength="128"></label>
+        <div class="form-row"><label>X (map m)<input id="chargerX" type="number" step="0.01"></label><label>Y (map m)<input id="chargerY" type="number" step="0.01"></label></div>
+        <label>朝向 (rad)<input id="chargerYaw" type="number" step="0.05"></label>
+        <button id="relocateChargerBtn" class="full">在地图上重新标注</button>
+        <p class="hint">导出时会检查完整footprint与正式可通行地图的间距。</p>
+      </div>
+      <div class="notice"><strong>执行边界</strong><p>规划结果仅通过离线地图、footprint外接圆和最小转弯半径检查。Mission会把路线拆成多个导航目标；Smac实际路径、逐段停车和车辆跟踪仍需离线路径复核及单独的Gazebo运动验收。</p></div>
+      <div id="mapIdentity" class="identity"></div>
+    </aside>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

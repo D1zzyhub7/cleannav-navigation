@@ -1,0 +1,118 @@
+{
+  "test_only": true,
+  "files": [
+    {
+      "source": "cleannav-experiments/cleannav-patrol-pillar-v1-route-20261102T163219Z/maps/patrol_pillar_v1_mapping_v1/occupancy_grid.json",
+      "sha256": "b09fd48018fa0e8b83aa24f66c76d8feec9dc5ab4d79633a2e1ea90743b4410f",
+      "fixture": "tests/fixtures/pillar/occupancy_grid.json.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "c078963f1936018d5306efc234cae3741bad1eefbb8a0d0b5e23fc5ecfb7a71a"
+    },
+    {
+      "source": "cleannav-experiments/cleannav-patrol-pillar-v1-route-20261102T163219Z/maps/patrol_pillar_v1_mapping_v1/map.pgm",
+      "sha256": "6ffc9e6a249aa6f3504dbd9688b5c84bf35f9fae7d67ea07e53ea5050bad7e76",
+      "fixture": "tests/fixtures/pillar/map.pgm.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "57b78ec6bd601b4ac809343d4536d4eb93bfb8a05b534097b2ac49a2115a1161"
+    },
+    {
+      "source": "cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/config/pillar_v1_patrol/pillar_v1_patrol_mask.yaml",
+      "sha256": "b4037b2328ef4bd9e395edec8a23866985cda2e754b8ea278a13afbfa1aece18",
+      "fixture": "tests/fixtures/pillar/keepout.yaml.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "8b44fc261b63bd1a390685b33e4a3c10aa1ea0ba4fed8b9dbe351cadbe2959ef"
+    },
+    {
+      "source": "cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/config/pillar_v1_patrol/pillar_v1_patrol_mask.pgm",
+      "sha256": "f304a1dd109ec42ff49e8e19b8b615b33a760d30cc952b0e83033f10c839fbcc",
+      "fixture": "tests/fixtures/pillar/keepout.pgm.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "a68ae415d05931c9a7a6adf7b733369b248e3cf45661270691a849f4d18bb2e4"
+    },
+    {
+      "source": "cleannav-experiments/campus-curb-safety-20261012/maps/campus_curb_scan_20261012_083555_fd1b1b/occupancy_grid.json",
+      "sha256": "4cda80bb525e87936553e28a1800571ab2fe1161d08d5c6f8e320ef42d8fd237",
+      "fixture": "tests/fixtures/campus/occupancy_grid.json.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "f78dd30c1566a7d976180d3fdcc34f10d93902b3ce3c9481801671cf01f4d6f3"
+    },
+    {
+      "source": "cleannav-experiments/campus-curb-safety-20261012/maps/campus_curb_scan_20261012_083555_fd1b1b/map.pgm",
+      "sha256": "a31e388511c018e7e25fd01d7ca8f344e7424e16f545a61aff2b54d0a3ab6d11",
+      "fixture": "tests/fixtures/campus/map.pgm.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "2761b0b99ed6ef70a11dd1a5ae1c78b677751a41be17b7955b8c92bd6bcc519d"
+    },
+    {
+      "source": "cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-navigation/cleannav_simulation/config/campus/campus_keepout_v2.yaml",
+      "sha256": "1acf976f9ed1751a0378201e63086cbc3300af509501cfc08cf7ae5ef805713e",
+      "fixture": "tests/fixtures/campus/keepout.yaml.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "35b6080cbaa8b3a4385b70458ac7692b00ffebebe7e4d9f628838ba8d6d910cc"
+    },
+    {
+      "source": "cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-navigation/cleannav_simulation/config/campus/campus_keepout_v2.pgm",
+      "sha256": "2a8c8c303a3a527db131961b12c5b95ead4cf9941f2b1911122e613be89e0e4e",
+      "fixture": "tests/fixtures/campus/keepout.pgm.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "51871503506015038822ba1aa939ce3dba45b9b72db6362ac55c104c3100d333"
+    },
+    {
+      "source": "cleannav-experiments/cleannav-patrol-sim-scene-20261014T155000Z/maps/gazebo_patrol_v1/manifest.json",
+      "sha256": "d2d685f3aad26ca3ab12e73b02d342e1f1498d1c943994088374b64a843f8597",
+      "fixture": "tests/fixtures/projection/manifest.json.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "3c8819f0b3272f90ab0a8ab4a86914687685cd33974cf1aff48f8b47d606c273"
+    },
+    {
+      "source": "cleannav-experiments/cleannav-patrol-sim-scene-20261014T155000Z/maps/gazebo_patrol_v1/map.yaml",
+      "sha256": "dc30539f50fcc06489e95800e479425eed23c4abef940e226ca5b63b7b7d8d9a",
+      "fixture": "tests/fixtures/projection/map.yaml.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "5b8abc6a12a188d9dbb348a4d31e67b231fbdb6a356ae9b0f7a16f5abef76390"
+    },
+    {
+      "source": "cleannav-experiments/cleannav-patrol-sim-scene-20261014T155000Z/maps/gazebo_patrol_v1/map.pgm",
+      "sha256": "6798d830fe9c6e7969f2f1bcb9dfb577075e6f57a2c403166ebb58c12f6603a1",
+      "fixture": "tests/fixtures/projection/map.pgm.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "32f377da2229b3272b6fbc136a11531c935ae43b9fa2a69994c16bbb6e84f51c"
+    },
+    {
+      "source": "cleannav-experiments/cleannav-patrol-sim-scene-20261014T155000Z/maps/gazebo_patrol_v1/occupancy_grid.json",
+      "sha256": "d43e1cf7058f1da4e3fe771b48db8352e8385ab095817e25d73002afc3146018",
+      "fixture": "tests/fixtures/projection/occupancy_grid.json.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "fc48bedbcec3fe8e11ff1e6fee290559fc0c372aa78ebf3b08927d8d4bc348e8"
+    },
+    {
+      "source": "cleannav-experiments/cleannav-patrol-sim-scene-20261014T155000Z/worlds/cleannav_patrol_regions_v1.world",
+      "sha256": "00aef0cdb9a07d5e06e876105014f068db7bdd20a9790a050209748a0bf2919a",
+      "fixture": "tests/fixtures/projection/source.world.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "de76dce14bb605e3a43a42c75e9670bd57984ac8c37d42657b34d66fa0311c66"
+    },
+    {
+      "source": "cleannav-experiments/cleannav-patrol-pillar-v1-route-20261102T163219Z/route.json",
+      "sha256": "6d48ad03ac3bfe3650e7c85e736f3389b453fe52a0ed341598c08f66d8255b73",
+      "fixture": "tests/fixtures/pillar/original-route.json.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "11b98d58d6c469e32ba3ca1e5f3646e576b790462b0a887e9ad6a4a163e83ea0"
+    },
+    {
+      "source": "cleannav-experiments/cleannav-r9-path-generation-20261106T092401Z/candidates/C/route.json",
+      "sha256": "136b62a4ae67aa69e0b7007eca731c9d40368ad2fc645d8dd513980954eee56b",
+      "fixture": "tests/fixtures/pillar/C-route.json.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "7b87180d369017cb67d3212cbecf9af33418cd003a9ce47e6d7269dce3c581cf"
+    },
+    {
+      "source": "cleannav-experiments/cleannav-r9-path-generation-20261106T092401Z/candidates/C/region_registry.yaml",
+      "sha256": "0aa2bcd552b8c87e54598f26751dde5a2ca315382018f5f1e2be3f36e3405032",
+      "fixture": "tests/fixtures/pillar/C-region_registry.yaml.gz",
+      "encoding": "gzip; decompressed bytes unchanged",
+      "fixture_sha256": "e965d901e4cd689297b5225301418bfd26c417f3840aa29afa3adcf625fb7e1c"
+    }
+  ],
+  "notes": "Original frozen maps and historical reports are never edited. gzip mtime=0, exact decompression SHA recorded."
+}

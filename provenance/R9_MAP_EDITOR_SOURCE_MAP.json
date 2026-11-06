@@ -1,0 +1,74 @@
+{
+  "source_base_main": "044e1842981df77ba0a03842dedccafd774872d9",
+  "original_owner": "cleannav-tools/map-editor (non-Git, preserved)",
+  "restored": [
+    {
+      "source": "cleannav-tools/map-editor/core.py",
+      "source_sha256": "6a508d68bdd10af396156d772cf2ca827feefb70df877384b626cc2d63f56cb4",
+      "git_path": "tools/map-editor/core.py",
+      "git_sha256": "ca9d3a3f74f85a0128f0dbe5c3fe436b9324392248db63fdf769f20edff33e28"
+    },
+    {
+      "source": "cleannav-tools/map-editor/map_codec.py",
+      "source_sha256": "4a6715d9652f406ce787ae0940d4ccfbdcee5fb8b3b9f888d4cbb4a2dd9fdbf3",
+      "git_path": "tools/map-editor/map_codec.py",
+      "git_sha256": "4a6715d9652f406ce787ae0940d4ccfbdcee5fb8b3b9f888d4cbb4a2dd9fdbf3"
+    },
+    {
+      "source": "cleannav-tools/map-editor/server.py",
+      "source_sha256": "a3ecb01d91dd1572a0b877b1fbae4f2a6a5303749f9f80cc3d4fd7935ff8e73b",
+      "git_path": "tools/map-editor/server.py",
+      "git_sha256": "a3ecb01d91dd1572a0b877b1fbae4f2a6a5303749f9f80cc3d4fd7935ff8e73b"
+    },
+    {
+      "source": "cleannav-tools/map-editor/README.md",
+      "source_sha256": "ad8b1b21c4aba27b21d1ea5040019551fa1090f1bafe9c3012372163b3b75e22",
+      "git_path": "tools/map-editor/README.md",
+      "git_sha256": "71302453e823c481245d320fed79c9ba911e801666cd981182295335faecbe8a"
+    },
+    {
+      "source": "cleannav-tools/map-editor/.gitignore",
+      "source_sha256": "0572832eb6ecab28ff4a6a38432fa51326e71ed54ca6bdd825c36d4005c1b1eb",
+      "git_path": "tools/map-editor/.gitignore",
+      "git_sha256": "0572832eb6ecab28ff4a6a38432fa51326e71ed54ca6bdd825c36d4005c1b1eb"
+    },
+    {
+      "source": "cleannav-tools/map-editor/tests/test_core.py",
+      "source_sha256": "c427383b001619b4b5c7cf3a32de608ca89711131ff5c1d88d88ad989635deba",
+      "git_path": "tools/map-editor/tests/test_core.py",
+      "git_sha256": "0dc91ec0ffe84415255c8603f0fb0f80a298b97564f963b995226a22cdde67b7"
+    },
+    {
+      "source": "cleannav-tools/map-editor/build_demo_fixture.py",
+      "source_sha256": "b7aa5d56a2ccebecbe4b9a1e899e7bc2000570ea1547f60d2f1b83d3eb31a100",
+      "git_path": "tools/map-editor/build_demo_fixture.py",
+      "git_sha256": "b7aa5d56a2ccebecbe4b9a1e899e7bc2000570ea1547f60d2f1b83d3eb31a100"
+    }
+  ],
+  "support": [
+    {
+      "source": "cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-navigation/cleannav_simulation/scripts/mapping_assets.py",
+      "git_path": "tools/map-editor/support/mapping_assets.py",
+      "sha256": "f1b0359987f9ffe87984a5eb9f2f6a09e1929b06e33f6f771c88734f65513ae8",
+      "scope": "verbatim existing offline helper; no runtime package/interface change"
+    },
+    {
+      "source": "cleannav-experiments/cleannav-patrol-pillar-v1-e2e-mm-path-log-fix-20261104T145733Z/install/cleannav_mission_manager/lib/python3.10/site-packages/cleannav_mission_manager/domain/region_registry.py",
+      "git_path": "tools/map-editor/support/region_registry.py",
+      "sha256": "c5aa9fc84808d7bff83edea210bb8065ee7825533e53feea859326bfcd98d268",
+      "scope": "verbatim existing offline helper; no runtime package/interface change"
+    },
+    {
+      "source": "cleannav-worktrees/pc-sim-v2-mapping-localization/src/cleannav-interfaces/config/region_registry.schema.json",
+      "git_path": "tools/map-editor/support/region_registry.schema.json",
+      "sha256": "dc0bb058bdb271c2684d3e086967f3dbd03e9991d98154a271af43e195e970eb",
+      "scope": "verbatim existing offline helper; no runtime package/interface change"
+    }
+  ],
+  "notes": [
+    "Only design factor1.03\u21921.20 changes route geometry.",
+    "Packaging uses repository vehicle YAML and verbatim existing validator/Registry/schema snapshots, removing former worktree imports.",
+    "Fixture-only changes are explicit source captures; no map, Keepout, Safety or Mission runtime edits.",
+    "Future module is independent and not integrated."
+  ]
+}

@@ -1,0 +1,7 @@
+# Mission Manager execution identity owning the safety lease.
+string execution_id
+---
+# Whether the acquire or release operation was accepted.
+bool success
+# Human-readable transport or supervisor result.
+string message

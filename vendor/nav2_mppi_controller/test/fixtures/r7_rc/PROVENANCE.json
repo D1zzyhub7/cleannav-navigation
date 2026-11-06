@@ -1,0 +1,47 @@
+[
+  {
+    "fixture": "route.csv",
+    "sha256": "47176d2a22b4fc220b71dd6f2af010b8543d7935c25895c8ed49fa8d540789d2",
+    "source": "cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/input/route.csv"
+  },
+  {
+    "fixture": "grid_144.txt",
+    "sha256": "8b07a9145685c360d19684411937c25df560850c5d81e9669849f0e8f8eb4709",
+    "source": "cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/input/grid_144.txt"
+  },
+  {
+    "fixture": "maps.csv",
+    "sha256": "d54c8d6a773e3d8af8656416e23a9a4b5da47bbf623bcef9e053a245c128180c",
+    "source": "cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/input/maps.csv"
+  },
+  {
+    "fixture": "grid_105.txt",
+    "sha256": "8e6f047500cb80b1081f53caf76910dc7948afc6527b852edd52caea22da5811",
+    "source": "cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/input/grid_105.txt"
+  },
+  {
+    "fixture": "grid_120.txt",
+    "sha256": "d9b88df098b991816822cb8d7b7b9b99d1a3613576855e6aa8b30caf1c8279fd",
+    "source": "cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/input/grid_120.txt"
+  },
+  {
+    "fixture": "grid_140.txt",
+    "sha256": "59dfaf2be43a9b268706b7d2699880951a0f1a637795f6dc59653d432f12d687",
+    "source": "cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/input/grid_140.txt"
+  },
+  {
+    "fixture": "poses.csv",
+    "sha256": "11774cd08704a8548bab447e799775c150a62d5b7c04899e3d767832fed6d8f2",
+    "source": "cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/input/poses.csv"
+  },
+  {
+    "fixture": "grid_132.txt",
+    "sha256": "443a3b423680380d84c4fb9bb6f7433a34802984e172bb887f26cde01a79381d",
+    "source": "cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/input/grid_132.txt"
+  },
+  {
+    "fixture": "grid_145.txt",
+    "sha256": "46d0fc1e21749e82cad03d1823ad5002e497f88b0b42c00186d6f7b81d3653e3",
+    "source": "cleannav-experiments/cleannav-patrol-r7-rc-20261105T022949Z/input/grid_145.txt"
+  }
+]

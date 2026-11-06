@@ -22,7 +22,7 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, OpaqueFunction
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription
 from launch.conditions import IfCondition, LaunchConfigurationEquals
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
@@ -32,6 +32,8 @@ from nav2_common.launch import RewrittenYaml
 
 def generate_launch_description():
     navigation_share = get_package_share_directory('cleannav_navigation')
+    global_planner_share = get_package_share_directory('cleannav_global_planner')
+    path_executor_share = get_package_share_directory('cleannav_path_executor')
     safety_share = get_package_share_directory('cleannav_safety_supervisor')
 
     params_file = LaunchConfiguration('params_file')
@@ -62,35 +64,34 @@ def generate_launch_description():
         convert_types=True,
     )
 
-    def legacy_launches(context):
-        # Facade mode is the integrated navigation path and does not consume
-        # the legacy planner bridge or path executor. Resolve those separate
-        # packages only when the caller explicitly selects legacy mode.
-        if LaunchConfiguration('execution_mode').perform(context) != 'legacy':
-            return []
-        global_planner_share = get_package_share_directory('cleannav_global_planner')
-        path_executor_share = get_package_share_directory('cleannav_path_executor')
-        return [
-            IncludeLaunchDescription(
-                launch_description_source=PythonLaunchDescriptionSource(os.path.join(
-                    global_planner_share, 'launch', 'cleannav_hybrid_planner_bridge.launch.py')),
-                launch_arguments={
-                    'planner_id': planner_id,
-                    'map_frame': map_frame,
-                    'replan_period_sec': replan_period_sec,
-                    'use_sim_time': use_sim_time,
-                }.items(),
-            ),
-            IncludeLaunchDescription(
-                launch_description_source=PythonLaunchDescriptionSource(os.path.join(
-                    path_executor_share, 'launch', 'cleannav_path_executor.launch.py')),
-                launch_arguments={
-                    'use_sim_time': use_sim_time,
-                    'completion_window_xy_tolerance': completion_window_xy_tolerance,
-                    'robot_base_frame': robot_base_frame,
-                }.items(),
-            ),
-        ]
+    planner_bridge = IncludeLaunchDescription(
+        condition=LaunchConfigurationEquals('execution_mode', 'legacy'),
+        launch_description_source=PythonLaunchDescriptionSource(os.path.join(
+            global_planner_share,
+            'launch',
+            'cleannav_hybrid_planner_bridge.launch.py',
+        )),
+        launch_arguments={
+            'planner_id': planner_id,
+            'map_frame': map_frame,
+            'replan_period_sec': replan_period_sec,
+            'use_sim_time': use_sim_time,
+        }.items(),
+    )
+
+    path_executor = IncludeLaunchDescription(
+        condition=LaunchConfigurationEquals('execution_mode', 'legacy'),
+        launch_description_source=PythonLaunchDescriptionSource(os.path.join(
+            path_executor_share,
+            'launch',
+            'cleannav_path_executor.launch.py',
+        )),
+        launch_arguments={
+            'use_sim_time': use_sim_time,
+            'completion_window_xy_tolerance': completion_window_xy_tolerance,
+            'robot_base_frame': robot_base_frame,
+        }.items(),
+    )
 
     safety_supervisor = IncludeLaunchDescription(
         condition=IfCondition(LaunchConfiguration('start_safety_supervisor', default='true')),
@@ -127,7 +128,7 @@ def generate_launch_description():
         name='controller_server',
         output='screen',
         parameters=[configured_params],
-        remappings=[('cmd_vel', LaunchConfiguration('controller_cmd_vel_topic'))],
+        remappings=[('cmd_vel', '/cleannav/cmd_vel_candidate')],
         arguments=node_log_args,
     )
 
@@ -137,7 +138,12 @@ def generate_launch_description():
         executable='navigation_facade_node.py',
         name='cleannav_navigation_facade',
         output='screen',
-        parameters=[configured_params, {'use_sim_time': use_sim_time, 'planner_id': planner_id}],
+        parameters=[configured_params, {
+            'use_sim_time': use_sim_time,
+            'planner_id': planner_id,
+            'replan_period_sec': replan_period_sec,
+            'replan_near_goal_tolerance': completion_window_xy_tolerance,
+        }],
         arguments=node_log_args,
     )
 
@@ -155,11 +161,6 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        DeclareLaunchArgument(
-            'controller_cmd_vel_topic', default_value='/cleannav/cmd_vel_candidate',
-            choices=['/cleannav/cmd_vel_candidate', '/cleannav/navigation/cmd_vel_raw'],
-            description='Parent with Collision Monitor selects the private raw input; never /cmd_vel',
-        ),
         DeclareLaunchArgument(
             'start_safety_supervisor', default_value='true', choices=['true', 'false'],
             description='Keep true unless the parent launch owns the single Safety instance',
@@ -249,6 +250,7 @@ def generate_launch_description():
         controller_server,
         navigation_facade,
         lifecycle_manager,
-        OpaqueFunction(function=legacy_launches),
+        planner_bridge,
+        path_executor,
         safety_supervisor,
     ])

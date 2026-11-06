@@ -1,0 +1,5 @@
+<library path="cleannav_navigation_boundary_layer">
+  <class name="cleannav_navigation::NavigationBoundaryLayer" type="cleannav_navigation::NavigationBoundaryLayer" base_class_type="nav2_costmap_2d::Layer">
+    <description>Additional immutable task polygon restriction; preserves all existing obstacle and unknown costs.</description>
+  </class>
+</library>

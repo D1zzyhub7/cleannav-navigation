@@ -7,9 +7,10 @@ cleannav_path_executor — Path Bridge Node.
 """
 
 import copy
-import hashlib
 import math
 import time
+
+from cleannav_global_planner.path_identity import path_signature as _path_signature
 
 import rclpy
 from rclpy.action import ActionClient
@@ -23,43 +24,17 @@ from nav2_msgs.action import FollowPath
 from std_msgs.msg import String
 
 
-def _path_signature(path_msg: Path) -> str:
-    """确定性路径签名：位置采样加最终朝向，作为 terminal 身份。"""
-    if not path_msg.poses:
-        return ""
-    first = path_msg.poses[0].pose.position
-    last = path_msg.poses[-1].pose.position
-    mid = path_msg.poses[len(path_msg.poses) // 2].pose.position
-    last_orientation = path_msg.poses[-1].pose.orientation
-    raw = (
-        f"{path_msg.header.frame_id}|{len(path_msg.poses)}|"
-        f"{first.x:.6f},{first.y:.6f}|"
-        f"{last.x:.6f},{last.y:.6f}|"
-        f"{mid.x:.6f},{mid.y:.6f}|"
-        f"{last_orientation.x:.6f},{last_orientation.y:.6f},"
-        f"{last_orientation.z:.6f},{last_orientation.w:.6f}"
-    )
-    return hashlib.sha256(raw.encode()).hexdigest()
-
-
 def _path_is_valid(path_msg: Path, logger) -> bool:
     """路径有效性检查。"""
     if not path_msg.header.frame_id:
         return False
     if len(path_msg.poses) < 2:
         return False
-    for i, pose_stamped in enumerate(path_msg.poses):
-        px = pose_stamped.pose.position.x
-        py = pose_stamped.pose.position.y
-        if not (math.isfinite(px) and math.isfinite(py)):
-            logger.warning(f"pose[{i}] position non-finite: ({px},{py})")
-            return False
-        if pose_stamped.header.frame_id and pose_stamped.header.frame_id != path_msg.header.frame_id:
-            logger.warning(
-                f"pose[{i}] frame_id mismatch: {pose_stamped.header.frame_id} "
-                f"!= {path_msg.header.frame_id}"
-            )
-            return False
+    try:
+        _path_signature(path_msg)
+    except ValueError as error:
+        logger.warning(str(error))
+        return False
     return True
 
 
@@ -103,9 +78,12 @@ class PathExecutorNode(Node):
         self._cancel_future = None
         self._cancel_requested: bool = False
         self._cancel_when_accepted: bool = False
+        self._submission_unverified = False
         self._last_pub_status: str = ""
 
         self._publish_status('waiting_for_action_server')
+        # server晚于首条路径就绪时也能送出已排队路径；仍受所有权/未知提交保护。
+        self._server_retry_timer = self.create_timer(.2, self._try_send_pending_path)
 
     def _feedback_callback(self, feedback_msg):
         """按 active path 的真实 XY 距离发布 completion-window 状态。"""
@@ -221,17 +199,17 @@ class PathExecutorNode(Node):
     # ------------------------------------------------------------------ #
 
     def _path_cb(self, msg: Path):
-        if not _path_is_valid(msg, self.get_logger()):
+        try:
+            sig = _path_signature(msg)
+        except ValueError as error:
+            self.get_logger().warning(str(error))
+            sig = ''
+        if not sig:
             self._publish_status('invalid_path')
             return
-
-        sig = _path_signature(msg)
-        current_signatures = {
-            self._sending_signature,
-            self._active_signature,
-            self._pending_path[1] if self._pending_path is not None else '',
-        }
-        if sig in current_signatures:
+        pending_signature = self._pending_path[1] if self._pending_path is not None else ''
+        if (sig == pending_signature or (self._pending_path is None
+                and sig in (self._sending_signature, self._active_signature))):
             self.get_logger().debug('duplicate path ignored')
             self._publish_status('duplicate_path_ignored')
             return
@@ -295,7 +273,8 @@ class PathExecutorNode(Node):
 
     def _try_send_pending_path(self):
         if (
-                self._pending_path is None
+                self._submission_unverified
+                or self._pending_path is None
                 or self._send_future is not None
                 or self._active_goal_handle is not None):
             return
@@ -333,8 +312,9 @@ class PathExecutorNode(Node):
             future = self._action_client.send_goal_async(
                 goal, feedback_callback=self._feedback_callback)
         except Exception as exc:
+            self._submission_unverified = True
             self.get_logger().error(f"send_goal_async exception: {exc}")
-            self._publish_status('follow_path_rejected')
+            self._publish_status('follow_path_submission_unverified')
             return
 
         self._send_future = future
@@ -363,12 +343,17 @@ class PathExecutorNode(Node):
         try:
             goal_handle = future.result()
         except Exception as exc:
+            self._submission_unverified = True
             self.get_logger().error(f"FollowPath goal response exception: {exc}")
-            self._publish_status('follow_path_rejected')
+            self._publish_status('follow_path_submission_unverified')
             self._try_send_pending_path()
             return
 
-        if goal_handle is None or not goal_handle.accepted:
+        if goal_handle is None:
+            self._submission_unverified = True
+            self._publish_status('follow_path_submission_unverified')
+            return
+        if not goal_handle.accepted:
             self.get_logger().error("FollowPath goal rejected")
             self._publish_status('follow_path_rejected')
             self._try_send_pending_path()
@@ -422,6 +407,17 @@ class PathExecutorNode(Node):
                 or goal_handle is not self._active_goal_handle):
             return
 
+        try:
+            result = future.result()
+            if result.status not in (GoalStatus.STATUS_SUCCEEDED,
+                    GoalStatus.STATUS_CANCELED, GoalStatus.STATUS_ABORTED):
+                raise ValueError(f'nonterminal result status={result.status}')
+        except Exception as exc:
+            self.get_logger().error(f'FollowPath result unverified: {exc}')
+            self._publish_status('follow_path_result_unverified')
+            self._request_cancel_active_goal()
+            return
+
         replacement_pending = self._pending_path is not None
         active_signature = self._active_signature
         self._active_goal_handle = None
@@ -430,14 +426,6 @@ class PathExecutorNode(Node):
         self._active_sequence = None
         self._cancel_future = None
         self._cancel_requested = False
-        try:
-            result = future.result()
-        except Exception as exc:
-            self.get_logger().error(f"get_result exception: {exc}")
-            self._publish_status(f'follow_path_aborted:{active_signature}')
-            self._try_send_pending_path()
-            return
-
         code = result.status
         self.get_logger().info(f"FollowPath result status={code}")
 

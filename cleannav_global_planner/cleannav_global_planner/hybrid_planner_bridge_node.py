@@ -2,8 +2,9 @@
 """Smac Hybrid-A* bridge：周期重规划同一最终目标并屏蔽过期结果。"""
 
 import copy
-import hashlib
 import math
+
+from cleannav_global_planner.path_identity import path_signature as _path_signature
 
 import rclpy
 from action_msgs.msg import GoalStatus
@@ -23,25 +24,6 @@ from std_msgs.msg import String
 
 _FAILURE_PREFIX = 'A* fail (Smac Hybrid):'
 _REPLAN_FAILURE_PREFIX = 'replan fail (Smac Hybrid):'
-
-
-def _path_signature(path_msg: Path) -> str:
-    """与 Path Executor 一致的确定性路径身份（含最终朝向）。"""
-    if not path_msg.poses:
-        return ''
-    first = path_msg.poses[0].pose.position
-    last = path_msg.poses[-1].pose.position
-    mid = path_msg.poses[len(path_msg.poses) // 2].pose.position
-    last_orientation = path_msg.poses[-1].pose.orientation
-    raw = (
-        f'{path_msg.header.frame_id}|{len(path_msg.poses)}|'
-        f'{first.x:.6f},{first.y:.6f}|'
-        f'{last.x:.6f},{last.y:.6f}|'
-        f'{mid.x:.6f},{mid.y:.6f}|'
-        f'{last_orientation.x:.6f},{last_orientation.y:.6f},'
-        f'{last_orientation.z:.6f},{last_orientation.w:.6f}'
-    )
-    return hashlib.sha256(raw.encode()).hexdigest()
 
 
 def _validate_goal(goal, map_frame):
@@ -117,6 +99,7 @@ class HybridPlannerBridgeNode(Node):
         self._active_generation = None
         self._active_request_id = None
         self._active_cancel_requested = False
+        self._submission_unverified = False
         self._last_status = ''
 
         # server retry 只负责送出已经排队的请求。
@@ -238,7 +221,8 @@ class HybridPlannerBridgeNode(Node):
 
     def _try_send_pending_goal(self):
         if (
-                self._pending_goal is None
+                self._submission_unverified
+                or self._pending_goal is None
                 or self._send_future is not None
                 or self._active_goal_handle is not None):
             return
@@ -263,6 +247,7 @@ class HybridPlannerBridgeNode(Node):
         try:
             future = self._action_client.send_goal_async(request)
         except Exception as exc:
+            self._submission_unverified = True
             self._publish_failure(f'exception {exc}', generation)
             return
 
@@ -288,11 +273,16 @@ class HybridPlannerBridgeNode(Node):
         try:
             goal_handle = future.result()
         except Exception as exc:
+            self._submission_unverified = True
             self._publish_failure(f'exception {exc}', generation)
             self._advance_request_queue()
             return
 
-        if goal_handle is None or not goal_handle.accepted:
+        if goal_handle is None:
+            self._submission_unverified = True
+            self._publish_failure('goal response unverified', generation)
+            return
+        if not goal_handle.accepted:
             self._publish_failure('goal rejected', generation)
             self._advance_request_queue()
             return
@@ -343,19 +333,24 @@ class HybridPlannerBridgeNode(Node):
                 or goal_handle is not self._active_goal_handle):
             return
 
+        try:
+            wrapped_result = future.result()
+            if wrapped_result.status not in (GoalStatus.STATUS_SUCCEEDED,
+                    GoalStatus.STATUS_CANCELED, GoalStatus.STATUS_ABORTED):
+                raise ValueError(f'nonterminal result status={wrapped_result.status}')
+        except Exception as exc:
+            # Future失败不是远端goal已终止的证据，保留所有权且不推进队列。
+            self.get_logger().error(f'planner result unverified: {exc}')
+            self._publish_failure(f'result unverified: {exc}', generation)
+            self._request_cancel_active_goal()
+            return
+
         self._active_goal_handle = None
         self._active_generation = None
         self._active_request_id = None
         self._active_cancel_requested = False
 
         if generation != self._generation or self._final_goal is None:
-            self._advance_request_queue()
-            return
-
-        try:
-            wrapped_result = future.result()
-        except Exception as exc:
-            self._publish_failure(f'exception {exc}', generation)
             self._advance_request_queue()
             return
 
@@ -371,10 +366,18 @@ class HybridPlannerBridgeNode(Node):
             self._advance_request_queue()
             return
 
+        try:
+            signature = _path_signature(path)
+        except ValueError as error:
+            self._publish_failure(f'invalid path: {error}', generation)
+            self._advance_request_queue()
+            return
+
         # Smac 已提供 SE2 orientation，保持 Path 内容原样。
         self._has_successful_path = True
-        self._latest_path_signature = _path_signature(path)
-        self._completion_window_signature = ''
+        self._latest_path_signature = signature
+        if self._completion_window_signature != signature:
+            self._completion_window_signature = ''
         self._path_pub.publish(path)
         self._publish_status(f'path: {len(path.poses)} poses')
         self._advance_request_queue()
@@ -385,8 +388,7 @@ class HybridPlannerBridgeNode(Node):
             return
         if self._replan_deferred and self._final_goal is not None:
             self._replan_deferred = False
-            self._pending_goal = (self._generation, self._final_goal)
-            self._try_send_pending_goal()
+            self._replan_timer_callback()
 
 
 def main(args=None):
